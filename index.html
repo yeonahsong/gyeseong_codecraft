@@ -13,12 +13,13 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // [주의] 본인의 Firebase 설정값으로 아래 객체를 대체해주세요!
-        // 비어있을 경우, 브라우저 로컬 저장소(localStorage)를 활용하는 가상 연동 모드로 자동 전환되어 테스트가 가능합니다.
+        // ==========================================
+        // [필독] 이 따옴표("") 사이에 본인의 Firebase 설정을 꼭 넣어주세요!
+        // ==========================================
         const firebaseConfig = {
-            apiKey: "Mykey",
+            apiKey: "AIzaSyCMcl9xXwy_C3tUNgjEXvJHsmcfxZdC3g4",
             authDomain: "gyeseong-codecraft.firebaseapp.com",
             projectId: "gyeseong-codecraft",
             storageBucket: "gyeseong-codecraft.firebasestorage.app",
@@ -26,41 +27,128 @@
             appId: "1:495357292481:web:92a5e1f8664fcef87a0940"
         };
 
-        // 전역 변수 노출
+        // 전역 변수 설정
         window.db = null;
         window.auth = null;
         window.userId = null;
         window.isFirebaseActive = false;
 
+        // Firebase 연동 상태 시각화 전용 로그 함수
+        function logConnection(msg, isError = false, detail = "") {
+            console.log(`[Firebase Log] ${msg} ${detail}`);
+            const statusBadge = document.getElementById('admin-mode-badge');
+            const loginStatusText = document.getElementById('login-status-text');
+            const connectionIndicator = document.getElementById('connection-indicator');
+            
+            // 대시보드 상태 배지 업데이트
+            if (statusBadge) {
+                if (isError) {
+                    statusBadge.innerText = `에러: ${msg}`;
+                    statusBadge.className = "px-2 py-1 bg-red-100 text-red-700 rounded font-bold text-[10px]";
+                } else {
+                    statusBadge.innerText = msg;
+                    statusBadge.className = "px-2 py-1 bg-emerald-100 text-emerald-700 rounded font-bold text-[10px]";
+                }
+            }
+
+            // 로그인 화면 상태 텍스트 업데이트
+            if (loginStatusText) {
+                loginStatusText.innerText = msg + (detail ? ` (${detail})` : "");
+                if (isError) {
+                    loginStatusText.className = "text-xs font-bold text-rose-500 mt-2";
+                    if (connectionIndicator) connectionIndicator.className = "w-3 h-3 rounded-full bg-rose-500 animate-pulse";
+                } else {
+                    loginStatusText.className = "text-xs font-bold text-emerald-600 mt-2";
+                    if (connectionIndicator) connectionIndicator.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
+                }
+            }
+        }
+
+        // 로그인 화면의 시작 버튼을 서버 접속 현황에 따라 동적으로 잠금/해제하는 함수
+        window.updateStartButtonState = function() {
+            const startBtn = document.getElementById('start-game-btn');
+            if (!startBtn) return;
+
+            if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+                if (window.isFirebaseActive && window.userId) {
+                    startBtn.disabled = false;
+                    startBtn.innerText = "학교 탐험 시작하기";
+                    startBtn.className = "w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-3 rounded-xl shadow-lg shadow-indigo-500/20 hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg cursor-pointer";
+                } else {
+                    startBtn.disabled = true;
+                    startBtn.innerText = "구글 서버 연결 대기 중...";
+                    startBtn.className = "w-full bg-slate-300 text-slate-500 font-black py-3 rounded-xl flex items-center justify-center gap-2 text-lg cursor-not-allowed";
+                }
+            } else {
+                // 설정이 비어있으면 오프라인(로컬 테스트)으로 즉시 진행 허용
+                startBtn.disabled = false;
+                startBtn.innerText = "학교 탐험 시작하기 (로컬 모드)";
+                startBtn.className = "w-full bg-gradient-to-r from-slate-500 to-slate-700 text-white font-black py-3 rounded-xl shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg cursor-pointer";
+            }
+        }
+
         // Firebase 초기화 진행
-        if (firebaseConfig.apiKey) {
+        if (firebaseConfig.apiKey && firebaseConfig.projectId) {
             try {
                 const app = initializeApp(firebaseConfig);
                 window.auth = getAuth(app);
                 window.db = getFirestore(app);
-                window.isFirebaseActive = true;
                 
-                // 익명 로그인 자동 수행
-                signInAnonymously(window.auth).catch(err => {
-                    console.error("Firebase Auth Error:", err);
-                });
-
-                onAuthStateChanged(window.auth, (user) => {
+                // 로그인 진행 상황 추적 및 세션 보장 처리
+                onAuthStateChanged(window.auth, async (user) => {
                     if (user) {
                         window.userId = user.uid;
-                        console.log("Firebase가 활성화되었으며, 익명 로그인 완료:", user.uid);
+                        window.isFirebaseActive = true;
+                        logConnection("Firebase Cloud 연동 성공");
+                        window.updateStartButtonState();
+                        
+                        // 대시보드 갱신 자동 유도
+                        if (typeof window.refreshAdminData === 'function') {
+                            window.refreshAdminData();
+                        }
+                    } else {
+                        logConnection("인증 서버 통신중...");
+                        try {
+                            await signInAnonymously(window.auth);
+                        } catch (err) {
+                            logConnection("익명 로그인 인증 실패", true, "Authentication 메뉴에서 익명 로그인을 활성화했는지 확인해주세요.");
+                            console.error(err);
+                        }
                     }
                 });
             } catch (e) {
-                console.error("Firebase 초기화 에러 (가상 모드로 작동합니다):", e);
+                console.error("Firebase 로딩 실패 (로컬 모드로 전환):", e);
+                logConnection("로컬 시뮬레이션 모드", true, e.message);
+                window.updateStartButtonState();
             }
         } else {
-            console.log("Firebase Config가 유효하지 않아 로컬 스토리지 모드(가상 연동)로 구동됩니다.");
+            console.log("Firebase 설정이 비어있어 가상 시뮬레이션(로컬) 모드로 시작합니다.");
+            // DOM이 준비된 후에 시작 버튼 상태 업데이트를 해야하므로 타이머 사용
+            setTimeout(() => {
+                window.updateStartButtonState();
+                const specWarning = document.getElementById('special-protocol-warning');
+                if (specWarning) {
+                    specWarning.innerHTML = "⚠️ 현재 Firebase 설정값이 입력되지 않아 <b>로컬 테스트 모드</b>로 구동됩니다. 다른 기기와 동기화하려면 <code>index.html</code> 코드 상단에 설정을 넣어주세요.";
+                    specWarning.className = "p-3 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] rounded-lg text-center leading-relaxed font-semibold";
+                }
+            }, 200);
         }
+
+        // 프로토콜(file://) 체크 및 시각 경고문 노출
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol === 'file:') {
+                const specWarning = document.getElementById('special-protocol-warning');
+                if (specWarning) {
+                    specWarning.innerHTML = "❌ <b>경고: 현재 HTML 파일을 로컬 더블클릭(file:///)으로 실행하셨습니다.</b><br>브라우저 보안 제약으로 구글 서버 연동이 차단됩니다. 반드시 <b>VS Code Live Server</b>로 켜거나, <b>GitHub Pages</b> 등에 업로드한 후 인터넷 주소(http/https)로 접속하셔야 실시간 리스트가 정상 작동합니다!";
+                    specWarning.className = "p-3 bg-rose-50 border border-rose-200 text-rose-800 text-[11px] rounded-lg text-left leading-relaxed font-semibold";
+                }
+            }
+            window.updateStartButtonState();
+        });
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght=400;750;800&family=Pretendard:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;750;800&family=Pretendard:wght@400;600;700;800&display=swap');
         
         body {
             font-family: 'Pretendard', 'Nanum Gothic', sans-serif;
@@ -215,6 +303,9 @@
             </div>
             
             <div class="space-y-4">
+                <!-- 프로토콜 경고 영역 -->
+                <div id="special-protocol-warning" class="hidden"></div>
+
                 <div class="grid grid-cols-3 gap-2">
                     <div class="col-span-1">
                         <label class="block text-xs text-slate-500 font-bold mb-1">학번 입력</label>
@@ -248,8 +339,15 @@
                         </button>
                     </div>
                 </div>
-                <button onclick="startGame()" class="w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-3 rounded-xl shadow-lg shadow-indigo-500/20 hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg">
-                    학교 탐험 시작하기 <i data-lucide="compass" class="w-5 h-5 fill-white"></i>
+
+                <!-- 실시간 서버 연결 현황 텍스트 UI -->
+                <div class="flex items-center justify-center gap-2 py-1 bg-slate-50 rounded-lg border border-slate-100">
+                    <span id="connection-indicator" class="w-3 h-3 rounded-full bg-slate-300"></span>
+                    <span id="login-status-text" class="text-xs font-bold text-slate-400">서버 접속 체크 대기 중...</span>
+                </div>
+
+                <button id="start-game-btn" disabled onclick="startGame()" class="w-full bg-slate-300 text-slate-500 font-black py-3 rounded-xl flex items-center justify-center gap-2 text-lg cursor-not-allowed">
+                    서버 연결 대기 중... <i data-lucide="compass" class="w-5 h-5 fill-slate-400"></i>
                 </button>
             </div>
         </section>
@@ -572,7 +670,6 @@
             lastActiveTime: ""
         };
 
-        // --- 목업용 로컬 스토리지 키 관리 ---
         const LOCAL_STORAGE_PLAYERS_KEY = "keisung_mockup_players";
 
         // --- 교실 원본 데이터 로드 ---
@@ -675,8 +772,8 @@
             if (window.isFirebaseActive && window.db && window.userId) {
                 try {
                     // 엄격한 계정별 경로 사용 규정 준수
-                    // 경로: /artifacts/{appId}/users/{userId}/{collectionName}/{docId}
-                    const userDocRef = doc(window.db, "artifacts", "keisung_tour", "users", window.userId, "player_data", "profile");
+                    // 경로: /artifacts/{appId}/users/{userId}
+                    const userDocRef = doc(window.db, "artifacts", "keisung_tour", "users", window.userId);
                     await setDoc(userDocRef, payload, { merge: true });
                 } catch (e) {
                     console.error("Firebase sync error: ", e);
@@ -1003,24 +1100,18 @@
                 try {
                     // Firebase 규칙에 따라 대량 단일 컬렉션 쿼리 대신,
                     // users 컬렉션 및 하위 문서를 실시간 수집하도록 세팅
-                    // (규정상 compound query 피하고 js로 소팅 제어)
                     const userSnapRef = collection(window.db, "artifacts", "keisung_tour", "users");
                     
                     // Firestore 실시간 데이터 수집 리스너 부착
                     onSnapshot(userSnapRef, (snapshot) => {
                         let players = [];
                         snapshot.forEach((userDoc) => {
-                            // 각 유저 내 player_data 내부 프로필을 수집해야 하나, 단순 조회용 mockup 통합 구조 처리를 대비해
-                            // 유저별 profile 데이터를 가져올 수 있도록 가볍게 동기화
                             const udata = userDoc.data();
-                            // 만약 내부 구조가 nested 형식이라면 js단에서 정리
                             if(udata.studentId) {
                                 players.push(udata);
                             }
                         });
                         
-                        // 하위 유저 데이터를 수집하지 못하는 경우를 대비해, 
-                        // profile 문서 직접 탐색 혹은 통합 연동 처리
                         activeAdminPlayers = players;
                         renderAdminPlayers();
                     }, (err) => {
@@ -1072,23 +1163,20 @@
                        (p.realName && p.realName.toLowerCase().includes(searchVal));
             });
 
-            // 2. 정렬 로직 적용 (규정 2: No Complex Queries -> 메모리 내 정렬)
+            // 2. 정렬 로직 적용 (메모리 내 정렬)
             if (adminSortBy === "studentId") {
-                // 학번 오름차순
                 list.sort((a, b) => {
                     const idA = parseInt(a.studentId) || 0;
                     const idB = parseInt(b.studentId) || 0;
                     return idA - idB;
                 });
             } else if (adminSortBy === "time") {
-                // 최신 접속 순 내림차순
                 list.sort((a, b) => {
                     const timeA = new Date(a.lastActiveTime || 0).getTime();
                     const timeB = new Date(b.lastActiveTime || 0).getTime();
                     return timeB - timeA;
                 });
             } else if (adminSortBy === "stamps") {
-                // 스탬프 획득 개수 내림차순
                 list.sort((a, b) => {
                     const cntA = a.completedCount || 0;
                     const cntB = b.completedCount || 0;
@@ -1116,7 +1204,6 @@
 
                 const roomsText = (p.completedRooms && p.completedRooms.length > 0) 
                     ? p.completedRooms.map(id => {
-                        // 교실 아이디로부터 보기 편한 명칭 전환
                         const cleanName = id.split('_')[1];
                         return cleanName === "music" ? "음악" : cleanName === "study" ? "자습" : cleanName === "infirmary" ? "보건" : cleanName === "art" ? "미술" : cleanName === "philosophy" ? "철학" : cleanName === "pe" ? "체육" : cleanName === "english" ? "영어" : cleanName === "geography" ? "지리" : cleanName === "korean" ? "국어" : cleanName === "computer" ? "컴퓨터" : cleanName === "lang" ? "외어" : cleanName === "math" ? "수학" : cleanName === "hanmun" ? "한문" : cleanName === "biology" ? "생물" : cleanName === "chemistry" ? "화학" : cleanName === "physics" ? "물리" : cleanName === "earth" ? "지구" : cleanName;
                       }).join(", ")
@@ -1703,7 +1790,7 @@
                         <div class="flip-card-front absolute inset-0 bg-indigo-600 border border-indigo-400 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-sm">?</div>
                         <div class="flip-card-back absolute inset-0 bg-white border border-slate-300 rounded-lg flex flex-col items-center justify-center p-1 shadow-sm">
                             <span class="text-xs font-black text-slate-800 break-words w-full px-0.5">${c.word}</span>
-                            <span class="text-[8px] font-bold mt-1.5 px-1.5 py-0.5 rounded ${c.lang === 'ENG' ? 'bg-sky-50 text-sky-650' : 'bg-indigo-50 text-indigo-650'}">${c.lang === 'ENG' ? 'ENG' : 'KOR'}</span>
+                            <span class="text-[8px] font-bold mt-1.5 px-1.5 py-0.5 rounded ${c.lang === 'ENG' ? 'bg-sky-50 text-sky-655' : 'bg-indigo-50 text-indigo-655'}">${c.lang === 'ENG' ? 'ENG' : 'KOR'}</span>
                         </div>
                     </div>
                 `;
@@ -2065,6 +2152,7 @@
 
                         if (dist < min) {
                             if (c1.level === c2.level) {
+                                // 합체 및 레벨업
                                 const nextLvl = c1.level + 1;
                                 if (nextLvl < levels.length) {
                                     playBeep('success');
@@ -2078,6 +2166,7 @@
                                     circles.splice(i, 1);
                                     circles.push(new Circle(midX, midY, nextLvl));
 
+                                    // 萬(만) 완성 검증
                                     if (nextLvl === levels.length - 1) {
                                         cancelAnimationFrame(animId);
                                         showCustomAlert('축하합니다! 萬(만) 합성에 성공하여 지혜의 한문 도장을 찍었습니다!', "합성 성공", "萬", () => {
@@ -2088,6 +2177,7 @@
                                 }
                                 return;
                             }
+                            // 겹침 밀어내기
                             const overlap = min - dist;
                             const nx = dx / dist;
                             const ny = dy / dist;
@@ -2102,6 +2192,8 @@
 
             function tickHanja() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 가이드선
                 if (canDrop) {
                     ctx.beginPath();
                     ctx.moveTo(currentX, 0);
@@ -2111,6 +2203,7 @@
                 }
 
                 handleHanjaCollisions();
+
                 circles.forEach(c => {
                     c.update();
                     c.draw();
@@ -2338,7 +2431,7 @@
         }
 
         // ==========================================
-        //  지구과학실 (지구 탄소순환 배관 퍼즐)
+        //  지구탄소순환 (배관 퍼즐)
         // ==========================================
         function setupCarbonCycleGame(container) {
             container.innerHTML = `
@@ -2431,17 +2524,34 @@
         }
 
         // ==========================================
-        //  퀴즈 은행 및 서브 게임 컴포넌트
+        //  서브 게임 컴포넌트: 퀴즈, 영어 타이핑, 수학 암산, 버그클릭
         // ==========================================
+
         const quizBank = {
-            pe: [{ q: '축구에서 골키퍼를 제외한 야외 필드 플레이어가 의도적으로 공을 손으로 터치했을 때의 반칙은?', a: ['오프사이드', '핸들링', '백패스'], right: 1 }],
-            geography: [{ q: '세계에서 가장 넓은 영토 면적을 자랑하는 나라는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 }],
-            geography2: [{ q: '적도 부근의 아열대 지역에서 주로 발달하며 일 년 내내 비가 많이 내리는 기후는?', a: ['열대 우림 기후', '사막 기후', '지중해성 기후'], right: 0 }],
-            korean2: [{ q: '조선 전기 시조 문학의 대가로, 대표작 "사미인곡"을 지은 문신은?', a: ['정철', '이황', '윤선도'], right: 0 }],
-            korean3: [{ q: '국어의 단어 형성에서 실질적인 의미를 나타내는 중심 부분을 뜻하는 문법 용어는?', a: ['접사', '어근', '어간'], right: 1 }],
-            lang: [{ q: '프랑스어로 "안녕하세요" 또는 "좋은 아침"을 뜻하는 다정한 인사는?', a: ['봉주르 (Bonjour)', '그라시아스 (Gracias)', '차오 (Ciao)'], right: 0 }],
-            history: [{ q: '조선 제4대 임금으로, 백성을 널리 이롭게 하기 위해 과학기술을 발달시키고 "훈민정음"을 창제하신 성군은 누구일까요?', a: ['태조', '정조', '세종대왕'], right: 2 }],
-            physics: [{ q: '뉴턴의 제2법칙으로 힘(F)은 질량(m) 곱하기 무엇과 같을까요?', a: ['속도 (v)', '시간 (t)', '가속도 (a)'], right: 2 }]
+            pe: [
+                { q: '축구에서 골키퍼를 제외한 야외 필드 플레이어가 의도적으로 공을 손으로 터치했을 때의 반칙은?', a: ['오프사이드', '핸들링', '백패스'], right: 1 }
+            ],
+            geography: [
+                { q: '세계에서 가장 넓은 영토 면적을 자랑하는 나라는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 }
+            ],
+            geography2: [
+                { q: '적도 부근의 아열대 지역에서 주로 발달하며 일 년 내내 비가 많이 내리는 기후는?', a: ['열대 우림 기후', '사막 기후', '지중해성 기후'], right: 0 }
+            ],
+            korean2: [
+                { q: '조선 전기 시조 문학의 대가로, 대표작 "사미인곡"을 지은 문신은?', a: ['정철', '이황', '윤선도'], right: 0 }
+            ],
+            korean3: [
+                { q: '국어의 단어 형성에서 실질적인 의미를 나타내는 중심 부분을 뜻하는 문법 용어는?', a: ['접사', '어근', '어간'], right: 1 }
+            ],
+            lang: [
+                { q: '프랑스어로 "안녕하세요" 또는 "좋은 아침"을 뜻하는 다정한 인사는?', a: ['봉주르 (Bonjour)', '그라시아스 (Gracias)', '차오 (Ciao)'], right: 0 }
+            ],
+            history: [
+                { q: '조선 제4대 임금으로, 백성을 널리 이롭게 하기 위해 과학기술을 발달시키고 "훈민정음"을 창제하신 성군은 누구일까요?', a: ['태조', '정조', '세종대왕'], right: 2 }
+            ],
+            physics: [
+                { q: '뉴턴의 제2법칙으로 힘(F)은 질량(m) 곱하기 무엇과 같을까요?', a: ['속도 (v)', '시간 (t)', '가속도 (a)'], right: 2 }
+            ]
         };
 
         function setupQuizGame(container, subject) {
@@ -2542,7 +2652,7 @@
                 <div class="w-full text-center">
                     <p class="text-xs text-slate-500 mb-2">화면에 출몰하는 컴퓨터 바이러스 오류 버그를 빠르게 탭하여 박멸하세요!</p>
                     <div id="bug-field" class="bg-slate-900 border border-slate-300 h-60 rounded-xl relative overflow-hidden mb-4 cursor-crosshair"></div>
-                    <div class="text-sm font-bold text-slate-650">
+                    <div class="text-sm font-bold text-slate-655">
                         박멸한 버그: <span id="bug-score" class="font-bold text-rose-500 text-base">0</span> / 8마리
                     </div>
                 </div>
@@ -2594,6 +2704,9 @@
             };
         }
 
+        // ==========================================
+        //  수학 암산 게임
+        // ==========================================
         function setupMathGame(container, level) {
             container.innerHTML = `
                 <div class="w-full text-center">
