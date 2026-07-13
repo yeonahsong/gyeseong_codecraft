@@ -182,7 +182,7 @@
                 <div>
                     <label class="block text-xs text-slate-500 font-bold mb-2">원하는 샛별 아바타 선택</label>
                     <div class="grid grid-cols-4 gap-4">
-                        <button onclick="selectAvatar('🧑‍🎓', this)" class="avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm ring-4 ring-indigo-500 scale-110 border-indigo-500">
+                        <button onclick="selectAvatar('🧑‍🎓', this)" class="avatar-option group relative p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 scale-110 flex flex-col items-center gap-1 shadow-md ring-4 ring-indigo-500 font-bold">
                             <div class="w-12 h-12 rounded-full bg-sky-200 border-2 border-white flex items-center justify-center text-3xl group-hover:animate-bounce shadow-inner">🧑‍🎓</div>
                             <span class="text-[10px] font-extrabold text-indigo-600">새싹 샛별이</span>
                         </button>
@@ -368,7 +368,6 @@
             <div class="bg-amber-50 border-2 border-amber-200 p-6 rounded-2xl mb-6 inline-block min-w-[280px]">
                 <div class="text-xs text-amber-600 tracking-widest font-bold">계성고등학교 명예졸업증서</div>
                 <div class="text-2xl font-bold mt-2 text-slate-800 text-center" id="grad-student-name">10101 홍길동</div>
-                <div class="text-xs text-slate-500 mt-1" id="grad-date">발급일자: 2026년 7월 10일</div>
             </div>
 
             <div class="flex justify-center gap-3">
@@ -666,7 +665,7 @@
             container.innerHTML = '';
 
             if (rooms.length === 0) {
-                container.innerHTML = `<div class="text-slate-400 text-xs text-center py-4">비어있음</div>`;
+                container.innerHTML = ``;
                 return;
             }
 
@@ -799,18 +798,45 @@
             }
         }
 
+        // --- 졸업 축하 모달 비활성화 ---
         function closeGrad() {
             playBeep('click');
             document.getElementById('grad-modal').classList.add('hidden');
             document.getElementById('grad-modal').classList.remove('flex');
         }
 
+        // --- 게임 리셋 후 최초 로그인 화면으로 이동 ---
         function resetGame() {
             playBeep('click');
-            player.completedRooms = [];
+            
+            // 플레이어 로컬 정보 완전 초기화
+            player = {
+                name: "학생",
+                avatar: "🎒",
+                currentFloor: 1,
+                completedRooms: [] 
+            };
+            
+            // 학번과 이름 입력필드 초기화
+            document.getElementById('input-student-id').value = "";
+            document.getElementById('input-username').value = "";
+            
+            // 아바타 선택 효과 초기화 (첫 번째 아바타 선택)
+            const firstAvatarBtn = document.querySelectorAll('.avatar-option')[0];
+            if (firstAvatarBtn) {
+                selectAvatar('🧑‍🎓', firstAvatarBtn);
+            }
+            
+            // HUD 획득 스탬프 개수 UI 업데이트
             updateStampHUD();
+            
+            // 화면 노출 상태 전환 (로그인 보이고 맵/HUD 숨김)
+            document.getElementById('player-hud').classList.add('hidden');
+            document.getElementById('screen-map').classList.add('hidden');
+            document.getElementById('screen-login').classList.remove('hidden');
+            
+            // 팝업 모달 닫기
             closeGrad();
-            renderFloor(1);
         }
 
         // ==========================================
@@ -916,7 +942,7 @@
                         <button onclick="triggerHit(2)" class="flex-1 bg-white border border-slate-300 py-2.5 rounded-lg active:bg-indigo-500 active:text-white font-bold text-xs shadow-sm text-slate-700">D (오른쪽)</button>
                     </div>
                     <div class="mt-3 flex justify-between items-center text-xs font-bold text-slate-600">
-                        <span>성공: <strong id="r-score" class="text-indigo-600 text-base">0</strong> / 8회</span>
+                        <span>성공: <strong id="r-score" class="text-indigo-650 text-base">0</strong> / 8회</span>
                         <span id="r-feedback" class="text-indigo-500">대기 중...</span>
                     </div>
                 </div>
@@ -1623,7 +1649,6 @@
                     <canvas id="hanja-canvas" width="400" height="420" class="border border-slate-300 rounded-xl bg-slate-50 block mx-auto cursor-crosshair shadow-inner"></canvas>
                     <div class="flex justify-between items-center text-xs font-bold text-slate-600">
                         <span>현재 점수: <strong id="hanja-score" class="text-indigo-650 text-sm">0</strong></span>
-                        <span>다음 한자: <strong id="next-hanja-ui" class="text-rose-500 text-sm">一</strong></span>
                     </div>
                 </div>
             `;
@@ -1642,8 +1667,7 @@
             ];
 
             let score = 0;
-            let currentLevel = 0;
-            let nextLevel = Math.floor(Math.random() * 3);
+            let currentLevel = Math.floor(Math.random() * 3);
             let circles = [];
             let canDrop = true;
             let currentX = canvas.width / 2;
@@ -1721,10 +1745,7 @@
                 circles.push(c);
 
                 canDrop = false;
-                currentLevel = nextLevel;
-                nextLevel = Math.floor(Math.random() * 3);
-                const nextUi = document.getElementById('next-hanja-ui');
-                if (nextUi) nextUi.innerText = levels[nextLevel].text;
+                currentLevel = Math.floor(Math.random() * 3);
 
                 setTimeout(() => { canDrop = true; }, 500);
             }
@@ -2059,10 +2080,11 @@
                     </div>
                 `;
 
+                // 초기 상태가 바로 통과되지 않도록 회전이 필요한 중요 배관 조각들의 디폴트 각도를 흐트려 놓았습니다.
                 const pipes = [
                     { id: 0, text: '☁ 대기', isStart: true },
                     { id: 1, text: '┃', angle: 90 },
-                    { id: 2, text: '━', angle: 0 },
+                    { id: 2, text: '━', angle: 90 }, // 디폴트 0에서 흐트러뜨림 (정답: 0 또는 180)
                     { id: 3, text: '┗', angle: 180 },
                     { id: 4, text: '━', angle: 90 },
                     { id: 5, text: '┓', angle: 0 },
@@ -2074,7 +2096,7 @@
                     { id: 11, text: '━', angle: 90 },
                     { id: 12, text: '┗', angle: 0 },
                     { id: 13, text: '┃', angle: 90 },
-                    { id: 14, text: '━', angle: 0 },
+                    { id: 14, text: '━', angle: 90 }, // 디폴트 0에서 흐트러뜨림 (정답: 0 또는 180)
                     { id: 15, text: '🌊 해양', isEnd: true }
                 ];
 
@@ -2211,10 +2233,18 @@
 
             let score = 0;
             let currentWord = "";
+            let lastWord = "";
             const inputField = document.getElementById('english-input');
 
             function nextWord() {
-                currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+                let newWord = wordList[Math.floor(Math.random() * wordList.length)];
+                // 이전 출제된 단어와 연속으로 일치하지 않도록 필터링 처리
+                while (newWord === lastWord) {
+                    newWord = wordList[Math.floor(Math.random() * wordList.length)];
+                }
+                currentWord = newWord;
+                lastWord = newWord;
+
                 document.getElementById('english-target-word').innerText = currentWord;
                 inputField.value = "";
                 inputField.focus();
