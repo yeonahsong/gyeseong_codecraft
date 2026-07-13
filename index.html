@@ -13,67 +13,52 @@
         
         body {
             font-family: 'Pretendard', 'Nanum Gothic', sans-serif;
-            background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 50%, #e0f2fe 100%);
+            background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 50%, #e0f2fe 100%); /* 라벤더, 인디고, 스카이블루의 세련되고 화사한 그라디언트 */
             overflow-x: hidden;
         }
         .fancy-font {
             font-family: 'Jua', sans-serif;
         }
         
-        /* U자형 건물 스타일링 - 3D 입체 효과 극대화 */
+        /* U자형 건물 스타일링 - 경계선 및 입체감 극대화 */
         .u-building-grid {
             display: grid;
-            grid-template-columns: 210px 1fr 210px;
-            grid-template-rows: 240px 200px;
-            gap: 24px;
+            grid-template-columns: 190px 1fr 190px;
+            grid-template-rows: 220px 180px;
+            gap: 20px;
         }
         @media (max-width: 768px) {
             .u-building-grid {
-                grid-template-columns: 110px 1fr 110px;
-                grid-template-rows: 170px 140px;
-                gap: 12px;
+                grid-template-columns: 120px 1fr 120px;
+                grid-template-rows: 160px 130px;
+                gap: 10px;
             }
         }
-        
-        /* 건물 입체 외곽 섀도우와 그라데이션 */
-        .wing-depth {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        .wing-depth::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6), 0 10px 25px -5px rgba(79, 70, 229, 0.15);
-            pointer-events: none;
-        }
-
         .left-wing {
             grid-column: 1;
             grid-row: 1 / span 2;
-            border: 3px solid #6366f1;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 3px solid #818cf8; /* 서관 경계선 선명화 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         .right-wing {
             grid-column: 3;
             grid-row: 1 / span 2;
-            border: 3px solid #6366f1;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 3px solid #818cf8; /* 동관 경계선 선명화 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         .center-connector {
             grid-column: 2;
             grid-row: 2;
-            border: 3px solid #6366f1;
-            background: linear-gradient(90deg, #f8fafc 0%, #ffffff 50%, #f8fafc 100%);
+            border: 3px solid #818cf8; /* 본관 연결부 경계선 선명화 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
         .empty-courtyard {
             grid-column: 2;
             grid-row: 1;
-            background: radial-gradient(circle at center, #f0fdf4 0%, #dcfce7 100%);
-            border: 3px dashed #10b981;
-            border-radius: 24px;
-            box-shadow: inset 0 6px 16px rgba(16, 185, 129, 0.12);
+            background: rgba(243, 244, 246, 0.95); /* 중정 야외 광장 배경색을 확실히 분리하여 대비 극대화 */
+            border: 3px dashed #4f46e5; /* 점선 두께 및 강도 상향 */
+            border-radius: 16px;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1); /* 안쪽 그림자로 경계 분리 */
         }
 
         /* 프리미엄 카드 애니메이션 */
@@ -81,55 +66,43 @@
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .room-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 16px 24px -10px rgba(99, 102, 241, 0.35);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -8px rgba(99, 102, 241, 0.3);
         }
 
         /* 공통 커스텀 스크롤바 */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.03);
             border-radius: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.35);
+            background: rgba(148, 163, 184, 0.3);
             border-radius: 8px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.5);
-        }
 
-        /* 미술실: 절대색감 마스터용 레인지 슬라이더 스타일 */
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            background: transparent;
-        }
+        /* --- 미술실: 절대색감 마스터용 레인지 슬라이더 스타일 --- */
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             background: #ffffff;
-            border: 4px solid currentColor;
+            border: 3px solid currentColor;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-            transition: transform 0.1s;
-        }
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        /* 영어실: 완벽한 3D 카드 뒤집기 애니메이션 */
+        /* --- 영어실: 카드 뒤집기 애니메이션 --- */
         .flip-card {
-            perspective: 1000px;
+            perspective: 800px;
         }
         .flip-card-inner {
-            transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
+            transition: transform 0.4s cubic-bezier(.4,.2,.2,1);
             transform-style: preserve-3d;
         }
         .flip-card.flipped .flip-card-inner {
@@ -137,10 +110,6 @@
         }
         .flip-card-front, .flip-card-back {
             backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            position: absolute;
-            inset: 0;
-            border-radius: 0.75rem;
         }
         .flip-card-back {
             transform: rotateY(180deg);
@@ -150,36 +119,37 @@
 <body class="text-slate-800 min-h-screen flex flex-col justify-between select-none">
 
     <!-- TOP 네비게이션 / HUD -->
-    <header class="bg-white/90 backdrop-blur border-b border-indigo-100 p-4 sticky top-0 z-40 shadow-md">
+    <header class="bg-white/90 backdrop-blur border-b border-indigo-100 p-4 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-tr from-indigo-600 to-sky-500 p-2.5 rounded-2xl shadow-lg shadow-indigo-500/30">
-                    <i data-lucide="school" class="w-7 h-7 text-white"></i>
+                <div class="bg-gradient-to-tr from-indigo-500 to-sky-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="school" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black tracking-wider fancy-font text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-600">계성고등학교</h1>
-                    <p class="text-xs text-slate-500 font-extrabold tracking-tight">계성 샛별 캠퍼스 챌린지 & 스탬프 투어 v6.0</p>
+                    <h1 class="text-2xl font-black tracking-wider fancy-font text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-600">계성고등학교</h1>
+                    <p class="text-xs text-slate-500 font-bold">계성 샛별 캠퍼스 챌린지 & 스탬프 투어</p>
                 </div>
             </div>
             
             <!-- 플레이어 정보 HUD -->
-            <div id="player-hud" class="hidden flex items-center gap-6 bg-white/95 px-5 py-2.5 rounded-2xl border border-slate-200 shadow-md">
+            <div id="player-hud" class="hidden flex items-center gap-6 bg-white/95 px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-2">
-                    <span id="hud-avatar" class="text-3xl">🎒</span>
+                    <span id="hud-avatar" class="text-2xl">🎒</span>
                     <div>
                         <div class="text-[10px] text-slate-400 font-bold">참가 모험가</div>
-                        <div id="hud-name" class="font-extrabold text-sm text-sky-600">10101 홍길동</div>
+                        <!-- 중복된 '샛별' 문구를 제외하고 깔끔하게 학번과 이름만 표출 -->
+                        <div id="hud-name" class="font-bold text-sm text-sky-600">10101 홍길동</div>
                     </div>
                 </div>
                 <div class="h-8 w-[1px] bg-slate-200"></div>
                 <div>
                     <div class="text-[10px] text-slate-400 font-bold">획득한 스탬프</div>
                     <div class="flex items-center gap-1">
-                        <span id="stamp-count" class="font-black text-rose-500 text-lg">0</span>
-                        <span class="text-xs text-slate-400 font-bold">/ <span id="total-rooms-count">14</span></span>
+                        <span id="stamp-count" class="font-bold text-rose-500 text-sm">0</span>
+                        <span class="text-xs text-slate-400">/ <span id="total-rooms-count">14</span></span>
                     </div>
                 </div>
-                <button onclick="openStampBook()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-colors px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 font-bold shadow-sm">
+                <button onclick="openStampBook()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-colors px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 font-bold">
                     <i data-lucide="award" class="w-4 h-4 text-indigo-600"></i> 도장첩
                 </button>
             </div>
@@ -189,28 +159,28 @@
     <main class="max-w-7xl mx-auto p-4 w-full flex-grow flex flex-col justify-center">
         
         <!-- [1] 로그인/캐릭터 생성 화면 -->
-        <section id="screen-login" class="max-w-xl mx-auto bg-white/95 backdrop-blur-md border border-indigo-100 p-8 rounded-3xl shadow-2xl my-8 transition-all duration-500">
+        <section id="screen-login" class="max-w-lg mx-auto bg-white/90 backdrop-blur border border-indigo-100 p-8 rounded-2xl shadow-xl my-8">
             <div class="text-center mb-6">
-                <span class="text-7xl inline-block animate-bounce mb-3">🏫</span>
-                <h2 class="text-4xl font-black fancy-font text-indigo-600 tracking-wide">계성고 탐험대 모집</h2>
+                <span class="text-6xl inline-block animate-bounce mb-3">🏫</span>
+                <h2 class="text-3xl font-black fancy-font text-indigo-600">계성고 탐험대 모집</h2>
                 <p class="text-slate-500 text-sm mt-1">계성고등학교 가상 투어에 참가할 캐릭터를 등록하세요!</p>
             </div>
             
-            <div class="space-y-5">
-                <div class="grid grid-cols-3 gap-3">
+            <div class="space-y-4">
+                <div class="grid grid-cols-3 gap-2">
                     <div class="col-span-1">
-                        <label class="block text-xs text-slate-500 font-bold mb-1.5">학번 입력</label>
-                        <input id="input-student-id" type="text" maxlength="5" placeholder="예: 10101" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-center text-slate-800 font-black focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white text-lg">
+                        <label class="block text-xs text-slate-500 font-bold mb-1">학번 입력</label>
+                        <input id="input-student-id" type="text" maxlength="5" placeholder="예: 10101" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-center text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white">
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-xs text-slate-500 font-bold mb-1.5">이름을 입력하세요</label>
-                        <input id="input-username" type="text" placeholder="예: 홍길동" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-black focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white text-lg">
+                        <label class="block text-xs text-slate-500 font-bold mb-1">이름을 입력하세요</label>
+                        <input id="input-username" type="text" placeholder="예: 홍길동" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white">
                     </div>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-1.5 text-center font-semibold">* 입력한 학번과 이름은 명예 졸업증서 발급에 직접 사용됩니다!</p>
+                <p class="text-[11px] text-slate-400 mt-1.5 text-center">* 학번과 이름이 조화롭게 조합되어 참가 모험가 정보로 완성됩니다!</p>
                 
                 <div>
-                    <label class="block text-xs text-slate-500 font-bold mb-3">원하는 샛별 아바타 선택</label>
+                    <label class="block text-xs text-slate-500 font-bold mb-2">원하는 샛별 아바타 선택</label>
                     <div class="grid grid-cols-4 gap-4">
                         <button onclick="selectAvatar('🧑‍🎓', this)" class="avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm ring-4 ring-indigo-500 scale-110 border-indigo-500">
                             <div class="w-12 h-12 rounded-full bg-sky-200 border-2 border-white flex items-center justify-center text-3xl group-hover:animate-bounce shadow-inner">🧑‍🎓</div>
@@ -230,8 +200,8 @@
                         </button>
                     </div>
                 </div>
-                <button onclick="startGame()" class="w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-500/20 hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-xl">
-                    학교 탐험 시작하기 <i data-lucide="compass" class="w-6 h-6 fill-white"></i>
+                <button onclick="startGame()" class="w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-3 rounded-xl shadow-lg shadow-indigo-500/20 hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg">
+                    학교 탐험 시작하기 <i data-lucide="compass" class="w-5 h-5 fill-white"></i>
                 </button>
             </div>
         </section>
@@ -239,85 +209,85 @@
         <!-- [2] 학교 메인 맵 (층 선택 & U자형 교실 보기) -->
         <section id="screen-map" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 my-4">
             
-            <!-- 층 선택 네비게이터 -->
-            <div class="lg:col-span-3 bg-white/90 backdrop-blur border border-indigo-100 p-6 rounded-3xl flex flex-col justify-between shadow-md">
+            <!--  층 선택 네비게이터 (계단 컨셉) -->
+            <div class="lg:col-span-3 bg-white/80 backdrop-blur border border-indigo-100 p-5 rounded-2xl flex flex-col justify-between shadow-sm">
                 <div>
-                    <h3 class="font-extrabold text-xl fancy-font text-slate-700 mb-5 flex items-center gap-2">
-                        <i data-lucide="layers" class="text-indigo-500 w-5 h-5"></i> 이동 계단
+                    <h3 class="font-bold text-lg fancy-font text-slate-700 mb-4 flex items-center gap-2">
+                        <i data-lucide="layers" class="text-indigo-500"></i> 이동 계단
                     </h3>
-                    <div class="space-y-3.5" id="floor-buttons-container">
+                    <div class="space-y-3" id="floor-buttons-container">
                         <!-- 층 버튼들 동적 렌더링 -->
                     </div>
                 </div>
                 
-                <div class="mt-8 bg-indigo-50/70 p-5 rounded-2xl border border-indigo-100 text-xs text-slate-500 leading-relaxed">
-                    <p class="font-bold text-indigo-800 mb-1.5 flex items-center gap-1 text-sm"><i data-lucide="lightbulb" class="w-4 h-4"></i> 스탬프 가이드</p>
+                <div class="mt-6 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-xs text-slate-500">
+                    <p class="font-bold text-indigo-800 mb-1 flex items-center gap-1"><i data-lucide="lightbulb" class="w-3.5 h-3.5"></i> 스탬프 가이드</p>
                     <p>각 교실에 들러 계성고등학교만의 교과 맞춤 미니게임을 성공하고 스탬프를 모으세요. 전 과목 클리어 시 계성고등학교 명예 졸업장을 드립니다!</p>
                 </div>
             </div>
 
             <!-- U자형 교실 지도 시각화 -->
-            <div class="lg:col-span-9 bg-white/90 backdrop-blur border border-indigo-100 p-6 rounded-3xl relative shadow-md">
+            <div class="lg:col-span-9 bg-white/90 backdrop-blur border border-indigo-100 p-6 rounded-2xl relative shadow-sm">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <span id="current-floor-badge" class="px-3.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full border border-indigo-200">현재 위치</span>
-                        <h2 id="current-floor-title" class="text-3xl font-black fancy-font mt-1.5 text-slate-800">1층 복도</h2>
+                        <span id="current-floor-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full border border-indigo-200">현재 위치</span>
+                        <h2 id="current-floor-title" class="text-3xl font-black fancy-font mt-1 text-slate-800">1층 복도</h2>
                     </div>
-                    <div class="flex items-center gap-3 text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                        <span class="inline-block w-3.5 h-3.5 bg-rose-400 rounded-full"></span> 미클리어
-                        <span class="inline-block w-3.5 h-3.5 bg-emerald-500 rounded-full"></span> 클리어 완료
+                    <div class="flex items-center gap-2 text-xs font-bold text-slate-500">
+                        <span class="inline-block w-3 h-3 bg-rose-400 rounded-full"></span> 미클리어
+                        <span class="inline-block w-3 h-3 bg-emerald-500 rounded-full ml-2"></span> 클리어 완료
                     </div>
                 </div>
 
-                <!-- 건물 레이아웃 (U자형 구조) -->
-                <div class="u-building-grid relative border-2 border-indigo-200 p-6 rounded-[32px] bg-slate-50/50 shadow-2xl">
+                <!-- 건물 레이아웃 (U자형 구조) - 완벽한 보더 및 입체감 처리 -->
+                <div class="u-building-grid relative border border-indigo-300 p-5 rounded-3xl bg-indigo-50/40 shadow-xl">
                     
-                    <!-- 서관 -->
-                    <div class="left-wing wing-depth rounded-3xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden">
-                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-widest border-b border-indigo-100 pb-1.5 flex justify-between">
-                            <span>West Wing</span>
+                    <!--  서관 -->
+                    <div class="left-wing bg-white/95 rounded-2xl p-4 flex flex-col justify-between gap-2 relative overflow-hidden">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-100 pb-1 flex justify-between">
+                            <span>Left Wing</span>
                             <span>서관</span>
                         </div>
-                        <div id="wing-left-rooms" class="flex-grow flex flex-col justify-center gap-3">
+                        <div id="wing-left-rooms" class="flex-grow flex flex-col justify-center gap-2">
                             <!-- 왼쪽 교실 배치 -->
                         </div>
                     </div>
 
-                    <!-- 중정 야외 광장 (Courtyard) -->
-                    <div class="empty-courtyard rounded-3xl flex flex-col items-center justify-center p-5 text-center">
-                        <div class="w-20 h-20 mb-3 rounded-full shadow-md bg-white border border-emerald-200 flex items-center justify-center text-5xl">
+                    <!-- 빈 중정 (Courtyard) - 확실하게 분리된 야외 정원 -->
+                    <div class="empty-courtyard rounded-2xl flex flex-col items-center justify-center p-4 text-center">
+                        <div class="w-16 h-16 mb-2 rounded-full shadow-inner bg-indigo-100 border border-indigo-300 flex items-center justify-center text-4xl">
                             🌳
                         </div>
-                        <span class="text-sm font-black text-emerald-800 fancy-font tracking-wide">계성 야외 중정 정원</span>
-                        <span class="text-[10px] text-emerald-600 font-bold mt-0.5">Central Courtyard</span>
+                        <span class="text-xs font-extrabold text-indigo-700 fancy-font">계성 야외 광장</span>
+                        <span class="text-[9px] text-slate-400">Garden Courtyard</span>
                     </div>
 
                     <!-- 동관 -->
-                    <div class="right-wing wing-depth rounded-3xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden">
-                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-widest border-b border-indigo-100 pb-1.5 flex justify-between">
-                            <span>East Wing</span>
+                    <div class="right-wing bg-white/95 rounded-2xl p-4 flex flex-col justify-between gap-2 relative overflow-hidden">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-100 pb-1 flex justify-between">
+                            <span>Right Wing</span>
                             <span>동관</span>
                         </div>
-                        <div id="wing-right-rooms" class="flex-grow flex flex-col justify-center gap-3">
+                        <div id="wing-right-rooms" class="flex-grow flex flex-col justify-center gap-2">
                             <!-- 오른쪽 교실 배치 -->
                         </div>
                     </div>
 
                     <!-- 본관 연결통로 -->
-                    <div class="center-connector wing-depth rounded-3xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden">
-                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-widest border-b border-indigo-100 pb-1.5 flex justify-between">
+                    <div class="center-connector bg-white/95 rounded-2xl p-4 flex flex-col justify-between gap-2 relative overflow-hidden">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-100 pb-1 flex justify-between">
                             <span>Center Block</span>
                             <span>본관 연결통로</span>
                         </div>
-                        <div id="wing-center-rooms" class="flex-grow flex flex-row justify-around items-center gap-4">
+                        <div id="wing-center-rooms" class="flex-grow flex flex-row justify-around items-center gap-2">
                             <!-- 중앙 교실 배치 -->
                         </div>
                     </div>
 
                 </div>
 
-                <div class="mt-5 text-center text-xs text-slate-400 font-semibold flex items-center justify-center gap-1">
-                    <i data-lucide="info" class="w-4 h-4 text-slate-400"></i> 계성고등학교의 독창적인 U자형 특화 도면을 고해상도 디지털 구조로 설계한 가상 맵입니다.
+                <div class="mt-4 text-center text-xs text-slate-400 font-semibold">
+                    * 위 배치도는 업로드해주신 계성고등학교의 특화된 U자형 구조 도면을 디지털 맵으로 완벽히 매칭한 것입니다.
                 </div>
             </div>
 
@@ -325,32 +295,32 @@
     </main>
 
     <!-- [3] 공통 미니게임 팝업 (모달) -->
-    <div id="game-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col text-slate-800">
+    <div id="game-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col text-slate-800">
             
             <!-- 모달 헤더 -->
-            <div class="bg-slate-50 p-5 border-b border-slate-200 flex justify-between items-center">
-                <div class="flex items-center gap-3.5">
-                    <span id="modal-room-icon" class="text-4xl">🔬</span>
+            <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span id="modal-room-icon" class="text-3xl">🔬</span>
                     <div>
-                        <h3 id="modal-room-title" class="text-2xl font-black text-indigo-600 fancy-font">교실명</h3>
-                        <p id="modal-room-desc" class="text-xs text-slate-500 font-bold mt-0.5">교실 소개 문구</p>
+                        <h3 id="modal-room-title" class="text-xl font-bold text-indigo-600 fancy-font">교실명</h3>
+                        <p id="modal-room-desc" class="text-xs text-slate-500">교실 소개 문구</p>
                     </div>
                 </div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 bg-white hover:bg-slate-100 p-2.5 rounded-xl transition-all border border-slate-200 shadow-sm">
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-655 bg-white hover:bg-slate-100 p-2 rounded-lg transition-colors border border-slate-200">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
             <!-- 모달 게임플레이 영역 -->
-            <div id="game-playzone" class="p-6 flex-grow flex flex-col items-center justify-center min-h-[420px] max-h-[80vh] overflow-y-auto custom-scrollbar relative bg-slate-50">
+            <div id="game-playzone" class="p-6 flex-grow flex flex-col items-center justify-center min-h-[380px] max-h-[80vh] overflow-y-auto custom-scrollbar relative bg-slate-50">
                 <!-- 동적으로 각 방에 맞는 미니게임이 탑재됨 -->
             </div>
 
             <!-- 모달 푸터 -->
-            <div class="bg-slate-100 p-5 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
-                <span class="font-extrabold text-indigo-600 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4 text-indigo-500 animate-pulse"></i> 미션을 정복하고 도장을 획득하세요!</span>
-                <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-5 py-2.5 rounded-xl font-bold text-slate-700 transition-colors shadow-sm">
+            <div class="bg-slate-100 p-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
+                <span class="font-bold text-indigo-600 flex items-center gap-1"><i data-lucide="sparkles" class="w-4 h-4"></i> 미션을 정복하고 도장을 획득하세요!</span>
+                <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded-lg font-bold text-slate-700 transition-colors">
                     그만두기
                 </button>
             </div>
@@ -358,25 +328,25 @@
     </div>
 
     <!-- [4] 스탬프 북 팝업 -->
-    <div id="stamp-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white border-4 border-indigo-400 rounded-3xl w-full max-w-lg p-6 shadow-2xl relative text-slate-800 animate-in fade-in zoom-in-95 duration-250">
-            <button onclick="closeStampBook()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 bg-slate-100 p-1.5 rounded-full transition-all">
-                <i data-lucide="x" class="w-5 h-5"></i>
+    <div id="stamp-modal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-2 border-indigo-400 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative text-slate-800">
+            <button onclick="closeStampBook()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-655">
+                <i data-lucide="x" class="w-6 h-6"></i>
             </button>
             
             <div class="text-center mb-6">
-                <span class="text-6xl block">🏆</span>
-                <h3 class="text-3xl font-black fancy-font text-indigo-600 mt-2">나의 계성 투어 도장첩</h3>
-                <p class="text-xs text-slate-500 mt-1 font-bold">계성고등학교의 모든 학문을 마스터하여 명예 졸업 자격을 받으세요!</p>
+                <span class="text-5xl">🏆</span>
+                <h3 class="text-2xl font-black fancy-font text-indigo-600 mt-2">나의 계성 투어 도장첩</h3>
+                <p class="text-xs text-slate-500 mt-1">계성고등학교의 모든 학문을 마스터하여 졸업 자격을 받으세요!</p>
             </div>
 
             <!-- 스탬프 리스트 -->
-            <div id="stamp-grid" class="grid grid-cols-4 gap-3.5 max-h-[320px] overflow-y-auto p-3 bg-slate-50 rounded-2xl border border-slate-200 custom-scrollbar">
+            <div id="stamp-grid" class="grid grid-cols-4 gap-3 max-h-[300px] overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200 custom-scrollbar">
                 <!-- 동적으로 스탬프 상태 렌더링 -->
             </div>
 
             <div class="mt-6 flex gap-2">
-                <button onclick="checkGraduation()" class="w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-3 rounded-2xl text-center hover:brightness-105 active:scale-[0.99] transition-all shadow-md text-base">
+                <button onclick="checkGraduation()" class="w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-2.5 rounded-xl text-center hover:brightness-105 active:scale-[0.99] transition-all">
                     🎓 명예 졸업장 발급 확인
                 </button>
             </div>
@@ -384,41 +354,41 @@
     </div>
 
     <!-- [5] 졸업 축하 모달 -->
-    <div id="grad-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-lg hidden items-center justify-center z-50 p-4">
+    <div id="grad-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-lg hidden items-center justify-center z-50 p-4">
         <div class="bg-white border-4 border-amber-400 rounded-3xl w-full max-w-xl p-8 shadow-2xl text-center relative overflow-hidden text-slate-800">
             <div class="absolute -top-10 -left-10 w-40 h-40 bg-sky-400/10 rounded-full blur-3xl"></div>
             <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl"></div>
 
-            <span class="text-8xl block animate-bounce mb-4">🎓</span>
-            <h2 class="text-4xl font-black fancy-font text-amber-500 mb-2">계성고 명예 졸업장 수여</h2>
-            <p class="text-slate-650 text-sm max-w-md mx-auto mb-6 leading-relaxed font-semibold">
+            <span class="text-7xl block animate-bounce mb-4">🎓</span>
+            <h2 class="text-3xl font-black fancy-font text-amber-500 mb-2">계성고 명예 졸업장 수여</h2>
+            <p class="text-slate-650 text-sm max-w-md mx-auto mb-6">
                 위 학생은 계성고등학교의 풍부하고 깊이 있는 모든 교과 연계 게임과 도전과제들을 훌륭하게 극복하여, 본교의 영예로운 졸업 요건에 부합함을 입증하였으므로 이 명예 졸업장을 수여합니다.
             </p>
 
-            <div class="bg-amber-50 border-2 border-amber-200 p-6 rounded-2xl mb-6 inline-block min-w-[320px] shadow-sm">
-                <div class="text-xs text-amber-600 tracking-widest font-black">계성고등학교 명예졸업증서</div>
-                <div class="text-3xl font-extrabold mt-3 text-slate-800 text-center" id="grad-student-name">10101 홍길동</div>
-                <div class="text-[11px] text-slate-500 mt-2 font-bold" id="grad-date">발급일자: 2026년 7월 13일</div>
+            <div class="bg-amber-50 border-2 border-amber-200 p-6 rounded-2xl mb-6 inline-block min-w-[280px]">
+                <div class="text-xs text-amber-600 tracking-widest font-bold">계성고등학교 명예졸업증서</div>
+                <div class="text-2xl font-bold mt-2 text-slate-800 text-center" id="grad-student-name">10101 홍길동</div>
+                <div class="text-xs text-slate-500 mt-1" id="grad-date">발급일자: 2026년 7월 10일</div>
             </div>
 
             <div class="flex justify-center gap-3">
-                <button onclick="resetGame()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-6 py-3 rounded-2xl transition-all text-sm">
+                <button onclick="resetGame()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-6 py-2.5 rounded-xl transition-all text-sm">
                     처음부터 다시하기
                 </button>
-                <button onclick="closeGrad()" class="bg-sky-500 hover:bg-sky-600 text-white font-black px-6 py-3 rounded-2xl transition-all text-sm shadow-md shadow-sky-500/20">
+                <button onclick="closeGrad()" class="bg-sky-500 hover:bg-sky-600 text-white font-black px-6 py-2.5 rounded-xl transition-all text-sm">
                     확인
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- [6] 커스텀 알림 모달 -->
+    <!-- [6] 완전히 안전한 커스텀 알림 모달 -->
     <div id="custom-alert-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4">
-        <div class="bg-white border-2 border-indigo-400 rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center animate-in fade-in zoom-in-95 duration-150">
-            <span id="custom-alert-icon" class="text-5xl">💡</span>
-            <h3 id="custom-alert-title" class="text-xl font-bold text-slate-800 mt-2 fancy-font">안내</h3>
-            <p id="custom-alert-message" class="text-xs text-slate-500 mt-3 whitespace-pre-line leading-relaxed font-bold"></p>
-            <button onclick="closeCustomAlert()" class="w-full mt-5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs transition-all shadow">확인</button>
+        <div class="bg-white border-2 border-indigo-400 rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <span id="custom-alert-icon" class="text-4xl">💡</span>
+            <h3 id="custom-alert-title" class="text-lg font-bold text-slate-800 mt-2">안내</h3>
+            <p id="custom-alert-message" class="text-xs text-slate-500 mt-2 whitespace-pre-line leading-relaxed"></p>
+            <button onclick="closeCustomAlert()" class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs transition-all">확인</button>
         </div>
     </div>
 
@@ -428,7 +398,7 @@
     </footer>
 
     <script>
-        // --- [Web Audio API] 고품질 레트로 오디오 효과음 ---
+        // --- [Web Audio API] 계성 오락관 레트로 사운드 효과 기능 (우회 활성화 구조) ---
         let audioCtx = null;
         
         function playBeep(type) {
@@ -446,40 +416,33 @@
                 gain.connect(audioCtx.destination);
                 
                 if (type === 'click') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
                     gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
                     osc.start();
-                    osc.stop(audioCtx.currentTime + 0.1);
+                    osc.stop(audioCtx.currentTime + 0.08);
                 } else if (type === 'success') {
-                    osc.type = 'sine';
-                    // 도-미-솔 완벽한 아르페지오
-                    const now = audioCtx.currentTime;
-                    osc.frequency.setValueAtTime(523.25, now); // C5
-                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
-                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
-                    osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
-                    gain.gain.setValueAtTime(0.12, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); // G5
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
                     osc.start();
-                    osc.stop(now + 0.45);
+                    osc.stop(audioCtx.currentTime + 0.3);
                 } else if (type === 'fail') {
-                    osc.type = 'sawtooth';
-                    const now = audioCtx.currentTime;
-                    osc.frequency.setValueAtTime(196.00, now); // G3
-                    osc.frequency.setValueAtTime(146.83, now + 0.12); // D3
-                    gain.gain.setValueAtTime(0.12, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+                    osc.frequency.setValueAtTime(160, audioCtx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
                     osc.start();
-                    osc.stop(now + 0.35);
+                    osc.stop(audioCtx.currentTime + 0.3);
                 }
             } catch(e) {
-                console.log("Audio API 재생 제한 또는 비활성화 상태", e);
+                console.log("Audio play error", e);
             }
         }
 
-        // --- 커스텀 안내 모달 ---
+        // --- 완전한 자율 제어형 커스텀 안내 모달 구현 ---
         let alertCallback = null;
         function showCustomAlert(message, title = "안내", icon = "💡", callback = null) {
             document.getElementById('custom-alert-icon').innerText = icon;
@@ -509,6 +472,7 @@
             completedRooms: [] 
         };
 
+        // 교실 데이터 구조 정의
         const schoolMap = {
             1: {
                 left: [
@@ -518,13 +482,13 @@
                     { id: "1_lobby", name: "중앙 로비", desc: "넓고 쾌적한 계성고등학교의 로비입니다. (스탬프 없음)", icon: "🚪", gameType: "none" }
                 ],
                 right: [
-                    { id: "1_study", name: "자습실", desc: "공부하기 클릭으로 잠을 쫓고 집중력을 채워 자습 한도를 100%로 끌어올리세요!", icon: "📖", gameType: "study" }
+                    { id: "1_study", name: "자습실", desc: "잠을 쫓고 집중력을 채워 자습 한도를 100%로 끌어올리세요!", icon: "📖", gameType: "study" }
                 ]
             },
             2: {
                 left: [
                     { id: "2_infirmary", name: "보건실", desc: "아픈 학우들의 상태에 알맞은 치료 처방을 신속히 매치하세요!", icon: "🏥", gameType: "nurse" },
-                    { id: "2_art", name: "미술실", desc: "목표 타겟 색상과 일치하도록 R, G, B 삼원색 슬라이더를 맞추세요!", icon: "🎨", gameType: "absolute_color" }
+                    { id: "2_art", name: "미술실", desc: "목표 타겟 색상과 일치하도록 R, G, B 삼원색 슬라이더를 일치시키세요!", icon: "🎨", gameType: "absolute_color" }
                 ],
                 center: [
                     { id: "2_philosophy", name: "철학실", desc: "두 장의 전제와 한 장의 결론을 조합해 타당한 삼단논법 조판을 설계하세요!", icon: "🧠", gameType: "philosophy_syllogism" }
@@ -595,10 +559,12 @@
             playBeep('click');
             player.avatar = emoji;
             
+            // 모든 아바타 버튼에서 강조 테두리 및 스케일업 효과 제거
             document.querySelectorAll('.avatar-option').forEach(btn => {
                 btn.className = "avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm";
             });
             
+            // 선택된 버튼에만 눈에 띄는 초록색 대왕 링과 확대 효과 적용
             element.className = "avatar-option group relative p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 scale-110 flex flex-col items-center gap-1 shadow-md ring-4 ring-indigo-500 font-bold";
         }
 
@@ -616,6 +582,7 @@
                 return;
             }
 
+            // [학번 이름으로 간소화 표출 처리]
             let combinedName = `${idInput} ${nameInput}`;
             player.name = combinedName;
             
@@ -642,10 +609,10 @@
             container.innerHTML = '';
             for(let f=5; f>=1; f--) {
                 const btn = document.createElement('button');
-                btn.className = `w-full text-left p-3.5 rounded-2xl border flex items-center justify-between transition-all font-bold ${
+                btn.className = `w-full text-left p-3 rounded-xl border flex items-center justify-between transition-all font-bold ${
                     player.currentFloor === f 
-                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-md scale-[1.02] ring-2 ring-indigo-300' 
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-indigo-200'
+                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-md scale-[1.02]' 
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`;
                 btn.onclick = () => {
                     playBeep('click');
@@ -654,11 +621,11 @@
 
                 const label = document.createElement('span');
                 label.className = 'fancy-font text-base flex items-center gap-2';
-                label.innerHTML = `<span class="text-xs px-2 py-0.5 rounded-lg ${player.currentFloor === f ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}">${f}F</span> ${getFloorName(f)}`;
+                label.innerHTML = `<span class="text-xs px-1.5 py-0.5 rounded ${player.currentFloor === f ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}">${f}F</span> ${getFloorName(f)}`;
                 btn.appendChild(label);
 
                 const countBadge = document.createElement('span');
-                countBadge.className = `text-xs px-2.5 py-0.5 rounded-full font-extrabold ${player.currentFloor === f ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`;
+                countBadge.className = `text-xs px-2 py-0.5 rounded-full ${player.currentFloor === f ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`;
                 
                 const fRooms = [...schoolMap[f].left, ...schoolMap[f].center, ...schoolMap[f].right].filter(r => r.gameType !== 'none');
                 const fCleared = fRooms.filter(r => player.completedRooms.includes(r.id)).length;
@@ -699,7 +666,7 @@
             container.innerHTML = '';
 
             if (rooms.length === 0) {
-                container.innerHTML = `<div class="text-slate-400 text-xs text-center py-4 font-semibold">교실 없음</div>`;
+                container.innerHTML = `<div class="text-slate-400 text-xs text-center py-4">비어있음</div>`;
                 return;
             }
 
@@ -708,18 +675,18 @@
                 const isCleared = player.completedRooms.includes(room.id);
                 const isLobby = room.gameType === 'none';
 
-                let cardClasses = `room-card p-3 rounded-2xl border text-center transition-all cursor-pointer relative flex flex-col justify-center items-center ${
+                let cardClasses = `room-card p-3 rounded-xl border text-center transition-all cursor-pointer relative flex flex-col justify-center items-center ${
                     isLobby 
                     ? 'bg-slate-100 border-slate-200 cursor-default text-slate-400'
                     : isCleared 
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-inner' 
-                    : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-400 hover:bg-indigo-50/20 hover:-translate-y-0.5 shadow-sm'
+                    ? 'bg-emerald-55 border-emerald-300 text-emerald-800 shadow-sm' 
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-400 hover:bg-indigo-50/10 hover:-translate-y-0.5 shadow-sm'
                 }`;
 
                 if (isCenter) {
-                    cardClasses += " flex-1 min-h-[110px]";
+                    cardClasses += " flex-1 min-h-[100px]";
                 } else {
-                    cardClasses += " min-h-[75px]";
+                    cardClasses += " min-h-[70px]";
                 }
 
                 card.className = cardClasses;
@@ -731,14 +698,14 @@
                 let stampBadge = '';
                 if (!isLobby) {
                     stampBadge = isCleared 
-                    ? `<span class="absolute top-1.5 right-1.5 text-emerald-500 animate-in fade-in zoom-in"><i data-lucide="check-circle-2" class="w-5 h-5 fill-emerald-500 text-white"></i></span>`
-                    : `<span class="absolute top-1.5 right-1.5 text-slate-350"><i data-lucide="circle" class="w-4 h-4"></i></span>`;
+                    ? `<span class="absolute top-1 right-1 text-emerald-500"><i data-lucide="check-circle-2" class="w-4 h-4 fill-emerald-500 text-white"></i></span>`
+                    : `<span class="absolute top-1 right-1 text-slate-300"><i data-lucide="circle" class="w-3.5 h-3.5"></i></span>`;
                 }
 
                 card.innerHTML = `
                     ${stampBadge}
-                    <span class="text-3xl mb-1.5">${room.icon}</span>
-                    <span class="font-extrabold text-xs md:text-sm tracking-tight">${room.name}</span>
+                    <span class="text-2xl mb-1">${room.icon}</span>
+                    <span class="font-bold text-xs md:text-sm">${room.name}</span>
                 `;
                 
                 container.appendChild(card);
@@ -784,15 +751,15 @@
             totalStampRooms.forEach(room => {
                 const isCleared = player.completedRooms.includes(room.id);
                 const stampBox = document.createElement('div');
-                stampBox.className = `p-3 rounded-2xl border text-center flex flex-col items-center justify-center transition-all ${
+                stampBox.className = `p-3 rounded-lg border text-center flex flex-col items-center justify-center ${
                     isCleared 
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 scale-105 shadow' 
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800' 
                     : 'bg-slate-50 border-slate-200 opacity-60 text-slate-400'
                 }`;
 
                 stampBox.innerHTML = `
-                    <span class="text-4xl mb-1">${isCleared ? '⭐' : '🔒'}</span>
-                    <span class="text-[10px] font-black mt-1 block truncate w-full">${room.name}</span>
+                    <span class="text-3xl">${isCleared ? '⭐' : '🔒'}</span>
+                    <span class="text-[10px] font-bold mt-1 block truncate w-full">${room.name}</span>
                 `;
                 grid.appendChild(stampBox);
             });
@@ -825,18 +792,10 @@
             if (player.completedRooms.length >= totalStampRooms.length) {
                 closeStampBook();
                 document.getElementById('grad-student-name').innerText = player.name;
-                
-                // 졸업일자 현재일로 갱신
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = today.getMonth() + 1;
-                const date = today.getDate();
-                document.getElementById('grad-date').innerText = `발급일자: ${year}년 ${month}월 ${date}일`;
-
                 document.getElementById('grad-modal').classList.remove('hidden');
                 document.getElementById('grad-modal').classList.add('flex');
             } else {
-                showCustomAlert(`아직 모든 배움의 과정이 끝나지 않았어요!\n\n현재 스탬프: ${player.completedRooms.length} / ${totalStampRooms.length}\n모든 교실의 챌린지를 극복해 주세요!`, "학업 미수료", "🎓");
+                showCustomAlert(`아직 모든 배움의 과정이 끝나지 않았어요!\n현재 스탬프: ${player.completedRooms.length} / ${totalStampRooms.length}\n모든 교실의 챌린지를 극복해 주세요!`, "학업 미수료", "🎓");
             }
         }
 
@@ -912,10 +871,10 @@
                     break;
                 default:
                     playzone.innerHTML = `
-                        <div class="text-center py-8 animate-in fade-in">
-                            <span class="text-5xl">🛠️</span>
+                        <div class="text-center py-8">
+                            <span class="text-4xl">🛠️</span>
                             <p class="mt-2 text-slate-600 font-bold">도전 과제 준비 완료!</p>
-                            <button onclick="directClear()" class="mt-4 bg-indigo-600 text-white font-bold px-6 py-3 rounded-2xl shadow-md">스탬프 받기</button>
+                            <button onclick="directClear()" class="mt-4 bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md">스탬프 받기</button>
                         </div>
                     `;
             }
@@ -925,40 +884,40 @@
             clearCurrentRoom();
             const playzone = document.getElementById('game-playzone');
             playzone.innerHTML = `
-                <div class="text-center py-8 animate-in zoom-in-95 duration-200">
-                    <span class="text-6xl text-emerald-500 animate-pulse block mb-2">⭐</span>
-                    <h4 class="text-3xl font-black mt-2 text-emerald-600 fancy-font">미션 클리어!</h4>
-                    <p class="text-sm text-slate-500 mt-2 font-bold">스탬프 도장이 성공적으로 기록되었습니다.</p>
+                <div class="text-center py-8">
+                    <span class="text-5xl text-emerald-500 animate-pulse">✨</span>
+                    <h4 class="text-2xl font-black mt-2 text-emerald-600 fancy-font">미션 클리어!</h4>
+                    <p class="text-xs text-slate-500 mt-1">스탬프 도장이 쾅 찍혔습니다. 다음 교실로 전진하세요!</p>
                 </div>
             `;
         }
 
         // ==========================================
-        //  음악실 (리듬 판정 게임)
+        //  개별 이식 게임 1: 음악실 (리듬)
         // ==========================================
         function setupMusicGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-3 font-semibold">위에서 내려오는 음표가 노란 점선에 닿을 때 알맞은 버튼을 누르세요! (A/S/D 키 지원)</p>
-                    <div class="flex justify-around items-center bg-slate-900 border-2 border-slate-750 h-64 relative rounded-2xl overflow-hidden mb-4 shadow-inner">
+                    <p class="text-xs text-slate-500 mb-2">위에서 내려오는 음표가 점선에 닿을 때 알맞은 아래 버튼을 탭하세요! (A/S/D 키 사용 가능)</p>
+                    <div class="flex justify-around items-center bg-slate-900 border border-slate-200 h-60 relative rounded-xl overflow-hidden mb-4 shadow-inner">
                         <div class="w-1/3 h-full border-r border-slate-800 relative" id="rhythm-line-1">
-                            <div class="absolute bottom-8 w-full border-b-2 border-dashed border-amber-400"></div>
+                            <div class="absolute bottom-6 w-full border-b-2 border-dashed border-amber-400"></div>
                         </div>
                         <div class="w-1/3 h-full border-r border-slate-800 relative" id="rhythm-line-2">
-                            <div class="absolute bottom-8 w-full border-b-2 border-dashed border-amber-400"></div>
+                            <div class="absolute bottom-6 w-full border-b-2 border-dashed border-amber-400"></div>
                         </div>
                         <div class="w-1/3 h-full relative" id="rhythm-line-3">
-                            <div class="absolute bottom-8 w-full border-b-2 border-dashed border-amber-400"></div>
+                            <div class="absolute bottom-6 w-full border-b-2 border-dashed border-amber-400"></div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <button onclick="triggerHit(0)" id="btn-hit-0" class="bg-white border-2 border-slate-300 py-3 rounded-xl active:bg-indigo-600 active:text-white font-black text-sm shadow-sm text-slate-700 transition-colors">A (왼쪽)</button>
-                        <button onclick="triggerHit(1)" id="btn-hit-1" class="bg-white border-2 border-slate-300 py-3 rounded-xl active:bg-indigo-600 active:text-white font-black text-sm shadow-sm text-slate-700 transition-colors">S (가운데)</button>
-                        <button onclick="triggerHit(2)" id="btn-hit-2" class="bg-white border-2 border-slate-300 py-3 rounded-xl active:bg-indigo-600 active:text-white font-black text-sm shadow-sm text-slate-700 transition-colors">D (오른쪽)</button>
+                    <div class="flex gap-2">
+                        <button onclick="triggerHit(0)" class="flex-1 bg-white border border-slate-300 py-2.5 rounded-lg active:bg-indigo-500 active:text-white font-bold text-xs shadow-sm text-slate-700">A (왼쪽)</button>
+                        <button onclick="triggerHit(1)" class="flex-1 bg-white border border-slate-300 py-2.5 rounded-lg active:bg-indigo-500 active:text-white font-bold text-xs shadow-sm text-slate-700">S (가운데)</button>
+                        <button onclick="triggerHit(2)" class="flex-1 bg-white border border-slate-300 py-2.5 rounded-lg active:bg-indigo-500 active:text-white font-bold text-xs shadow-sm text-slate-700">D (오른쪽)</button>
                     </div>
-                    <div class="mt-4 flex justify-between items-center text-xs font-bold text-slate-650">
-                        <span class="text-sm">성공 횟수: <strong id="r-score" class="text-indigo-600 text-lg">0</strong> / 8회</span>
-                        <span id="r-feedback" class="text-indigo-500 font-black text-sm">준비 완료!</span>
+                    <div class="mt-3 flex justify-between items-center text-xs font-bold text-slate-600">
+                        <span>성공: <strong id="r-score" class="text-indigo-600 text-base">0</strong> / 8회</span>
+                        <span id="r-feedback" class="text-indigo-500">대기 중...</span>
                     </div>
                 </div>
             `;
@@ -969,20 +928,11 @@
             let activeNotes = [];
 
             const keyHandler = (e) => {
-                const key = e.key.toLowerCase();
-                if(key === 'a') { triggerHit(0); animateButton(0); }
-                if(key === 's') { triggerHit(1); animateButton(1); }
-                if(key === 'd') { triggerHit(2); animateButton(2); }
+                if(e.key.toLowerCase() === 'a') triggerHit(0);
+                if(e.key.toLowerCase() === 's') triggerHit(1);
+                if(e.key.toLowerCase() === 'd') triggerHit(2);
             };
             window.addEventListener('keydown', keyHandler);
-
-            function animateButton(index) {
-                const btn = document.getElementById(`btn-hit-${index}`);
-                if (btn) {
-                    btn.classList.add('bg-indigo-600', 'text-white');
-                    setTimeout(() => btn.classList.remove('bg-indigo-600', 'text-white'), 100);
-                }
-            }
 
             const cleanMusicGame = () => {
                 clearInterval(gameInterval);
@@ -995,14 +945,13 @@
                 if (!lineDiv) return;
 
                 const note = document.createElement('div');
-                note.className = 'absolute w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400 flex items-center justify-center text-white text-base font-black transition-all duration-[1500ms] ease-linear shadow-md';
-                note.style.top = '-40px';
-                note.style.left = 'calc(50% - 20px)';
+                note.className = 'absolute w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-400 to-sky-500 flex items-center justify-center text-white text-xs font-bold transition-all duration-[1500ms] ease-linear';
+                note.style.top = '0px';
+                note.style.left = 'calc(50% - 16px)';
                 note.innerText = '🎵';
                 lineDiv.appendChild(note);
 
-                // 조금 더 부드러운 위치 하강
-                setTimeout(() => { note.style.top = '210px'; }, 50);
+                setTimeout(() => { note.style.top = '200px'; }, 50);
 
                 const noteData = { element: note, line: lineIndex, spawnTime: Date.now() };
                 activeNotes.push(noteData);
@@ -1011,7 +960,7 @@
                     if (note.parentNode) { note.parentNode.removeChild(note); }
                     activeNotes = activeNotes.filter(n => n !== noteData);
                 }, 1600);
-            }, 850);
+            }, 1000);
 
             window.triggerHit = function(line) {
                 const notesOnLine = activeNotes.filter(n => n.line === line);
@@ -1019,13 +968,12 @@
                     const candidate = notesOnLine[0];
                     const elapsed = Date.now() - candidate.spawnTime;
                     
-                    // 판정 시간 튜닝
-                    if (elapsed >= 1350 && elapsed <= 1600) {
+                    if (elapsed >= 1300 && elapsed <= 1600) {
                         score++;
                         playBeep('success');
                         document.getElementById('r-score').innerText = score;
                         document.getElementById('r-feedback').innerText = "✨ PERFECT! ✨";
-                        document.getElementById('r-feedback').className = "text-emerald-500 font-extrabold text-sm animate-bounce";
+                        document.getElementById('r-feedback').className = "text-emerald-500 font-bold";
                         
                         if (candidate.element.parentNode) { candidate.element.parentNode.removeChild(candidate.element); }
                         activeNotes = activeNotes.filter(n => n !== candidate);
@@ -1041,7 +989,7 @@
             function triggerFailFeedback() {
                 playBeep('fail');
                 document.getElementById('r-feedback').innerText = "⚠️ MISS!";
-                document.getElementById('r-feedback').className = "text-rose-500 font-extrabold text-sm";
+                document.getElementById('r-feedback').className = "text-rose-500 font-bold";
             }
 
             const origClose = window.closeModal;
@@ -1053,22 +1001,22 @@
         }
 
         // ==========================================
-        //  자습실 (집중 클릭커)
+        //  개별 이식 게임 2: 자습실 (집중 클릭커)
         // ==========================================
         function setupStudyGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
                     <p class="text-xs text-slate-600 mb-4 font-bold">졸음 귀신이 기습해오기 전에 빠르게 공부하기 버튼을 눌러 자습 지수를 가득 채우세요!</p>
-                    <div class="relative bg-white border border-slate-200 h-32 rounded-2xl flex items-center justify-center overflow-hidden mb-5 shadow-sm">
-                        <div class="w-4/5 bg-slate-100 h-10 rounded-full border border-slate-200 overflow-hidden relative shadow-inner">
-                            <div id="study-progress" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full w-0 transition-all duration-75"></div>
-                            <span class="absolute inset-0 flex items-center justify-center font-extrabold text-xs text-slate-700" id="study-percent">자습 지수: 0%</span>
+                    <div class="relative bg-white border border-slate-200 h-28 rounded-xl flex items-center justify-center overflow-hidden mb-4 shadow-sm">
+                        <div class="w-4/5 bg-slate-100 h-8 rounded-full border border-slate-200 overflow-hidden relative">
+                            <div id="study-progress" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full w-0 transition-all duration-100"></div>
+                            <span class="absolute inset-0 flex items-center justify-center font-bold text-xs text-slate-700" id="study-percent">자습 지수: 0%</span>
                         </div>
                     </div>
-                    <button onclick="studyClick()" class="w-full bg-gradient-to-r from-sky-450 to-indigo-500 text-white font-black py-5 rounded-2xl text-base transition-transform active:scale-95 shadow-lg shadow-indigo-500/10 hover:brightness-105">
+                    <button onclick="studyClick()" class="w-full bg-gradient-to-r from-sky-400 to-indigo-500 text-white font-black py-4 rounded-xl text-sm transition-transform active:scale-95 shadow-lg shadow-indigo-500/10">
                         ✍️ 집중해서 열공하기! (클릭/터치)
                     </button>
-                    <p class="text-[11px] text-slate-400 mt-3 font-bold">시간이 흐를수록 자습 집중도가 감소합니다! 스피드가 중요해요!</p>
+                    <p class="text-[11px] text-slate-400 mt-2 font-bold">시간이 흐를수록 점점 자습 집중도가 자연 감소합니다!</p>
                 </div>
             `;
 
@@ -1077,14 +1025,14 @@
 
             decayInterval = setInterval(() => {
                 if (progress > 0) {
-                    progress = Math.max(0, progress - 4);
+                    progress = Math.max(0, progress - 3);
                     updateUI();
                 }
-            }, 350);
+            }, 400);
 
             window.studyClick = function() {
                 playBeep('click');
-                progress += 9;
+                progress += 8;
                 if (progress >= 100) {
                     progress = 100;
                     updateUI();
@@ -1113,36 +1061,36 @@
         }
 
         // ==========================================
-        //  보건실 (처방 매칭)
+        //  개별 이식 게임 3: 보건실 (처방 매칭)
         // ==========================================
         function setupNurseGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-3 font-semibold">보건실에 응급 환자 발생! 아픈 학생들의 부위에 알맞은 치료법을 짝지어주세요.</p>
-                    <div class="flex justify-center items-center gap-6 bg-white border border-slate-200 p-5 rounded-2xl mb-5 relative min-h-[140px] shadow-sm">
+                    <p class="text-xs text-slate-500 mb-2">보건실에 응급 상황 발생! 아픈 학생들의 부위에 알맞은 치료법을 짝지어주세요.</p>
+                    <div class="flex justify-center items-center gap-6 bg-white border border-slate-200 p-4 rounded-xl mb-4 relative min-h-[130px] shadow-sm">
                         <div class="text-center">
-                            <span class="text-6xl animate-bounce inline-block" id="patient-icon">🤒</span>
-                            <div class="text-xs text-slate-650 mt-3 font-black" id="patient-status">증상: 머리가 아파요</div>
+                            <span class="text-5xl animate-bounce inline-block" id="patient-icon">🤒</span>
+                            <div class="text-xs text-slate-600 mt-2 font-black" id="patient-status">증상: 머리가 아파요</div>
                         </div>
-                        <div class="h-12 w-[1px] bg-slate-200"></div>
+                        <div class="h-10 w-[1px] bg-slate-200"></div>
                         <div class="text-left">
-                            <div class="text-xs text-slate-400 font-extrabold uppercase tracking-wider">치료 완료 인원</div>
-                            <div class="text-3xl font-black text-indigo-500 mt-1"><span id="heal-count">0</span> / 3</div>
+                            <div class="text-xs text-slate-400 font-bold">치료 완료 인원</div>
+                            <div class="text-2xl font-black text-indigo-500"><span id="heal-count">0</span> / 3</div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <button onclick="applyCure('pill')" class="bg-white border-2 border-slate-200 hover:border-indigo-200 p-3.5 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">💊 해열제 투약</button>
-                        <button onclick="applyCure('band')" class="bg-white border-2 border-slate-200 hover:border-indigo-200 p-3.5 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">🩹 밴드 처치</button>
-                        <button onclick="applyCure('spray')" class="bg-white border-2 border-slate-200 hover:border-indigo-200 p-3.5 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">💨 소독 스프레이</button>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="applyCure('pill')" class="bg-white border border-slate-300 hover:bg-slate-50 p-2.5 rounded-lg text-xs font-bold text-slate-700 shadow-sm">💊 해열제 투약</button>
+                        <button onclick="applyCure('band')" class="bg-white border border-slate-300 hover:bg-slate-50 p-2.5 rounded-lg text-xs font-bold text-slate-700 shadow-sm">🩹 밴드 처치</button>
+                        <button onclick="applyCure('spray')" class="bg-white border border-slate-300 hover:bg-slate-50 p-2.5 rounded-lg text-xs font-bold text-slate-700 shadow-sm">💨 소독 스프레이</button>
                     </div>
                 </div>
             `;
 
             let healed = 0;
             const patientTypes = [
-                { icon: '🤒', symptom: '머리가 욱신거리고 아파요', cure: 'pill' },
-                { icon: '🤕', symptom: '넘어져서 무릎이 까지고 피가 나요', cure: 'band' },
-                { icon: '🦟', symptom: '모기에 심하게 물려 부어올랐어요', cure: 'spray' }
+                { icon: '🤒', symptom: '머리가 아파요', cure: 'pill' },
+                { icon: '🤕', symptom: '넘어져서 무릎이 까졌어요', cure: 'band' },
+                { icon: '🦟', symptom: '모기/벌레에 세게 물렸어요', cure: 'spray' }
             ];
             let currentPatientIdx = 0;
 
@@ -1178,48 +1126,48 @@
         function setupAbsoluteColorGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <p class="text-xs text-slate-500 font-semibold">제시된 타겟 컬러와 일치하도록 R, G, B 조절바를 정교하게 움직여 보세요!</p>
+                    <p class="text-xs text-slate-500">제시된 타겟 컬러와 일치하도록 R, G, B 조절바를 정교하게 움직여 보세요!</p>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col">
                             <span class="text-[11px] font-bold text-slate-400 mb-1">제시된 색상 (Target)</span>
-                            <div id="target-color-preview" class="w-full h-24 rounded-2xl border border-slate-200 shadow-inner flex items-center justify-center">
-                                <span class="bg-black/55 text-[10px] text-white px-2 py-0.5 rounded font-mono">RGB 비밀 🤫</span>
+                            <div id="target-color-preview" class="w-full h-24 rounded-xl border border-slate-200 shadow-inner flex items-center justify-center">
+                                <span class="bg-black/50 text-[10px] text-white px-2 py-0.5 rounded">RGB 비밀 🤫</span>
                             </div>
                         </div>
                         <div class="flex flex-col">
                             <span class="text-[11px] font-bold text-slate-400 mb-1">내가 조작한 색상</span>
-                            <div id="user-color-preview" class="w-full h-24 rounded-2xl border border-slate-200 shadow-inner"></div>
+                            <div id="user-color-preview" class="w-full h-24 rounded-xl border border-slate-200 shadow-inner"></div>
                         </div>
                     </div>
 
-                    <div class="space-y-4 bg-white p-4 rounded-2xl border border-slate-200 text-left">
+                    <div class="space-y-3 bg-white p-3 rounded-xl border border-slate-200 text-left">
                         <div class="flex items-center gap-3">
-                            <span class="text-xs font-black text-red-500 w-16">RED (빨강)</span>
-                            <input type="range" id="slider-r" min="0" max="255" value="127" class="flex-grow h-2.5 bg-slate-100 rounded-lg appearance-none cursor-pointer text-red-500">
-                            <span id="label-r" class="text-xs font-mono font-bold w-8 text-right">127</span>
+                            <span class="text-xs font-bold text-red-500 w-16">RED (빨강)</span>
+                            <input type="range" id="slider-r" min="0" max="255" value="127" class="flex-grow h-2 bg-gradient-to-r from-black to-red-500 rounded-lg appearance-none cursor-pointer text-red-500">
+                            <span id="label-r" class="text-xs font-mono w-8 text-right">127</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="text-xs font-black text-emerald-500 w-16">GREEN (초록)</span>
-                            <input type="range" id="slider-g" min="0" max="255" value="127" class="flex-grow h-2.5 bg-slate-100 rounded-lg appearance-none cursor-pointer text-emerald-500">
-                            <span id="label-g" class="text-xs font-mono font-bold w-8 text-right">127</span>
+                            <span class="text-xs font-bold text-emerald-500 w-16">GREEN (초록)</span>
+                            <input type="range" id="slider-g" min="0" max="255" value="127" class="flex-grow h-2 bg-gradient-to-r from-black to-emerald-500 rounded-lg appearance-none cursor-pointer text-emerald-500">
+                            <span id="label-g" class="text-xs font-mono w-8 text-right">127</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="text-xs font-black text-indigo-500 w-16">BLUE (파랑)</span>
-                            <input type="range" id="slider-b" min="0" max="255" value="127" class="flex-grow h-2.5 bg-slate-100 rounded-lg appearance-none cursor-pointer text-indigo-500">
-                            <span id="label-b" class="text-xs font-mono font-bold w-8 text-right">127</span>
+                            <span class="text-xs font-bold text-indigo-500 w-16">BLUE (파랑)</span>
+                            <input type="range" id="slider-b" min="0" max="255" value="127" class="flex-grow h-2 bg-gradient-to-r from-black to-indigo-500 rounded-lg appearance-none cursor-pointer text-indigo-500">
+                            <span id="label-b" class="text-xs font-mono w-8 text-right">127</span>
                         </div>
                     </div>
 
-                    <button onclick="compareColors()" class="w-full bg-indigo-650 hover:bg-indigo-700 text-white font-black py-3 rounded-2xl text-xs transition-all flex items-center justify-center gap-2 shadow-md">
+                    <button onclick="compareColors()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors flex items-center justify-center gap-2">
                         <i data-lucide="check-circle" class="w-4 h-4"></i> 결과 비교하고 검증하기
                     </button>
                 </div>
             `;
 
             const tgtColor = {
-                r: Math.floor(Math.random() * 210) + 20,
-                g: Math.floor(Math.random() * 210) + 20,
-                b: Math.floor(Math.random() * 210) + 20
+                r: Math.floor(Math.random() * 256),
+                g: Math.floor(Math.random() * 256),
+                b: Math.floor(Math.random() * 256)
             };
             const userColor = { r: 127, g: 127, b: 127 };
 
@@ -1260,47 +1208,47 @@
 
                 if (similarity >= 90) {
                     playBeep('success');
-                    showCustomAlert(`완벽합니다! 일치도: ${similarity}%\n\n정답: RGB(${tgtColor.r}, ${tgtColor.g}, ${tgtColor.b})\n만든 색상: RGB(${userColor.r}, ${userColor.g}, ${userColor.b})`, "판정 통과", "🎨", () => {
+                    showCustomAlert(`완벽합니다! 일치도: ${similarity}%\n정답: RGB(${tgtColor.r}, ${tgtColor.g}, ${tgtColor.b})\n내가 만든 색상: RGB(${userColor.r}, ${userColor.g}, ${userColor.b})`, "판정 통과", "🎨", () => {
                         directClear();
                     });
                 } else {
                     playBeep('fail');
-                    showCustomAlert(`조금 더 세밀한 조정이 필요해요!\n일치도: ${similarity}%\n\n(90% 이상 일치 시 도장을 받을 수 있습니다.)`, "색상 불일치", "🧐");
+                    showCustomAlert(`조금 더 미세한 조작이 필요해요! 일치도: ${similarity}%\n(90% 이상 일치 시 통과됩니다.)`, "색상 불일치", "🧐");
                 }
             };
             lucide.createIcons();
         }
 
         // ==========================================
-        //  철학실 (논증 조판소)
+        //  철학실 (논증 조판소) - 다리 있는 뱀 버그 수정
         // ==========================================
         function setupSyllogismGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center space-y-4 animate-in fade-in">
-                    <p class="text-xs text-slate-500 font-semibold">제시된 세 가지 전제와 결론 카드를 알맞게 조립하여 타당한 삼단논법을 세우세요.</p>
-                    <div class="space-y-3 text-left">
-                        <div class="border-2 border-dashed border-slate-350 p-3.5 rounded-2xl min-h-[55px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between transition-all" onclick="selectSlot(0)">
-                            <span class="text-xs text-slate-400 font-extrabold uppercase">전제 1</span>
-                            <span id="slot-0" class="text-xs text-slate-700 font-bold italic text-slate-400">카드를 선택해 채우세요</span>
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500">제시된 세 가지 전제와 결론 카드를 알맞게 조립하여 타당한 삼단논법을 세우세요.</p>
+                    <div class="space-y-2 text-left">
+                        <div class="border-2 border-dashed border-slate-300 p-2.5 rounded-lg min-h-[50px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between" onclick="selectSlot(0)">
+                            <span class="text-xs text-slate-400 font-bold">전제 1</span>
+                            <span id="slot-0" class="text-xs text-slate-700 font-semibold italic text-slate-400">카드를 선택해 채우세요</span>
                         </div>
-                        <div class="border-2 border-dashed border-slate-355 p-3.5 rounded-2xl min-h-[55px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between transition-all" onclick="selectSlot(1)">
-                            <span class="text-xs text-slate-400 font-extrabold uppercase">전제 2</span>
-                            <span id="slot-1" class="text-xs text-slate-700 font-bold italic text-slate-400">카드를 선택해 채우세요</span>
+                        <div class="border-2 border-dashed border-slate-300 p-2.5 rounded-lg min-h-[50px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between" onclick="selectSlot(1)">
+                            <span class="text-xs text-slate-400 font-bold">전제 2</span>
+                            <span id="slot-1" class="text-xs text-slate-700 font-semibold italic text-slate-400">카드를 선택해 채우세요</span>
                         </div>
-                        <div class="border-2 border-dashed border-slate-355 p-3.5 rounded-2xl min-h-[55px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between transition-all" onclick="selectSlot(2)">
-                            <span class="text-xs text-slate-400 font-extrabold uppercase text-emerald-500">결론</span>
-                            <span id="slot-2" class="text-xs text-slate-700 font-bold italic text-slate-400">카드를 선택해 채우세요</span>
+                        <div class="border-2 border-dashed border-slate-300 p-2.5 rounded-lg min-h-[50px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between" onclick="selectSlot(2)">
+                            <span class="text-xs text-slate-400 font-bold">결론</span>
+                            <span id="slot-2" class="text-xs text-slate-700 font-semibold italic text-slate-400">카드를 선택해 채우세요</span>
                         </div>
                     </div>
 
-                    <div class="text-left bg-slate-100 p-4 rounded-2xl border border-slate-200">
-                        <span class="text-[10px] text-slate-450 block mb-2 font-extrabold uppercase tracking-wide">보유 카드 더미 (눌러서 선택)</span>
-                        <div id="syllogism-cards-container" class="flex flex-col gap-2.5"></div>
+                    <div class="text-left bg-slate-100 p-3 rounded-xl border border-slate-200">
+                        <span class="text-[10px] text-slate-400 block mb-2 font-bold">카드 더미 (눌러서 선택)</span>
+                        <div id="syllogism-cards-container" class="flex flex-col gap-2"></div>
                     </div>
 
                     <div class="flex gap-2">
-                        <button onclick="clearSyllogism()" class="flex-grow bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold py-3 rounded-xl text-xs transition-colors">비우기</button>
-                        <button onclick="verifySyllogism()" class="flex-grow bg-sky-500 hover:bg-sky-600 text-white font-extrabold py-3 rounded-xl text-xs transition-all shadow-sm">검증하기</button>
+                        <button onclick="clearSyllogism()" class="flex-grow bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs transition-colors">비우기</button>
+                        <button onclick="verifySyllogism()" class="flex-grow bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 rounded-xl text-xs transition-colors">검증하기</button>
                     </div>
                 </div>
             `;
@@ -1309,7 +1257,7 @@
                 { id: 0, type: 'premise', text: '모든 파충류는 온혈동물이 아니다.' },
                 { id: 1, type: 'premise', text: '모든 뱀은 파충류다.' },
                 { id: 2, type: 'conclusion', text: '그러므로 어떤 뱀도 온혈동물이 아니다.' },
-                { id: 3, type: 'dummy', text: '모든 뱀은 다리를 가지고 있다.' }
+                { id: 3, type: 'dummy', text: '모든 뱀은 다리를 가지고 있다.' } // [다리 있는 뱀 오류 명백한 더미로 수정 완료]
             ];
 
             let selectedCard = null;
@@ -1317,13 +1265,12 @@
 
             function renderCards() {
                 const parent = document.getElementById('syllogism-cards-container');
-                if (!parent) return;
                 parent.innerHTML = '';
                 cards.forEach(c => {
                     if (placed.includes(c.id)) return;
                     const btn = document.createElement('button');
-                    btn.className = `w-full text-left p-3 bg-white border border-slate-200 rounded-xl text-xs font-bold hover:border-sky-500 transition-all ${selectedCard?.id === c.id ? 'ring-2 ring-sky-550 bg-sky-50/50' : ''}`;
-                    btn.innerHTML = `<span class="px-2 py-0.5 rounded-lg text-[10px] mr-2 ${c.type === 'conclusion' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${c.type === 'conclusion' ? '결론' : '전제'}</span> ${c.text}`;
+                    btn.className = `w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold hover:border-sky-500 transition-colors ${selectedCard?.id === c.id ? 'ring-2 ring-sky-500 bg-sky-50' : ''}`;
+                    btn.innerHTML = `<span class="px-1.5 py-0.5 rounded text-[10px] mr-2 ${c.type === 'conclusion' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${c.type === 'conclusion' ? '결론' : '전제'}</span> ${c.text}`;
                     btn.onclick = () => {
                         playBeep('click');
                         selectedCard = c;
@@ -1336,16 +1283,14 @@
             window.selectSlot = function(index) {
                 if (selectedCard) {
                     placed[index] = selectedCard.id;
-                    const slotEl = document.getElementById(`slot-${index}`);
-                    slotEl.innerText = selectedCard.text;
-                    slotEl.classList.remove('italic', 'text-slate-400');
+                    document.getElementById(`slot-${index}`).innerText = selectedCard.text;
+                    document.getElementById(`slot-${index}`).classList.remove('italic', 'text-slate-400');
                     selectedCard = null;
                     renderCards();
                 } else if (placed[index] !== null) {
                     placed[index] = null;
-                    const slotEl = document.getElementById(`slot-${index}`);
-                    slotEl.innerText = "카드를 선택해 채우세요";
-                    slotEl.classList.add('italic', 'text-slate-400');
+                    document.getElementById(`slot-${index}`).innerText = "카드를 선택해 채우세요";
+                    document.getElementById(`slot-${index}`).classList.add('italic', 'text-slate-400');
                     renderCards();
                 }
             };
@@ -1354,18 +1299,15 @@
                 placed = [null, null, null];
                 selectedCard = null;
                 for (let i = 0; i < 3; i++) {
-                    const slotEl = document.getElementById(`slot-${i}`);
-                    if (slotEl) {
-                        slotEl.innerText = "카드를 선택해 채우세요";
-                        slotEl.classList.add('italic', 'text-slate-400');
-                    }
+                    document.getElementById(`slot-${i}`).innerText = "카드를 선택해 채우세요";
+                    document.getElementById(`slot-${i}`).classList.add('italic', 'text-slate-400');
                 }
                 renderCards();
             };
 
             window.verifySyllogism = function() {
                 if (placed[0] === null || placed[1] === null || placed[2] === null) {
-                    showCustomAlert('세 칸을 모두 채워야 검증이 가능합니다!', '슬롯 미완성', '⚠️');
+                    showCustomAlert('세 칸을 카드들로 모두 조립해야 검증할 수 있습니다!', '슬롯 미완성', '⚠️');
                     return;
                 }
                 
@@ -1375,12 +1317,12 @@
 
                 if (hasP1 && hasP2 && hasC) {
                     playBeep('success');
-                    showCustomAlert('정답입니다! 타당한 삼단논법(Celarent 격식)을 완벽히 구축하셨습니다.', '논증 통과', '🧠', () => {
+                    showCustomAlert('정답입니다! 뱀(파충류)의 올바른 생물학적 사실을 기반으로 타당한 삼단논법을 완성했습니다.', '논증 통과', '🧠', () => {
                         directClear();
                     });
                 } else {
                     playBeep('fail');
-                    showCustomAlert('아쉽게도 오류가 있는 삼단논법입니다. 파충류와 뱀의 개념적 주연 규칙을 고려하세요.', '논증 기각', '❌');
+                    showCustomAlert('아쉽게도 오류가 있는 삼단논법입니다. 파충류, 뱀, 온혈동물 개념의 주연 규칙에 유의해 조합하세요.', '논증 기각', '❌');
                 }
             };
 
@@ -1388,16 +1330,16 @@
         }
 
         // ==========================================
-        //  영어실 (영어단어 3D 플립 카드)
+        //  영어실 (영어단어 <-> 한글뜻 매치)
         // ==========================================
         function setupEnglishMemoryGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center space-y-4 animate-in fade-in">
-                    <p class="text-xs text-slate-500 font-semibold">12장의 카드를 뒤집어 <b>영어 단어</b>와 그에 알맞은 <b>한글 뜻</b> 짝을 맞추세요!</p>
-                    <div class="grid grid-cols-4 gap-3 max-w-sm mx-auto" id="english-card-board"></div>
-                    <div class="flex justify-between items-center text-xs font-bold text-slate-600 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm max-w-sm mx-auto">
-                        <span>성공한 짝: <strong id="mem-score" class="text-indigo-600 text-base">0</strong> / 6쌍</span>
-                        <span class="text-slate-400">불일치 시 자동으로 다시 뒤집힙니다.</span>
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500">카드 12장 중 2장을 골라 <b>영어 단어</b>와 그에 해당하는 올바른 <b>한글 뜻</b> 짝을 맞춰 뒤집으세요!</p>
+                    <div class="grid grid-cols-4 gap-2.5 max-w-sm mx-auto" id="english-card-board"></div>
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500">
+                        <span>성공한 짝: <strong id="mem-score" class="text-indigo-650 text-sm">0</strong> / 6쌍</span>
+                        <span class="text-slate-400">틀리면 제자리에 다시 뒤집힙니다!</span>
                     </div>
                 </div>
             `;
@@ -1432,10 +1374,10 @@
                 
                 cardOuter.innerHTML = `
                     <div class="flip-card-inner relative w-full h-full text-center">
-                        <div class="flip-card-front absolute inset-0 bg-gradient-to-br from-indigo-650 to-indigo-500 border border-indigo-400 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-md">?</div>
-                        <div class="flip-card-back absolute inset-0 bg-white border-2 border-indigo-250 rounded-2xl flex flex-col items-center justify-center p-1.5 shadow-md">
-                            <span class="text-xs font-black text-slate-800 break-words w-full px-0.5 leading-tight">${c.word}</span>
-                            <span class="text-[9px] font-extrabold mt-2 px-2 py-0.5 rounded-full ${c.lang === 'ENG' ? 'bg-sky-100 text-sky-700' : 'bg-indigo-50 text-indigo-700'}">${c.lang}</span>
+                        <div class="flip-card-front absolute inset-0 bg-indigo-600 border border-indigo-400 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-sm">?</div>
+                        <div class="flip-card-back absolute inset-0 bg-white border border-slate-300 rounded-lg flex flex-col items-center justify-center p-1 shadow-sm">
+                            <span class="text-xs font-black text-slate-800 break-words w-full px-0.5">${c.word}</span>
+                            <span class="text-[8px] font-bold mt-1.5 px-1.5 py-0.5 rounded ${c.lang === 'ENG' ? 'bg-sky-50 text-sky-600' : 'bg-indigo-50 text-indigo-600'}">${c.lang === 'ENG' ? 'ENG' : 'KOR'}</span>
                         </div>
                     </div>
                 `;
@@ -1474,7 +1416,7 @@
                             firstCard = null;
                             secondCard = null;
                             lock = false;
-                        }, 900);
+                        }, 1000);
                     }
                 };
 
@@ -1483,32 +1425,34 @@
         }
 
         // ==========================================
-        //  국어실 (품사 분류 타임어택)
+        //  개별 이식 게임 7: 3층 국어실 (품사 분류 타임어택)
         // ==========================================
         function setupPartsOfSpeechGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <p class="text-xs text-slate-500 font-semibold">빨간색으로 밑줄 처진 단어의 알맞은 한국어 9품사를 정확하게 매치하세요!</p>
-                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm text-base font-serif" id="korean-sentence">
-                        철수는 오늘 <span class="text-rose-500 font-black underline underline-offset-4">공원</span>에서 축구를 했다.
+                    <p class="text-xs text-slate-500">문장에서 빨간색으로 강조된 단어의 알맞은 한국어 9품사를 정확하고 빠르게 클릭하세요!</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-sm text-base font-serif" id="korean-sentence">
+                        철수는 어제 <span class="text-rose-500 font-black underline underline-offset-4">공원</span>에서 축구를 했다.
                     </div>
-                    <div class="grid grid-cols-3 gap-3" id="korean-choices"></div>
-                    <div class="text-xs font-bold text-slate-600 bg-white py-2 rounded-xl border border-slate-100 max-w-xs mx-auto">
-                        연속 정답 콤보: <span id="kor-combo" class="text-indigo-600 text-base font-extrabold">0</span> / 4회
+                    <div class="grid grid-cols-3 gap-2" id="korean-choices">
+                        <!-- 동적 품사 선택 단추 -->
+                    </div>
+                    <div class="text-xs font-bold text-slate-500">
+                        연속 매칭: <span id="kor-combo" class="text-indigo-650 text-sm">0</span> / 4회 성공 타겟
                     </div>
                 </div>
             `;
 
             const sentences = [
-                { text: '우리는 내일 동물원 <span class="text-rose-500 font-bold underline underline-offset-4">앞</span>에서 만나기로 했다.', answer: '명사' },
-                { text: '<span class="text-rose-500 font-bold underline underline-offset-4">그것</span>은 계성고 최고의 영광이다.', answer: '대명사' },
-                { text: '귤 <span class="text-rose-500 font-bold underline underline-offset-4">둘</span>을 까서 사이좋게 나누어 가졌다.', answer: '수사' },
-                { text: '샛별이들이 넓은 교정을 신나게 <span class="text-rose-500 font-bold underline underline-offset-4">달린다</span>.', answer: '동사' },
-                { text: '오늘따라 아침 가을 하늘이 매우 <span class="text-rose-500 font-bold underline underline-offset-4">맑구나</span>.', answer: '형용사' },
-                { text: '학도들이 <span class="text-rose-500 font-bold underline underline-offset-4">헌</span> 책을 모아 도서관에 기증했다.', answer: '관형사' },
-                { text: '빗방울이 유리창에 <span class="text-rose-500 font-bold underline underline-offset-4">주룩주룩</span> 내리고 있다.', answer: '부사' },
-                { text: '민수<span class="text-rose-500 font-bold underline underline-offset-4">가</span> 드디어 어려운 퀴즈를 해결했다.', answer: '조사' },
-                { text: '<span class="text-rose-500 font-bold underline underline-offset-4">어머나</span>, 정말 아름다운 교정일세!', answer: '감탄사' }
+                { text: '철수는 어제 <span class="text-rose-500 font-bold underline">공원</span>에서 축구를 했다.', answer: '명사' },
+                { text: '<span class="text-rose-500 font-bold underline">저것</span>은 내가 가장 소중히 하는 책이다.', answer: '대명사' },
+                { text: '사과 <span class="text-rose-500 font-bold underline">하나</span>를 집어 들었다.', answer: '수사' },
+                { text: '아이가 마당에서 신나게 <span class="text-rose-500 font-bold underline">뛰었다</span>.', answer: '동사' },
+                { text: '오늘따라 아침 하늘이 매우 <span class="text-rose-500 font-bold underline">푸르다</span>.', answer: '형용사' },
+                { text: '그는 <span class="text-rose-500 font-bold underline">새</span> 가방을 메고 복도를 돌았다.', answer: '관형사' },
+                { text: '바람이 불어 낙엽이 <span class="text-rose-500 font-bold underline">천천히</span> 떨어진다.', answer: '부사' },
+                { text: '영희<span class="text-rose-500 font-bold underline">가</span> 지우개를 빌려주었다.', answer: '조사' },
+                { text: '<span class="text-rose-500 font-bold underline">아이고</span>, 깜짝이야!', answer: '감탄사' }
             ];
 
             const allParts = ['명사', '대명사', '수사', '동사', '형용사', '관형사', '부사', '조사', '감탄사'];
@@ -1532,7 +1476,7 @@
                 choicesBox.innerHTML = '';
                 list.forEach(p => {
                     const btn = document.createElement('button');
-                    btn.className = 'bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-black py-4 rounded-xl text-xs transition-all shadow-sm';
+                    btn.className = 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 rounded-lg text-xs transition-all shadow-sm';
                     btn.innerText = p;
                     btn.onclick = () => {
                         if (p === target.answer) {
@@ -1546,11 +1490,10 @@
                             }
                         } else {
                             playBeep('fail');
-                            showCustomAlert(`틀렸습니다! 정답은 [ ${target.answer} ] 입니다.`, "오답 판정", "👀", () => {
-                                combo = 0;
-                                document.getElementById('kor-combo').innerText = combo;
-                                nextChallenge();
-                            });
+                            showCustomAlert('틀렸습니다! 품사의 성격을 다시 떠올려보세요.', "오답 안내", "👀");
+                            combo = 0;
+                            document.getElementById('kor-combo').innerText = combo;
+                            nextChallenge();
                         }
                     };
                     choicesBox.appendChild(btn);
@@ -1561,47 +1504,46 @@
         }
 
         // ==========================================
-        //  수학실 (숫자 야구 게임)
+        //  개별 이식 게임 8: 3층 수학실 (숫자 야구)
         // ==========================================
         function setupNumberBaseballGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <p class="text-xs text-slate-500 font-semibold">컴퓨터가 숨겨둔 <b>서로 다른 3자리 숫자(0-9)</b>를 맞추세요!<br>(숫자와 위치가 모두 맞으면 Strike, 숫자만 맞으면 Ball)</p>
+                    <p class="text-xs text-slate-500">컴퓨터가 숨겨둔 <b>서로 다른 3자리 숫자(0-9)</b>를 맞추세요!<br>(숫자와 위치가 모두 맞으면 Strike, 숫자만 맞으면 Ball)</p>
                     
-                    <div class="flex justify-center gap-3.5" id="baseball-slots">
-                        <div class="w-14 h-16 border-2 border-slate-350 rounded-2xl flex items-center justify-center font-black text-3xl text-slate-800 bg-white" id="b-guess-0">-</div>
-                        <div class="w-14 h-16 border-2 border-slate-350 rounded-2xl flex items-center justify-center font-black text-3xl text-slate-800 bg-white" id="b-guess-1">-</div>
-                        <div class="w-14 h-16 border-2 border-slate-350 rounded-2xl flex items-center justify-center font-black text-3xl text-slate-800 bg-white" id="b-guess-2">-</div>
+                    <div class="flex justify-center gap-2" id="baseball-slots">
+                        <div class="w-12 h-14 border-2 border-slate-300 rounded-lg flex items-center justify-center font-black text-2xl text-slate-800 bg-white" id="b-guess-0">-</div>
+                        <div class="w-12 h-14 border-2 border-slate-300 rounded-lg flex items-center justify-center font-black text-2xl text-slate-800 bg-white" id="b-guess-1">-</div>
+                        <div class="w-12 h-14 border-2 border-slate-300 rounded-lg flex items-center justify-center font-black text-2xl text-slate-800 bg-white" id="b-guess-2">-</div>
                     </div>
 
                     <!-- 숫자 버튼 패드 -->
-                    <div class="grid grid-cols-5 gap-2 max-w-xs mx-auto">
-                        <button onclick="pressNum(1)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">1</button>
-                        <button onclick="pressNum(2)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">2</button>
-                        <button onclick="pressNum(3)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">3</button>
-                        <button onclick="pressNum(4)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">4</button>
-                        <button onclick="pressNum(5)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">5</button>
-                        <button onclick="pressNum(6)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">6</button>
-                        <button onclick="pressNum(7)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">7</button>
-                        <button onclick="pressNum(8)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">8</button>
-                        <button onclick="pressNum(9)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">9</button>
-                        <button onclick="pressNum(0)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">0</button>
+                    <div class="grid grid-cols-5 gap-1.5 max-w-xs mx-auto">
+                        <button onclick="pressNum(1)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">1</button>
+                        <button onclick="pressNum(2)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">2</button>
+                        <button onclick="pressNum(3)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">3</button>
+                        <button onclick="pressNum(4)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">4</button>
+                        <button onclick="pressNum(5)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">5</button>
+                        <button onclick="pressNum(6)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">6</button>
+                        <button onclick="pressNum(7)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">7</button>
+                        <button onclick="pressNum(8)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">8</button>
+                        <button onclick="pressNum(9)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">9</button>
+                        <button onclick="pressNum(0)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">0</button>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-                        <button onclick="backspaceBaseball()" class="py-2.5 bg-slate-200 text-slate-700 rounded-xl text-xs font-black">지우기</button>
-                        <button onclick="submitBaseball()" class="py-2.5 bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-sm">입력 완료</button>
+                        <button onclick="backspaceBaseball()" class="py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">지우기</button>
+                        <button onclick="submitBaseball()" class="py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold">입력 완료</button>
                     </div>
 
-                    <div class="text-left bg-white p-4 rounded-2xl border border-slate-200 max-h-36 overflow-y-auto custom-scrollbar text-xs font-mono" id="baseball-history">
-                        <div class="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-1">판정 역사 보드</div>
+                    <div class="text-left bg-white p-3 rounded-xl border border-slate-200 max-h-36 overflow-y-auto custom-scrollbar text-xs font-mono" id="baseball-history">
+                        <div class="text-[10px] text-slate-400 font-bold mb-1">판정 역사 보드</div>
                     </div>
                 </div>
             `;
 
-            const pool = [1,2,3,4,5,6,7,8,9];
+            const pool = [0,1,2,3,4,5,6,7,8,9];
             const secret = [];
-            // 중복이 안 되는 첫 번째 수와 나머지 두 수를 난수로 선정
             for(let i=0; i<3; i++) {
                 const idx = Math.floor(Math.random() * pool.length);
                 secret.push(pool.splice(idx, 1)[0]);
@@ -1634,7 +1576,7 @@
 
             window.submitBaseball = function() {
                 if (guess.length < 3) {
-                    showCustomAlert('3자리 숫자를 모두 입력해야 검증이 실행됩니다!', '입력 부족', '⚠️');
+                    showCustomAlert('3자리 숫자를 가득 채워주세요!', '입력 부족', '⚠️');
                     return;
                 }
 
@@ -1653,14 +1595,14 @@
                 if (historyEl) {
                     const p = document.createElement('div');
                     p.className = 'border-b border-slate-100 py-1 flex justify-between';
-                    p.innerHTML = `<span>내 예측: ${guess.join('')}</span> <span class="font-bold text-sky-600">${resultText}</span>`;
+                    p.innerHTML = `<span>내 입력: ${guess.join('')}</span> <span class="font-bold text-sky-600">${resultText}</span>`;
                     historyEl.appendChild(p);
                     historyEl.scrollTop = historyEl.scrollHeight;
                 }
 
                 if (strike === 3) {
                     playBeep('success');
-                    showCustomAlert(`축하합니다! 수학적 비밀수 [ ${guess.join('')} ]을 완벽히 정복했습니다!`, "추리 성공", "👑", () => {
+                    showCustomAlert(`정답입니다! 수학적 비밀수 ${guess.join('')}을 올바르게 추리하셨습니다!`, "추리 성공", "👑", () => {
                         directClear();
                     });
                 } else {
@@ -1672,16 +1614,16 @@
         }
 
         // ==========================================
-        //  한문실 (한문 수박 융합 게임)
+        //  개별 이식 게임 9: 3층 한문실 (한문 수박 게임)
         // ==========================================
         function setupHanjaDropGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center space-y-4 animate-in fade-in">
-                    <p class="text-[11px] text-slate-500 font-semibold">같은 한자가 있는 원끼리 융합시켜, 최종 최고 한자 '萬(만)'까지 도달하세요!</p>
-                    <canvas id="hanja-canvas" width="380" height="400" class="border-2 border-indigo-200 rounded-2xl bg-slate-50 block mx-auto cursor-crosshair shadow-md"></canvas>
-                    <div class="flex justify-between items-center text-xs font-bold text-slate-600 max-w-[380px] mx-auto bg-white px-3 py-2 rounded-xl border border-slate-100 shadow-sm">
-                        <span>현재 점수: <strong id="hanja-score" class="text-indigo-600 text-sm">0</strong></span>
-                        <span class="flex items-center gap-1">다음 한자: <strong id="next-hanja-ui" class="text-rose-500 text-sm bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100">一</strong></span>
+                <div class="w-full text-center space-y-4">
+                    <p class="text-[11px] text-slate-500">한문 원형 블록을 떨어뜨려 동일한 한자끼리 충돌 융합시키고, 최종 '萬(만)'까지 도달하세요!</p>
+                    <canvas id="hanja-canvas" width="400" height="420" class="border border-slate-300 rounded-xl bg-slate-50 block mx-auto cursor-crosshair shadow-inner"></canvas>
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                        <span>현재 점수: <strong id="hanja-score" class="text-indigo-650 text-sm">0</strong></span>
+                        <span>다음 한자: <strong id="next-hanja-ui" class="text-rose-500 text-sm">一</strong></span>
                     </div>
                 </div>
             `;
@@ -1696,7 +1638,7 @@
                 { text: "人", radius: 30, color: "#00b894", val: 16 },
                 { text: "木", radius: 36, color: "#0984e3", val: 32 },
                 { text: "水", radius: 42, color: "#6c5ce7", val: 64 },
-                { text: "萬", radius: 48, color: "#10b981", val: 256 }
+                { text: "萬", radius: 50, color: "#55efc4", val: 256 }
             ];
 
             let score = 0;
@@ -1724,27 +1666,26 @@
                     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                     ctx.fillStyle = this.color;
                     ctx.fill();
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 1.5;
                     ctx.strokeStyle = '#ffffff';
                     ctx.stroke();
 
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = `bold ${this.radius * 1.05}px sans-serif`;
+                    ctx.fillStyle = '#333333';
+                    ctx.font = `bold ${this.radius}px sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(this.text, this.x, this.y);
                 }
                 update() {
                     if (this.isFixed) return;
-                    this.vy += 0.35; // 물리 중력 최적화
+                    this.vy += 0.4; // 중력
                     this.x += this.vx;
                     this.y += this.vy;
 
                     // 바닥 충돌
                     if (this.y + this.radius > canvas.height) {
                         this.y = canvas.height - this.radius;
-                        this.vy = -this.vy * 0.15; // 바닥 탄성 감소로 안정성 확보
-                        this.vx *= 0.9; // 마찰력
+                        this.vy = -this.vy * 0.2;
                     }
                     // 좌우 벽 충돌
                     if (this.x - this.radius < 0) {
@@ -1776,7 +1717,7 @@
             function dropHanja() {
                 if (!canDrop) return;
                 playBeep('click');
-                const c = new Circle(currentX, 35, currentLevel);
+                const c = new Circle(currentX, 40, currentLevel);
                 circles.push(c);
 
                 canDrop = false;
@@ -1785,7 +1726,7 @@
                 const nextUi = document.getElementById('next-hanja-ui');
                 if (nextUi) nextUi.innerText = levels[nextLevel].text;
 
-                setTimeout(() => { canDrop = true; }, 400);
+                setTimeout(() => { canDrop = true; }, 500);
             }
 
             function handleHanjaCollisions() {
@@ -1800,6 +1741,7 @@
 
                         if (dist < min) {
                             if (c1.level === c2.level) {
+                                // 합체 및 레벨업
                                 const nextLvl = c1.level + 1;
                                 if (nextLvl < levels.length) {
                                     playBeep('success');
@@ -1813,10 +1755,10 @@
                                     circles.splice(i, 1);
                                     circles.push(new Circle(midX, midY, nextLvl));
 
-                                    // 만(萬) 융합에 성공했을 경우 통과
+                                    // 萬(만) 완성 검증
                                     if (nextLvl === levels.length - 1) {
                                         cancelAnimationFrame(animId);
-                                        showCustomAlert("축하합니다! 고차원 한자 '萬(만)'을 조립해 내어 부수 한문 스탬프를 획득했습니다!", "한자 조립 완성", "萬", () => {
+                                        showCustomAlert('축하합니다! 萬(만) 합성에 성공하여 지혜의 한문 도장을 찍었습니다!', "합성 성공", "萬", () => {
                                             directClear();
                                         });
                                         return;
@@ -1824,7 +1766,7 @@
                                 }
                                 return;
                             }
-                            // 겹침 밀어내기 물리 수식 고도화
+                            // 겹침 밀어내기
                             const overlap = min - dist;
                             const nx = dx / dist;
                             const ny = dy / dist;
@@ -1840,35 +1782,13 @@
             function tickHanja() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                // 낙하 에이밍 가이드 라인 (현재 에이밍 구 폭 반영)
+                // 가이드선
                 if (canDrop) {
-                    const currentRadius = levels[currentLevel].radius;
                     ctx.beginPath();
-                    ctx.setLineDash([4, 4]);
-                    ctx.moveTo(currentX - currentRadius, 0);
-                    ctx.lineTo(currentX - currentRadius, canvas.height);
-                    ctx.moveTo(currentX + currentRadius, 0);
-                    ctx.lineTo(currentX + currentRadius, canvas.height);
-                    ctx.strokeStyle = 'rgba(99, 102, 241, 0.25)';
+                    ctx.moveTo(currentX, 0);
+                    ctx.lineTo(currentX, canvas.height);
+                    ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
                     ctx.stroke();
-                    ctx.setLineDash([]);
-
-                    // 상단 에이밍 원 미리보기
-                    ctx.beginPath();
-                    ctx.arc(currentX, 35, currentRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = levels[currentLevel].color;
-                    ctx.globalAlpha = 0.6;
-                    ctx.fill();
-                    ctx.globalAlpha = 1.0;
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = `bold ${currentRadius * 1.05}px sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(levels[currentLevel].text, currentX, 35);
                 }
 
                 handleHanjaCollisions();
@@ -1892,25 +1812,25 @@
         }
 
         // ==========================================
-        //  생물실 (DNA 주형 전사)
+        //  생물실 (DNA 전사 타임어택) - 틀리면 오답 상보결합 쌍 전송 가이드 추가
         // ==========================================
         function setupDnaTranscriptionGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center space-y-4 animate-in fade-in">
-                    <p class="text-xs text-slate-500 font-semibold">제시된 DNA 가닥에 대응하여, 전사 결합하는 알맞은 mRNA 가닥 염기(A, U, G, C)를 선택하세요!</p>
-                    <div class="bg-indigo-950 text-white border-2 border-indigo-500 p-6 rounded-2xl max-w-xs mx-auto shadow-md">
-                        <span class="text-[10px] text-indigo-300 block mb-1.5 font-bold uppercase tracking-wider">DNA Template Base</span>
-                        <div id="dna-target-base" class="text-5xl font-black tracking-widest text-sky-400 animate-pulse">A</div>
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500">제시된 DNA 주형 가닥을 바탕으로, 전사 상보결합하는 알맞은 mRNA 가닥 염기(A, U, G, C)를 조립해 가세요!</p>
+                    <div class="bg-indigo-950 text-white border-2 border-indigo-455 p-6 rounded-2xl max-w-xs mx-auto shadow-md">
+                        <span class="text-[10px] text-indigo-300 block mb-1 font-bold">DNA 주형 가닥</span>
+                        <div id="dna-target-base" class="text-5xl font-black tracking-widest text-sky-400">A</div>
                     </div>
-                    <div class="grid grid-cols-4 gap-3" id="transcription-buttons"></div>
-                    <div class="text-xs font-bold text-slate-600 bg-white py-2 rounded-xl border border-slate-100 max-w-xs mx-auto shadow-sm">
-                        정확한 결합 횟수: <span id="trans-score" class="text-indigo-600 text-base font-extrabold">0</span> / 6쌍 달성 타겟
+                    <div class="grid grid-cols-4 gap-2" id="transcription-buttons"></div>
+                    <div class="text-xs font-bold text-slate-600">
+                        전사 완료 염기쌍: <span id="trans-score" class="text-indigo-650 text-sm">0</span> / 6쌍 성공 타겟
                     </div>
                 </div>
             `;
 
             const rule = { 'A': 'U', 'T': 'A', 'G': 'C', 'C': 'G' };
-            const expl = { 'A': 'U (유라실)', 'T': 'A (아데닌)', 'G': 'C (사이토신)', 'C': 'G (구아닌)' };
+            const helperExplain = { 'A': 'U (유라실)', 'T': 'A (아데닌)', 'G': 'C (사이토신)', 'C': 'G (구아닌)' };
             const bases = ['A', 'T', 'G', 'C'];
             let score = 0;
             let currentBase = '';
@@ -1925,7 +1845,7 @@
                 const options = ['A', 'U', 'G', 'C']; 
                 options.forEach(opt => {
                     const btn = document.createElement('button');
-                    btn.className = 'bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-800 font-black py-4 rounded-xl text-xl transition-all shadow-sm active:scale-95';
+                    btn.className = 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold py-3.5 rounded-lg text-lg';
                     btn.innerText = opt;
                     btn.onclick = () => {
                         if (opt === rule[currentBase]) {
@@ -1940,8 +1860,8 @@
                         } else {
                             playBeep('fail');
                             showCustomAlert(
-                                `🧬 **DNA 주형** [ ${currentBase} ] 은\n🧪 **mRNA** [ ${expl[currentBase]} ] 로 상보결합하여 전사되어야 합니다.\n\n기초 의학 지식을 바탕으로 처음부터 다시 도전하세요!`,
-                                "DNA 전사 결합 에러", "🧬", () => {
+                                `잘못된 전사 매칭이 확인되었습니다!\n\n🧬 **DNA 주형** [ ${currentBase} ] 은\n🧪 **mRNA** [ ${helperExplain[currentBase]} ] 로 상보결합되어야 정상 전사 작용이 성립합니다.\n\n다시 처음부터 도전하세요.`,
+                                "DNA 전사 결합 오류", "🧬", () => {
                                     score = 0;
                                     document.getElementById('trans-score').innerText = score;
                                     nextBase();
@@ -1957,39 +1877,39 @@
         }
 
         // ==========================================
-        //  화학실 (이온 결합 전하합 0 게임)
+        //  화학실 (원소 이온결합 전하합 0) - 30초 스피드 타임어택 밸런스 조정
         // ==========================================
         function setupIonBondGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center space-y-4 animate-in fade-in">
-                    <p class="text-xs text-slate-500 font-semibold">제한 시간 <b>30초!</b> 원형 이온 타일들을 조합해 총 전하량의 합을 <b>0</b>으로 수렴시켜 소멸시키세요!</p>
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500">제한 시간 <b class="text-rose-500">30초!</b> 원형 타일들을 클릭(또는 터치)해 총 전하량의 합을 <b>0</b>으로 만드세요!</p>
                     
-                    <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden relative shadow-inner">
-                        <div id="ion-timer-bar" class="bg-gradient-to-r from-red-500 to-amber-500 h-full w-full transition-all duration-100"></div>
+                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden relative">
+                        <div id="ion-timer-bar" class="bg-gradient-to-r from-red-400 to-amber-400 h-full w-full transition-all duration-200"></div>
                     </div>
-                    <div class="text-right text-xs font-bold text-red-500 font-mono" id="ion-timer-text">남은 시간: 30.0s</div>
+                    <div class="text-right text-[10px] font-bold text-red-500 font-mono" id="ion-timer-text">남은 시간: 30.0s</div>
 
-                    <div id="ion-board-grid" class="grid grid-cols-5 gap-2 max-w-sm mx-auto bg-slate-100 p-3 rounded-2xl border border-slate-200 shadow-inner"></div>
+                    <div id="ion-board-grid" class="grid grid-cols-5 gap-1.5 max-w-sm mx-auto bg-slate-100 p-2.5 rounded-xl border border-slate-200 shadow-inner"></div>
 
                     <div class="flex gap-2 justify-center max-w-sm mx-auto">
-                        <button onclick="clearSelectedIons()" class="flex-grow bg-slate-200 hover:bg-slate-300 py-3 rounded-xl text-xs font-extrabold text-slate-600">선택 초기화</button>
-                        <button onclick="combineSelectedIons()" class="flex-grow bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl text-xs font-extrabold text-white shadow">결합(소멸)</button>
+                        <button onclick="clearSelectedIons()" class="flex-grow bg-slate-200 hover:bg-slate-300 py-2 rounded-lg text-xs font-bold text-slate-600">선택 초기화</button>
+                        <button onclick="combineSelectedIons()" class="flex-grow bg-emerald-600 hover:bg-emerald-700 py-2.5 rounded-lg text-xs font-bold text-white shadow">결합(소멸)</button>
                     </div>
 
-                    <div class="text-xs font-bold text-slate-500 bg-white p-3 rounded-xl border border-slate-100 shadow-sm max-w-sm mx-auto flex justify-between items-center">
-                        <span>현재 조합 전하량 합: <strong id="current-charge-sum" class="text-rose-500 text-sm">0</strong></span>
-                        <span>성공한 결합 수: <strong id="ion-score" class="text-indigo-650 text-base">0</strong> / 3회 달성 목표</span>
+                    <div class="text-xs font-bold text-slate-500">
+                        현재 조합 전하량 합: <span id="current-charge-sum" class="text-rose-500 font-bold">0</span> <br>
+                        성공한 결합 수: <span id="ion-score" class="text-indigo-650 text-sm">0</span> / 3회 달성 목표
                     </div>
                 </div>
             `;
 
             const pool = [
-                { sym: 'H', val: +1, bg: 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100' },
-                { sym: 'Na', val: +1, bg: 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100' },
-                { sym: 'Cl', val: -1, bg: 'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100' },
-                { sym: 'F', val: -1, bg: 'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100' },
-                { sym: 'O', val: -2, bg: 'bg-teal-50 text-teal-800 border-teal-300 hover:bg-teal-100' },
-                { sym: 'Mg', val: +2, bg: 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100' }
+                { sym: 'H', val: +1, bg: 'bg-rose-100 text-rose-800 border-rose-300' },
+                { sym: 'Na', val: +1, bg: 'bg-rose-100 text-rose-800 border-rose-300' },
+                { sym: 'Cl', val: -1, bg: 'bg-sky-100 text-sky-800 border-sky-300' },
+                { sym: 'F', val: -1, bg: 'bg-sky-100 text-sky-800 border-sky-300' },
+                { sym: 'O', val: -2, bg: 'bg-teal-100 text-teal-800 border-teal-300' },
+                { sym: 'Mg', val: +2, bg: 'bg-amber-100 text-amber-800 border-amber-300' }
             ];
 
             let board = [];
@@ -2004,7 +1924,7 @@
                     chemistryTimeLeft = 0;
                     clearInterval(chemInterval);
                     playBeep('fail');
-                    showCustomAlert("타임아웃! 이온 결합을 제한시간 내에 맞추지 못했습니다.", "시간 초과", "⏳", () => {
+                    showCustomAlert("타임아웃! 30초의 제한 시간이 끝났습니다. 다시 보드를 리뉴얼합니다.", "시간 초과", "⏳", () => {
                         setupIonBondGame(container);
                     });
                     return;
@@ -2029,17 +1949,17 @@
                     board.push(item);
 
                     const btn = document.createElement('button');
-                    btn.className = `w-full aspect-square border-2 rounded-2xl flex flex-col items-center justify-center font-black text-sm transition-all ${item.bg}`;
-                    btn.innerHTML = `<span>${item.sym}</span><span class="text-[10px] font-mono opacity-80">${item.val > 0 ? '+' : ''}${item.val}</span>`;
+                    btn.className = `w-full aspect-square border-2 rounded-xl flex flex-col items-center justify-center font-bold text-xs transition-all ${item.bg}`;
+                    btn.innerHTML = `<span>${item.sym}</span><span class="text-[9px] font-mono opacity-80">${item.val > 0 ? '+' : ''}${item.val}</span>`;
                     
                     btn.onclick = () => {
                         playBeep('click');
                         if (selected.includes(i)) {
                             selected = selected.filter(idx => idx !== i);
-                            btn.classList.remove('ring-4', 'ring-indigo-500', 'scale-95', 'bg-indigo-100');
+                            btn.classList.remove('ring-4', 'ring-indigo-500', 'scale-95');
                         } else {
                             selected.push(i);
-                            btn.classList.add('ring-4', 'ring-indigo-500', 'scale-95', 'bg-indigo-100');
+                            btn.classList.add('ring-4', 'ring-indigo-500', 'scale-95');
                         }
                         updateChargeSum();
                     };
@@ -2054,9 +1974,9 @@
                 if (!sumEl) return;
                 sumEl.innerText = `${sum > 0 ? '+' : ''}${sum}`;
                 if (sum === 0 && selected.length > 0) {
-                    sumEl.className = "text-emerald-500 font-black text-base";
+                    sumEl.className = "text-emerald-500 font-extrabold";
                 } else {
-                    sumEl.className = "text-rose-500 font-bold text-sm";
+                    sumEl.className = "text-rose-500 font-bold";
                 }
             }
 
@@ -2076,13 +1996,13 @@
                         clearInterval(chemInterval);
                         directClear();
                     } else {
-                        showCustomAlert('안정화 성공! 전하량 합이 0인 무극성 안정이온 결합이 성립되었습니다.', '이온 결합 수립', '🧪', () => {
+                        showCustomAlert('성공! 전하량이 0으로 안정적인 중성이온 결합이 완료되었습니다!', '결합 수립', '🧪', () => {
                             initBoard();
                         });
                     }
                 } else {
                     playBeep('fail');
-                    showCustomAlert(`결합 불가! 현재 조합 전하량 총합이 [ ${sum > 0 ? '+' : ''}${sum} ]입니다.\n반드시 총합이 0이 되도록 비율을 조정하세요.`, "불안정 이온 조합", "❌", () => {
+                    showCustomAlert(`결합 불가! 현재 조합 전하량의 총합은 [ ${sum > 0 ? '+' : ''}${sum} ]입니다.\n반드시 총합이 0이 되도록 양이온과 음이온의 숫자를 맞추어 조합하세요!`, "전하 불일치", "❌", () => {
                         selected = [];
                         initBoard();
                     });
@@ -2100,24 +2020,25 @@
         }
 
         // ==========================================
-        //  지구과학실 (지구 탄소순환 배관 퍼즐 - BFS 경로 탐색 구현)
+        //  지구과학실 (지구 탄소순환 배관 퍼즐) - 상식 대기 모달 일시정지화
         // ==========================================
         function setupCarbonCycleGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center space-y-4 animate-in fade-in" id="carbon-intro-container">
-                    <div class="bg-indigo-50 border border-indigo-200 p-5 rounded-2xl text-left space-y-3.5 shadow-sm">
-                        <h4 class="font-black text-indigo-900 text-sm flex items-center gap-1.5"><i data-lucide="book-open" class="w-4 h-4"></i> 지구 탄소 순환 핵심 특강</h4>
-                        <p class="text-xs text-slate-650 leading-relaxed font-semibold">
-                            대기 중의 이산화탄소($CO_2$)는 지구 전체 생태계를 순환하며 생명과 온도를 유지합니다. 배관을 잘 가동하여 우주로 날아가지 않고 바다로 스며들 수 있도록 전도 통로를 설계해 주세요!
+                <div class="w-full text-center space-y-4" id="carbon-intro-container">
+                    <div class="bg-indigo-50 border border-indigo-200 p-5 rounded-2xl text-left space-y-3 shadow-sm">
+                        <h4 class="font-black text-indigo-850 text-sm flex items-center gap-1.5"><i data-lucide="book-open"></i> 지구 탄소 순환 핵심 특강</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            대기 중의 이산화탄소($CO_2$)는 끊임없이 이동하며 지구 시스템을 순환합니다.<br>
+                            이 게임을 통해 탄소를 각각의 목적지 저장고로 안전하게 운송해 봅시다!
                         </p>
-                        <div class="space-y-2 text-xs text-slate-500 font-bold">
+                        <div class="space-y-1.5 text-xs text-slate-500">
                             <div>🌊 <b>해양 저장고:</b> 대기 중 이산화탄소가 용해되어 탄산이온 형태로 보관됩니다.</div>
                             <div>🌲 <b>생물권 저장고:</b> 육상 식물들이 광합성을 전개하여 유기물로 단단히 고정합니다.</div>
-                            <div>🪨 <b>지권 저장고:</b> 퇴적된 고대 생물의 사체가 화석연료 형태로 보관됩니다.</div>
+                            <div>🪨 <b>지권 저장고:</b> 퇴적된 고대 생물의 사체가 화석연료(석유·석탄) 형태로 보관됩니다.</div>
                         </div>
                     </div>
-                    <button onclick="startActualCarbonPuzzle()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4.5 rounded-2xl text-xs transition-colors shadow">
-                        강의를 충분히 정독했습니다! 퍼즐 시작 ➔
+                    <button onclick="startActualCarbonPuzzle()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow">
+                        강의를 충분히 정독했습니다! 게임 시작 ➔
                     </button>
                 </div>
             `;
@@ -2125,47 +2046,42 @@
 
             window.startActualCarbonPuzzle = function() {
                 container.innerHTML = `
-                    <div class="w-full text-center space-y-4 animate-in zoom-in-95 duration-200">
-                        <p class="text-xs text-slate-550 font-bold">배관 조각을 터치하여 회전시키면서, 왼쪽의 <b>☁ 대기 (0번)</b>에서 오른쪽의 <b>🌊 해양 (15번)</b>까지 탄소가 흐르는 배관 통로를 수립하세요!</p>
-                        <div class="grid grid-cols-4 gap-2 bg-slate-100 p-3 rounded-2xl border border-slate-200 max-w-sm mx-auto" id="carbon-grid-board"></div>
-                        <div class="text-[11px] text-slate-400 font-semibold leading-relaxed">
-                            * 각 배관 타일을 탭하여 회전시킵니다.<br>
-                            * 0번(출발)에서 15번(도착)까지 길이 매끄럽게 연결되어야 작동에 통과합니다.
+                    <div class="w-full text-center space-y-4">
+                        <p class="text-xs text-slate-500">배관 조각을 탭하여 회전시키면서, 왼쪽의 <b>☁ 대기</b>(출발지)에서 오른쪽의 <b>🌊 해양, 🌲 생물, 🪨 지권</b>(목적지)까지 탄소를 수송하세요!</p>
+                        <div class="grid grid-cols-4 gap-2 bg-slate-100 p-3 rounded-xl border border-slate-200 max-w-sm mx-auto" id="carbon-grid-board"></div>
+                        <div class="text-xs text-slate-400">
+                            * 각 배관 타일을 클릭하여 방향을 일치시키세요. <br>
+                            연결이 완료되면 아래 작동 단추를 누르세요.
                         </div>
-                        <button onclick="checkCarbonPipes()" class="w-full bg-indigo-650 hover:bg-indigo-700 text-white font-black py-3 rounded-2xl text-xs transition-all shadow-md">
-                            배관 작동 (탄소 수송 개시!)
+                        <button onclick="checkCarbonPipes()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow">
+                            배관 작동 (탄소 수송 시작!)
                         </button>
                     </div>
                 `;
 
-                // 4x4 Grid (16 Cells)
                 const pipes = [
-                    { id: 0, text: '☁ 대기', isStart: true, type: 'start' },
-                    { id: 1, text: '━', angle: 90, type: 'straight' },
-                    { id: 2, text: '┗', angle: 180, type: 'elbow' },
-                    { id: 3, text: '┓', angle: 0, type: 'elbow' },
-                    { id: 4, text: '┃', angle: 90, type: 'straight' },
-                    { id: 5, text: '━', angle: 0, type: 'straight' },
-                    { id: 6, text: '┗', angle: 90, type: 'elbow' },
-                    { id: 7, text: '┃', angle: 0, type: 'straight' },
-                    { id: 8, text: '┗', angle: 270, type: 'elbow' },
-                    { id: 9, text: '┓', angle: 180, type: 'elbow' },
-                    { id: 10, text: '━', angle: 90, type: 'straight' },
-                    { id: 11, text: '┃', angle: 90, type: 'straight' },
-                    { id: 12, text: '┓', angle: 90, type: 'elbow' },
-                    { id: 13, text: '━', angle: 0, type: 'straight' },
-                    { id: 14, text: '┗', angle: 0, type: 'elbow' },
-                    { id: 15, text: '🌊 해양', isEnd: true, type: 'end' }
+                    { id: 0, text: '☁ 대기', isStart: true },
+                    { id: 1, text: '┃', angle: 90 },
+                    { id: 2, text: '━', angle: 0 },
+                    { id: 3, text: '┗', angle: 180 },
+                    { id: 4, text: '━', angle: 90 },
+                    { id: 5, text: '┓', angle: 0 },
+                    { id: 6, text: '┃', angle: 90 },
+                    { id: 7, text: '━', angle: 180 },
+                    { id: 8, text: '┗', angle: 270 },
+                    { id: 9, text: '┓', angle: 90 },
+                    { id: 10, text: '┃', angle: 0 },
+                    { id: 11, text: '━', angle: 90 },
+                    { id: 12, text: '┗', angle: 0 },
+                    { id: 13, text: '┃', angle: 90 },
+                    { id: 14, text: '━', angle: 0 },
+                    { id: 15, text: '🌊 해양', isEnd: true }
                 ];
 
                 const board = document.getElementById('carbon-grid-board');
                 pipes.forEach((p, idx) => {
                     const btn = document.createElement('button');
-                    btn.className = `w-full aspect-square border-2 rounded-xl flex items-center justify-center font-black text-sm transition-all ${
-                        p.isStart 
-                        ? 'bg-sky-100 border-sky-300 text-sky-850' 
-                        : (p.isEnd ? 'bg-indigo-100 border-indigo-300 text-indigo-850' : 'bg-white border-slate-250')
-                    }`;
+                    btn.className = `w-full aspect-square border-2 rounded-xl flex items-center justify-center font-bold text-xs transition-transform ${p.isStart ? 'bg-sky-100 border-sky-300' : (p.isEnd ? 'bg-indigo-100 border-indigo-300' : 'bg-white border-slate-200')}`;
                     btn.innerText = p.text;
 
                     if (!p.isStart && !p.isEnd) {
@@ -2179,123 +2095,51 @@
                     board.appendChild(btn);
                 });
 
-                // BFS 경로 확인 알고리즘 적용
                 window.checkCarbonPipes = function() {
-                    // 각 셀별 연결 포트 정의 (UP, DOWN, LEFT, RIGHT)
-                    function getActivePorts(cell) {
-                        const ports = { UP: false, DOWN: false, LEFT: false, RIGHT: false };
-                        if (cell.type === 'start') {
-                            ports.RIGHT = true; // 대기는 항상 우측으로 흘러나감
-                        } else if (cell.type === 'end') {
-                            ports.LEFT = true; // 해양은 항상 좌측에서 받아들임
-                        } else if (cell.type === 'straight') {
-                            if (cell.angle === 0 || cell.angle === 180) {
-                                ports.LEFT = true; ports.RIGHT = true;
-                            } else {
-                                ports.UP = true; ports.DOWN = true;
-                            }
-                        } else if (cell.type === 'elbow') {
-                            // ┗ 형태 (기본 angle 0: UP + RIGHT 연결)
-                            if (cell.angle === 0) { ports.UP = true; ports.RIGHT = true; }
-                            else if (cell.angle === 90) { ports.RIGHT = true; ports.DOWN = true; }
-                            else if (cell.angle === 180) { ports.DOWN = true; ports.LEFT = true; }
-                            else if (cell.angle === 270) { ports.LEFT = true; ports.UP = true; }
-                        } else if (cell.type === 'corner') {
-                            // ┓ 형태 (기본 angle 0: DOWN + LEFT 연결)
-                            if (cell.angle === 0) { ports.DOWN = true; ports.LEFT = true; }
-                            else if (cell.angle === 90) { ports.LEFT = true; ports.UP = true; }
-                            else if (cell.angle === 180) { ports.UP = true; ports.RIGHT = true; }
-                            else if (cell.angle === 270) { ports.RIGHT = true; ports.DOWN = true; }
-                        }
-                        return ports;
-                    }
+                    const isCorrect = (pipes[2].angle === 0 || pipes[2].angle === 180) &&
+                                      (pipes[14].angle === 0 || pipes[14].angle === 180);
 
-                    // 한문 ┓는 여기서 'elbow' 형식을 차용하여 일관되게 분석
-                    // 4x4 Grid BFS 탐색
-                    const visited = new Set();
-                    const queue = [0];
-                    visited.add(0);
-                    let connected = false;
-
-                    while (queue.length > 0) {
-                        const curr = queue.shift();
-                        if (curr === 15) {
-                            connected = true;
-                            break;
-                        }
-
-                        const currPorts = getActivePorts(pipes[curr]);
-                        const cx = curr % 4;
-                        const cy = Math.floor(curr / 4);
-
-                        const neighbors = [
-                            { dir: 'UP', dx: 0, dy: -1, opp: 'DOWN' },
-                            { dir: 'DOWN', dx: 0, dy: 1, opp: 'UP' },
-                            { dir: 'LEFT', dx: -1, dy: 0, opp: 'RIGHT' },
-                            { dir: 'RIGHT', dx: 1, dy: 0, opp: 'LEFT' }
-                        ];
-
-                        neighbors.forEach(n => {
-                            if (currPorts[n.dir]) {
-                                const nx = cx + n.dx;
-                                const ny = cy + n.dy;
-                                if (nx >= 0 && nx < 4 && ny >= 0 && ny < 4) {
-                                    const nextIdx = ny * 4 + nx;
-                                    if (!visited.has(nextIdx)) {
-                                        const nextPorts = getActivePorts(pipes[nextIdx]);
-                                        if (nextPorts[n.opp]) {
-                                            visited.add(nextIdx);
-                                            queue.push(nextIdx);
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-
-                    // 조금 유연한 정답 통과를 위해, BFS 통과가 되거나, 혹은 핵심 파이프 가동 체크
-                    // 실제 BFS 알고리즘 연산 또는 우회 검증
-                    if (connected || (pipes[2].angle === 180 && pipes[14].angle === 0)) {
+                    if (isCorrect) {
                         playBeep('success');
-                        showCustomAlert('대성공! 대기 중 유실되거나 흩어지던 이산화탄소를 해양 및 전 기권으로 유도해 안정한 순환 고리를 형성했습니다.', "탄소 수송 개시 완료", "🌍", () => {
+                        showCustomAlert('대성공! 탄소가 대기에서 해양 및 지구 저장고로 한치의 누수도 없이 흐름 순환을 달성했습니다!', "수송 성공", "🌍", () => {
                             directClear();
                         });
                     } else {
                         playBeep('fail');
-                        showCustomAlert('경로가 도중에 중단되어 탄소가 대기 밖으로 빠져나갑니다. 배관 타일을 눌러 연결 상태를 점검하세요!', "배관 순환 단절", "⚠️");
+                        showCustomAlert('연결이 완전하지 않거나 공기 중으로 유실되는 밸브가 발견되었습니다. 배관을 회전시켜 다시 일치시키세요!', "회로 누수 발생", "⚠️");
                     }
                 };
             };
         }
 
         // ==========================================
-        //  서브 컴포넌트 (퀴즈, 타이핑, 수학, 버그 등)
+        //  서브 게임 컴포넌트: 퀴즈, 영어 타이핑, 수학 암산, 버그클릭
         // ==========================================
 
         const quizBank = {
             pe: [
-                { q: '축구 경기에서 골키퍼 외의 수비수나 공격수가 의도적으로 공을 팔이나 손으로 터치했을 때 선언되는 반칙 명칭은?', a: ['오프사이드', '핸들링', '백패스 바이올레이션'], right: 1 }
+                { q: '축구에서 골키퍼를 제외한 야외 필드 플레이어가 의도적으로 공을 손으로 터치했을 때의 반칙은?', a: ['오프사이드', '핸들링', '백패스'], right: 1 }
             ],
             geography: [
-                { q: '세계에서 가장 넓은 영토 면적을 자랑하며 아시아와 유럽에 모두 걸쳐 있는 나라는?', a: ['미국', '러시아', '캐나다'], right: 1 }
+                { q: '세계에서 가장 넓은 영토 면적을 자랑하는 나라는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 }
             ],
             geography2: [
-                { q: '대기 순환에 따라 강수량이 연중 풍부하며 무덥고 울창한 밀림이 발달하는 적도 부근의 기후는?', a: ['열대 우림 기후', '사하라 사막 기후', '온화한 지중해성 기후'], right: 0 }
+                { q: '적도 부근의 아열대 지역에서 주로 발달하며 일 년 내내 비가 많이 내리는 기후는?', a: ['열대 우림 기후', '사막 기후', '지중해성 기후'], right: 0 }
             ],
             korean2: [
-                { q: '조선 전기의 학자이자 정치가로, 호는 송강이며 가사 문학의 대작인 "사미인곡"과 "속미인곡"을 저술한 대문장가는?', a: ['정철', '이황', '윤선도'], right: 0 }
+                { q: '조선 전기 시조 문학의 대가로, 대표작 "사미인곡"을 지은 문신은?', a: ['정철', '이황', '윤선도'], right: 0 }
             ],
             korean3: [
-                { q: '국어 문법 단어 형성 과정에서, 실질적인 의미를 내포하고 있는 가장 근본적인 중심 부분을 무엇이라 일컫는가?', a: ['접사', '어근', '어미'], right: 1 }
+                { q: '국어의 단어 형성에서 실질적인 의미를 나타내는 중심 부분을 뜻하는 문법 용어는?', a: ['접사', '어근', '어간'], right: 1 }
             ],
             lang: [
-                { q: '프랑스인들과 만났을 때 나누는 가장 클래식하고 대중적인 인사의 말은?', a: ['봉주르 (Bonjour)', '그라시아스 (Gracias)', '챠오 (Ciao)'], right: 0 }
+                { q: '프랑스어로 "안녕하세요" 또는 "좋은 아침"을 뜻하는 다정한 인사는?', a: ['봉주르 (Bonjour)', '그라시아스 (Gracias)', '차오 (Ciao)'], right: 0 }
             ],
             history: [
-                { q: '조선 제4대 왕으로, 훈민정음 창제를 비롯하여 측우기, 자격루 등 다방면의 과학 및 문화를 꽃피운 성군은?', a: ['태조', '정조', '세종대왕'], right: 2 }
+                { q: '조선 제4대 임금으로, 백성을 널리 이롭게 하기 위해 과학기술을 발달시키고 "훈민정음"을 창제하신 성군은 누구일까요?', a: ['태조', '정조', '세종대왕'], right: 2 }
             ],
             physics: [
-                { q: '뉴턴의 가속도 제2법칙에 따르면 힘(F)은 질량(m)에 무엇을 곱한 결과값과 완벽하게 일치하는가?', a: ['평균 속도(v)', '시간 변화량(t)', '가속도(a)'], right: 2 }
+                { q: '뉴턴의 제2법칙으로 힘(F)은 질량(m) 곱하기 무엇과 같을까요?', a: ['속도 (v)', '시간 (t)', '가속도 (a)'], right: 2 }
             ]
         };
 
@@ -2307,12 +2151,12 @@
             function renderQuiz() {
                 const quiz = list[currentIdx];
                 container.innerHTML = `
-                    <div class="w-full text-center animate-in fade-in">
-                        <span class="inline-block bg-sky-100 text-sky-700 font-bold px-3 py-1 text-xs rounded-full border border-sky-200 mb-3">종합 교과 상식 퀴즈</span>
-                        <h4 class="text-sm font-black mb-6 text-slate-800 leading-relaxed max-w-sm mx-auto">${quiz.q}</h4>
-                        <div class="flex flex-col gap-3 max-w-sm mx-auto" id="quiz-options"></div>
-                        <div class="mt-6 text-xs text-slate-500 font-extrabold bg-white inline-block px-4 py-1.5 rounded-full border border-slate-100">
-                            완료 수량: <span class="font-bold text-sky-605">${successStreak}</span> / ${list.length}
+                    <div class="w-full text-center">
+                        <span class="inline-block bg-sky-100 text-sky-700 font-bold px-3 py-1 text-xs rounded-full border border-sky-200 mb-3">퀴즈 챌린지</span>
+                        <h4 class="text-sm font-black mb-6 text-slate-800 leading-relaxed">${quiz.q}</h4>
+                        <div class="flex flex-col gap-3 max-w-md mx-auto" id="quiz-options"></div>
+                        <div class="mt-6 text-xs text-slate-500 font-bold">
+                            정답 확인: <span class="font-bold text-sky-600">${successStreak}</span> / ${list.length}
                         </div>
                     </div>
                 `;
@@ -2320,7 +2164,7 @@
                 const optContainer = document.getElementById('quiz-options');
                 quiz.a.forEach((option, idx) => {
                     const btn = document.createElement('button');
-                    btn.className = 'w-full bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-left px-5 py-4 rounded-xl text-xs font-black shadow-sm text-slate-700 transition-all';
+                    btn.className = 'w-full bg-white hover:bg-slate-50 border border-slate-200 text-left px-5 py-3 rounded-xl text-xs font-bold shadow-sm text-slate-700';
                     btn.innerText = `${idx + 1}.  ${option}`;
                     btn.onclick = () => {
                         if (idx === quiz.right) {
@@ -2334,7 +2178,7 @@
                             }
                         } else {
                             playBeep('fail');
-                            showCustomAlert('틀렸습니다! 교과 기초를 다시 점검해 보세요.', "오답 안내", "👀");
+                            showCustomAlert('틀렸습니다! 질문을 잘 복기하고 다시 해결해 보세요.', "오답 안내", "👀");
                             successStreak = 0;
                             currentIdx = 0;
                             renderQuiz();
@@ -2351,16 +2195,16 @@
             const wordList = ['excellent', 'colleague', 'laboratory', 'university', 'geography', 'philosophy'];
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-3 font-semibold">화면에 제공되는 영어 단어의 스펠링을 빠르고 정확하게 타격하여 입력하세요!</p>
-                    <div class="bg-white border border-slate-200 p-6 rounded-2xl mb-4 shadow-sm max-w-xs mx-auto">
+                    <p class="text-xs text-slate-500 mb-2">화면에 등장하는 영어 스펠링을 빠르고 정확하게 입력창에 타이핑하세요!</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-xl mb-4 shadow-sm">
                         <div class="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-1">Target Word</div>
-                        <div id="english-target-word" class="text-3xl font-black text-sky-655 tracking-wide">school</div>
+                        <div id="english-target-word" class="text-2xl font-black text-sky-600 tracking-wide">school</div>
                     </div>
                     <div class="max-w-xs mx-auto">
-                        <input id="english-input" type="text" placeholder="영단어를 따라치세요" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-center font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm text-lg" autocomplete="off">
+                        <input id="english-input" type="text" placeholder="영단어를 따라치세요" class="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-center font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm">
                     </div>
-                    <div class="mt-4 text-xs text-slate-500 font-extrabold bg-white py-1.5 px-4 rounded-full border border-slate-100 inline-block shadow-sm">
-                        수집한 단어: <span id="eng-score" class="font-extrabold text-emerald-500 text-sm">0</span> / 4개
+                    <div class="mt-4 text-xs text-slate-500 font-bold">
+                        수집한 단어: <span id="eng-score" class="font-bold text-emerald-500 text-sm">0</span> / 4개
                     </div>
                 </div>
             `;
@@ -2395,10 +2239,10 @@
         function setupBugGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-3 font-semibold">화면에 불규칙하게 도망다니는 컴퓨터 버그(👾)를 빠르게 터치하여 소탕하세요!</p>
-                    <div id="bug-field" class="bg-slate-900 border border-slate-300 h-64 rounded-2xl relative overflow-hidden mb-4 cursor-crosshair"></div>
-                    <div class="text-sm font-bold text-slate-600 bg-white py-1.5 px-4 rounded-full border border-slate-100 inline-block shadow-sm">
-                        박멸한 버그: <span id="bug-score" class="font-black text-rose-500 text-base">0</span> / 8마리
+                    <p class="text-xs text-slate-500 mb-2">화면에 출몰하는 컴퓨터 바이러스 오류 버그를 빠르게 탭하여 박멸하세요!</p>
+                    <div id="bug-field" class="bg-slate-900 border border-slate-300 h-60 rounded-xl relative overflow-hidden mb-4 cursor-crosshair"></div>
+                    <div class="text-sm font-bold text-slate-600">
+                        박멸한 버그: <span id="bug-score" class="font-bold text-rose-500 text-base">0</span> / 8마리
                     </div>
                 </div>
             `;
@@ -2411,10 +2255,10 @@
             function spawnBug() {
                 if (!field) return;
                 const bg = document.createElement('div');
-                bg.className = 'absolute w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500 flex items-center justify-center text-2xl cursor-pointer select-none transition-all active:scale-90 animate-pulse';
+                bg.className = 'absolute w-10 h-10 rounded-full bg-rose-500/20 border border-rose-500 flex items-center justify-center text-xl cursor-pointer select-none transition-transform active:scale-90';
                 
-                const maxX = field.clientWidth - 48;
-                const maxY = field.clientHeight - 48;
+                const maxX = field.clientWidth - 40;
+                const maxY = field.clientHeight - 40;
                 bg.style.left = `${Math.floor(Math.random() * maxX)}px`;
                 bg.style.top = `${Math.floor(Math.random() * maxY)}px`;
                 bg.innerText = '👾';
@@ -2436,10 +2280,10 @@
 
                 setTimeout(() => {
                     if (bg.parentNode) { bg.remove(); }
-                }, 1300);
+                }, 1500);
             }
 
-            bugInterval = setInterval(spawnBug, 750);
+            bugInterval = setInterval(spawnBug, 800);
 
             const origClose = window.closeModal;
             window.closeModal = function() {
@@ -2452,14 +2296,14 @@
         function setupMathGame(container, level) {
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <span class="inline-block bg-emerald-100 text-emerald-700 font-bold px-3 py-1 text-xs rounded-full border border-emerald-200 mb-3">뇌섹 스피드 계산</span>
-                    <p class="text-xs text-slate-500 mb-4 font-semibold">제시되는 고차원 공식을 제한 시간 없이 완벽히 맞추세요!</p>
-                    <div class="bg-white border border-slate-200 p-6 rounded-2xl mb-4 shadow-sm max-w-xs mx-auto">
-                        <div id="math-equation" class="text-3xl font-black text-sky-655 tracking-wider">5 + 3 = ?</div>
+                    <span class="inline-block bg-emerald-100 text-emerald-700 font-bold px-3 py-1 text-xs rounded-full border border-emerald-200 mb-2">스피드 암산</span>
+                    <p class="text-xs text-slate-500 mb-3">제시된 공식을 신속하게 풀어 올바른 값을 고르세요!</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-xl mb-4 shadow-sm">
+                        <div id="math-equation" class="text-3xl font-black text-sky-600 tracking-wider">5 + 3 = ?</div>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 max-w-sm mx-auto" id="math-options"></div>
-                    <div class="mt-4 text-xs text-slate-550 font-bold bg-white py-1.5 px-4 rounded-full border border-slate-100 inline-block shadow-sm">
-                        연속 정답 성공: <span id="math-score" class="font-extrabold text-sky-600 text-sm">0</span> / 4회
+                    <div class="grid grid-cols-3 gap-3" id="math-options"></div>
+                    <div class="mt-4 text-xs text-slate-500 font-bold">
+                        연속 성공 수: <span id="math-score" class="font-bold text-sky-600 text-sm">0</span> / 4회
                     </div>
                 </div>
             `;
@@ -2474,12 +2318,12 @@
 
                 let num1, num2, op;
                 if (level === 'hard') {
-                    num1 = Math.floor(Math.random() * 21) + 12;
-                    num2 = Math.floor(Math.random() * 9) + 3;
+                    num1 = Math.floor(Math.random() * 20) + 10;
+                    num2 = Math.floor(Math.random() * 9) + 2;
                     op = Math.random() > 0.5 ? '*' : '-';
                 } else {
-                    num1 = Math.floor(Math.random() * 22) + 2;
-                    num2 = Math.floor(Math.random() * 18) + 2;
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * 15) + 1;
                     op = Math.random() > 0.5 ? '+' : '-';
                 }
 
@@ -2500,7 +2344,7 @@
 
                 choices.forEach(val => {
                     const btn = document.createElement('button');
-                    btn.className = 'bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-black py-4 rounded-xl transition-all shadow-sm active:scale-95';
+                    btn.className = 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 rounded-xl transition-all hover:scale-105 active:scale-95 shadow-sm';
                     btn.innerText = val;
                     btn.onclick = () => {
                         if (val === solution) {
@@ -2514,11 +2358,10 @@
                             }
                         } else {
                             playBeep('fail');
-                            showCustomAlert(`틀렸습니다! 올바른 답은 [ ${solution} ] 이었습니다.`, "연산 불일치", "📐", () => {
-                                score = 0;
-                                document.getElementById('math-score').innerText = score;
-                                nextMath();
-                            });
+                            showCustomAlert('오답입니다! 다시 연산 수식을 집중해서 계산하세요.', "연산 불일치", "📐");
+                            score = 0;
+                            document.getElementById('math-score').innerText = score;
+                            nextMath();
                         }
                     };
                     optContainer.appendChild(btn);
