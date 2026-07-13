@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계성고등학교 가상 투어 & 스탬프 챌린지</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;750;800&family=Pretendard:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Pretendard', 'Nanum Gothic', sans-serif;
+            background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 50%, #e0f2fe 100%);
+            overflow-x: hidden;
+        }
+        .fancy-font {
+            font-family: 'Jua', sans-serif;
+        }
+        
+        /* U자형 건물 스타일링 - 3D 입체 효과 극대화 */
+        .u-building-grid {
+            display: grid;
+            grid-template-columns: 210px 1fr 210px;
+            grid-template-rows: 240px 200px;
+            gap: 24px;
+        }
+        @media (max-width: 768px) {
+            .u-building-grid {
+                grid-template-columns: 110px 1fr 110px;
+                grid-template-rows: 170px 140px;
+                gap: 12px;
+            }
+        }
+        
+        /* 건물 입체 외곽 섀도우와 그라데이션 */
+        .wing-depth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .wing-depth::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6), 0 10px 25px -5px rgba(79, 70, 229, 0.15);
+            pointer-events: none;
+        }
+
+        .left-wing {
+            grid-column: 1;
+            grid-row: 1 / span 2;
+            border: 3px solid #6366f1;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .right-wing {
+            grid-column: 3;
+            grid-row: 1 / span 2;
+            border: 3px solid #6366f1;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .center-connector {
+            grid-column: 2;
+            grid-row: 2;
+            border: 3px solid #6366f1;
+            background: linear-gradient(90deg, #f8fafc 0%, #ffffff 50%, #f8fafc 100%);
+        }
+        .empty-courtyard {
+            grid-column: 2;
+            grid-row: 1;
+            background: radial-gradient(circle at center, #f0fdf4 0%, #dcfce7 100%);
+            border: 3px dashed #10b981;
+            border-radius: 24px;
+            box-shadow: inset 0 6px 16px rgba(16, 185, 129, 0.12);
+        }
+
+        /* 프리미엄 카드 애니메이션 */
+        .room-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .room-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 16px 24px -10px rgba(99, 102, 241, 0.35);
+        }
+
+        /* 공통 커스텀 스크롤바 */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.35);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        /* 미술실: 절대색감 마스터용 레인지 슬라이더 스타일 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 4px solid currentColor;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        /* 영어실: 완벽한 3D 카드 뒤집기 애니메이션 */
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.5s cubic-bezier(.4,.2,.2,1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            position: absolute;
+            inset: 0;
+            border-radius: 0.75rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between select-none">
+
+    <!-- TOP 네비게이션 / HUD -->
+    <header class="bg-white/90 backdrop-blur border-b border-indigo-100 p-4 sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-indigo-600 to-sky-500 p-2.5 rounded-2xl shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="school" class="w-7 h-7 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black tracking-wider fancy-font text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-600">계성고등학교</h1>
+                    <p class="text-xs text-slate-500 font-extrabold tracking-tight">계성 샛별 캠퍼스 챌린지 & 스탬프 투어 v6.0</p>
+                </div>
+            </div>
+            
+            <!-- 플레이어 정보 HUD -->
+            <div id="player-hud" class="hidden flex items-center gap-6 bg-white/95 px-5 py-2.5 rounded-2xl border border-slate-200 shadow-md">
+                <div class="flex items-center gap-2">
+                    <span id="hud-avatar" class="text-3xl">🎒</span>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold">참가 모험가</div>
+                        <div id="hud-name" class="font-extrabold text-sm text-sky-600">10101 홍길동</div>
+                    </div>
+                </div>
+                <div class="h-8 w-[1px] bg-slate-200"></div>
+                <div>
+                    <div class="text-[10px] text-slate-400 font-bold">획득한 스탬프</div>
+                    <div class="flex items-center gap-1">
+                        <span id="stamp-count" class="font-black text-rose-500 text-lg">0</span>
+                        <span class="text-xs text-slate-400 font-bold">/ <span id="total-rooms-count">14</span></span>
+                    </div>
+                </div>
+                <button onclick="openStampBook()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-colors px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 font-bold shadow-sm">
+                    <i data-lucide="award" class="w-4 h-4 text-indigo-600"></i> 도장첩
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 w-full flex-grow flex flex-col justify-center">
+        
+        <!-- [1] 로그인/캐릭터 생성 화면 -->
+        <section id="screen-login" class="max-w-xl mx-auto bg-white/95 backdrop-blur-md border border-indigo-100 p-8 rounded-3xl shadow-2xl my-8 transition-all duration-500">
+            <div class="text-center mb-6">
+                <span class="text-7xl inline-block animate-bounce mb-3">🏫</span>
+                <h2 class="text-4xl font-black fancy-font text-indigo-600 tracking-wide">계성고 탐험대 모집</h2>
+                <p class="text-slate-500 text-sm mt-1">계성고등학교 가상 투어에 참가할 캐릭터를 등록하세요!</p>
+            </div>
+            
+            <div class="space-y-5">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-1">
+                        <label class="block text-xs text-slate-500 font-bold mb-1.5">학번 입력</label>
+                        <input id="input-student-id" type="text" maxlength="5" placeholder="예: 10101" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-center text-slate-800 font-black focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white text-lg">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs text-slate-500 font-bold mb-1.5">이름을 입력하세요</label>
+                        <input id="input-username" type="text" placeholder="예: 홍길동" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-black focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white text-lg">
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1.5 text-center font-semibold">* 입력한 학번과 이름은 명예 졸업증서 발급에 직접 사용됩니다!</p>
+                
+                <div>
+                    <label class="block text-xs text-slate-500 font-bold mb-3">원하는 샛별 아바타 선택</label>
+                    <div class="grid grid-cols-4 gap-4">
+                        <button onclick="selectAvatar('🧑‍🎓', this)" class="avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm ring-4 ring-indigo-500 scale-110 border-indigo-500">
+                            <div class="w-12 h-12 rounded-full bg-sky-200 border-2 border-white flex items-center justify-center text-3xl group-hover:animate-bounce shadow-inner">🧑‍🎓</div>
+                            <span class="text-[10px] font-extrabold text-indigo-600">새싹 샛별이</span>
+                        </button>
+                        <button onclick="selectAvatar('👩‍🎓', this)" class="avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm">
+                            <div class="w-12 h-12 rounded-full bg-pink-200 border-2 border-white flex items-center justify-center text-3xl group-hover:animate-bounce shadow-inner">👩‍🎓</div>
+                            <span class="text-[10px] font-extrabold text-pink-600">지혜 샛별이</span>
+                        </button>
+                        <button onclick="selectAvatar('👾', this)" class="avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm">
+                            <div class="w-12 h-12 rounded-full bg-purple-200 border-2 border-white flex items-center justify-center text-3xl group-hover:animate-bounce shadow-inner">👾</div>
+                            <span class="text-[10px] font-extrabold text-purple-600">천재 오락장</span>
+                        </button>
+                        <button onclick="selectAvatar('🍀', this)" class="avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm">
+                            <div class="w-12 h-12 rounded-full bg-emerald-200 border-2 border-white flex items-center justify-center text-3xl group-hover:animate-bounce shadow-inner">🍀</div>
+                            <span class="text-[10px] font-extrabold text-emerald-600">행운 요정</span>
+                        </button>
+                    </div>
+                </div>
+                <button onclick="startGame()" class="w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-500/20 hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-xl">
+                    학교 탐험 시작하기 <i data-lucide="compass" class="w-6 h-6 fill-white"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- [2] 학교 메인 맵 (층 선택 & U자형 교실 보기) -->
+        <section id="screen-map" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 my-4">
+            
+            <!-- 층 선택 네비게이터 -->
+            <div class="lg:col-span-3 bg-white/90 backdrop-blur border border-indigo-100 p-6 rounded-3xl flex flex-col justify-between shadow-md">
+                <div>
+                    <h3 class="font-extrabold text-xl fancy-font text-slate-700 mb-5 flex items-center gap-2">
+                        <i data-lucide="layers" class="text-indigo-500 w-5 h-5"></i> 이동 계단
+                    </h3>
+                    <div class="space-y-3.5" id="floor-buttons-container">
+                        <!-- 층 버튼들 동적 렌더링 -->
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-indigo-50/70 p-5 rounded-2xl border border-indigo-100 text-xs text-slate-500 leading-relaxed">
+                    <p class="font-bold text-indigo-800 mb-1.5 flex items-center gap-1 text-sm"><i data-lucide="lightbulb" class="w-4 h-4"></i> 스탬프 가이드</p>
+                    <p>각 교실에 들러 계성고등학교만의 교과 맞춤 미니게임을 성공하고 스탬프를 모으세요. 전 과목 클리어 시 계성고등학교 명예 졸업장을 드립니다!</p>
+                </div>
+            </div>
+
+            <!-- U자형 교실 지도 시각화 -->
+            <div class="lg:col-span-9 bg-white/90 backdrop-blur border border-indigo-100 p-6 rounded-3xl relative shadow-md">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <span id="current-floor-badge" class="px-3.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full border border-indigo-200">현재 위치</span>
+                        <h2 id="current-floor-title" class="text-3xl font-black fancy-font mt-1.5 text-slate-800">1층 복도</h2>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                        <span class="inline-block w-3.5 h-3.5 bg-rose-400 rounded-full"></span> 미클리어
+                        <span class="inline-block w-3.5 h-3.5 bg-emerald-500 rounded-full"></span> 클리어 완료
+                    </div>
+                </div>
+
+                <!-- 건물 레이아웃 (U자형 구조) -->
+                <div class="u-building-grid relative border-2 border-indigo-200 p-6 rounded-[32px] bg-slate-50/50 shadow-2xl">
+                    
+                    <!-- 서관 -->
+                    <div class="left-wing wing-depth rounded-3xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden">
+                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-widest border-b border-indigo-100 pb-1.5 flex justify-between">
+                            <span>West Wing</span>
+                            <span>서관</span>
+                        </div>
+                        <div id="wing-left-rooms" class="flex-grow flex flex-col justify-center gap-3">
+                            <!-- 왼쪽 교실 배치 -->
+                        </div>
+                    </div>
+
+                    <!-- 중정 야외 광장 (Courtyard) -->
+                    <div class="empty-courtyard rounded-3xl flex flex-col items-center justify-center p-5 text-center">
+                        <div class="w-20 h-20 mb-3 rounded-full shadow-md bg-white border border-emerald-200 flex items-center justify-center text-5xl">
+                            🌳
+                        </div>
+                        <span class="text-sm font-black text-emerald-800 fancy-font tracking-wide">계성 야외 중정 정원</span>
+                        <span class="text-[10px] text-emerald-600 font-bold mt-0.5">Central Courtyard</span>
+                    </div>
+
+                    <!-- 동관 -->
+                    <div class="right-wing wing-depth rounded-3xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden">
+                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-widest border-b border-indigo-100 pb-1.5 flex justify-between">
+                            <span>East Wing</span>
+                            <span>동관</span>
+                        </div>
+                        <div id="wing-right-rooms" class="flex-grow flex flex-col justify-center gap-3">
+                            <!-- 오른쪽 교실 배치 -->
+                        </div>
+                    </div>
+
+                    <!-- 본관 연결통로 -->
+                    <div class="center-connector wing-depth rounded-3xl p-4 flex flex-col justify-between gap-3 relative overflow-hidden">
+                        <div class="text-[10px] text-indigo-500 font-extrabold uppercase tracking-widest border-b border-indigo-100 pb-1.5 flex justify-between">
+                            <span>Center Block</span>
+                            <span>본관 연결통로</span>
+                        </div>
+                        <div id="wing-center-rooms" class="flex-grow flex flex-row justify-around items-center gap-4">
+                            <!-- 중앙 교실 배치 -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mt-5 text-center text-xs text-slate-400 font-semibold flex items-center justify-center gap-1">
+                    <i data-lucide="info" class="w-4 h-4 text-slate-400"></i> 계성고등학교의 독창적인 U자형 특화 도면을 고해상도 디지털 구조로 설계한 가상 맵입니다.
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- [3] 공통 미니게임 팝업 (모달) -->
+    <div id="game-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col text-slate-800">
+            
+            <!-- 모달 헤더 -->
+            <div class="bg-slate-50 p-5 border-b border-slate-200 flex justify-between items-center">
+                <div class="flex items-center gap-3.5">
+                    <span id="modal-room-icon" class="text-4xl">🔬</span>
+                    <div>
+                        <h3 id="modal-room-title" class="text-2xl font-black text-indigo-600 fancy-font">교실명</h3>
+                        <p id="modal-room-desc" class="text-xs text-slate-500 font-bold mt-0.5">교실 소개 문구</p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 bg-white hover:bg-slate-100 p-2.5 rounded-xl transition-all border border-slate-200 shadow-sm">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- 모달 게임플레이 영역 -->
+            <div id="game-playzone" class="p-6 flex-grow flex flex-col items-center justify-center min-h-[420px] max-h-[80vh] overflow-y-auto custom-scrollbar relative bg-slate-50">
+                <!-- 동적으로 각 방에 맞는 미니게임이 탑재됨 -->
+            </div>
+
+            <!-- 모달 푸터 -->
+            <div class="bg-slate-100 p-5 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
+                <span class="font-extrabold text-indigo-600 flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4 text-indigo-500 animate-pulse"></i> 미션을 정복하고 도장을 획득하세요!</span>
+                <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-5 py-2.5 rounded-xl font-bold text-slate-700 transition-colors shadow-sm">
+                    그만두기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [4] 스탬프 북 팝업 -->
+    <div id="stamp-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-indigo-400 rounded-3xl w-full max-w-lg p-6 shadow-2xl relative text-slate-800 animate-in fade-in zoom-in-95 duration-250">
+            <button onclick="closeStampBook()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 bg-slate-100 p-1.5 rounded-full transition-all">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <span class="text-6xl block">🏆</span>
+                <h3 class="text-3xl font-black fancy-font text-indigo-600 mt-2">나의 계성 투어 도장첩</h3>
+                <p class="text-xs text-slate-500 mt-1 font-bold">계성고등학교의 모든 학문을 마스터하여 명예 졸업 자격을 받으세요!</p>
+            </div>
+
+            <!-- 스탬프 리스트 -->
+            <div id="stamp-grid" class="grid grid-cols-4 gap-3.5 max-h-[320px] overflow-y-auto p-3 bg-slate-50 rounded-2xl border border-slate-200 custom-scrollbar">
+                <!-- 동적으로 스탬프 상태 렌더링 -->
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button onclick="checkGraduation()" class="w-full bg-gradient-to-r from-indigo-500 to-sky-500 text-white font-black py-3 rounded-2xl text-center hover:brightness-105 active:scale-[0.99] transition-all shadow-md text-base">
+                    🎓 명예 졸업장 발급 확인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [5] 졸업 축하 모달 -->
+    <div id="grad-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-lg hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-amber-400 rounded-3xl w-full max-w-xl p-8 shadow-2xl text-center relative overflow-hidden text-slate-800">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-sky-400/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl"></div>
+
+            <span class="text-8xl block animate-bounce mb-4">🎓</span>
+            <h2 class="text-4xl font-black fancy-font text-amber-500 mb-2">계성고 명예 졸업장 수여</h2>
+            <p class="text-slate-650 text-sm max-w-md mx-auto mb-6 leading-relaxed font-semibold">
+                위 학생은 계성고등학교의 풍부하고 깊이 있는 모든 교과 연계 게임과 도전과제들을 훌륭하게 극복하여, 본교의 영예로운 졸업 요건에 부합함을 입증하였으므로 이 명예 졸업장을 수여합니다.
+            </p>
+
+            <div class="bg-amber-50 border-2 border-amber-200 p-6 rounded-2xl mb-6 inline-block min-w-[320px] shadow-sm">
+                <div class="text-xs text-amber-600 tracking-widest font-black">계성고등학교 명예졸업증서</div>
+                <div class="text-3xl font-extrabold mt-3 text-slate-800 text-center" id="grad-student-name">10101 홍길동</div>
+                <div class="text-[11px] text-slate-500 mt-2 font-bold" id="grad-date">발급일자: 2026년 7월 13일</div>
+            </div>
+
+            <div class="flex justify-center gap-3">
+                <button onclick="resetGame()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-6 py-3 rounded-2xl transition-all text-sm">
+                    처음부터 다시하기
+                </button>
+                <button onclick="closeGrad()" class="bg-sky-500 hover:bg-sky-600 text-white font-black px-6 py-3 rounded-2xl transition-all text-sm shadow-md shadow-sky-500/20">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [6] 커스텀 알림 모달 -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4">
+        <div class="bg-white border-2 border-indigo-400 rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center animate-in fade-in zoom-in-95 duration-150">
+            <span id="custom-alert-icon" class="text-5xl">💡</span>
+            <h3 id="custom-alert-title" class="text-xl font-bold text-slate-800 mt-2 fancy-font">안내</h3>
+            <p id="custom-alert-message" class="text-xs text-slate-500 mt-3 whitespace-pre-line leading-relaxed font-bold"></p>
+            <button onclick="closeCustomAlert()" class="w-full mt-5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl text-xs transition-all shadow">확인</button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white py-4 text-center text-xs text-slate-400 border-t border-indigo-100">
+        <p>© 2026 계성고등학교 코드 크래프트 동아리. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // --- [Web Audio API] 고품질 레트로 오디오 효과음 ---
+        let audioCtx = null;
+        
+        function playBeep(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'success') {
+                    osc.type = 'sine';
+                    // 도-미-솔 완벽한 아르페지오
+                    const now = audioCtx.currentTime;
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.start();
+                    osc.stop(now + 0.45);
+                } else if (type === 'fail') {
+                    osc.type = 'sawtooth';
+                    const now = audioCtx.currentTime;
+                    osc.frequency.setValueAtTime(196.00, now); // G3
+                    osc.frequency.setValueAtTime(146.83, now + 0.12); // D3
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.start();
+                    osc.stop(now + 0.35);
+                }
+            } catch(e) {
+                console.log("Audio API 재생 제한 또는 비활성화 상태", e);
+            }
+        }
+
+        // --- 커스텀 안내 모달 ---
+        let alertCallback = null;
+        function showCustomAlert(message, title = "안내", icon = "💡", callback = null) {
+            document.getElementById('custom-alert-icon').innerText = icon;
+            document.getElementById('custom-alert-title').innerText = title;
+            document.getElementById('custom-alert-message').innerHTML = message;
+            alertCallback = callback;
+            
+            const modal = document.getElementById('custom-alert-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeCustomAlert() {
+            const modal = document.getElementById('custom-alert-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            if (alertCallback) {
+                alertCallback();
+                alertCallback = null;
+            }
+        }
+
+        // --- 전역 상태 및 게임 데이터 ---
+        let player = {
+            name: "학생",
+            avatar: "🎒",
+            currentFloor: 1,
+            completedRooms: [] 
+        };
+
+        const schoolMap = {
+            1: {
+                left: [
+                    { id: "1_music", name: "음악실", desc: "도레미~ 날아오는 노트를 판정선 타이밍에 정확하게 처보세요!", icon: "🎵", gameType: "rhythm" }
+                ],
+                center: [
+                    { id: "1_lobby", name: "중앙 로비", desc: "넓고 쾌적한 계성고등학교의 로비입니다. (스탬프 없음)", icon: "🚪", gameType: "none" }
+                ],
+                right: [
+                    { id: "1_study", name: "자습실", desc: "공부하기 클릭으로 잠을 쫓고 집중력을 채워 자습 한도를 100%로 끌어올리세요!", icon: "📖", gameType: "study" }
+                ]
+            },
+            2: {
+                left: [
+                    { id: "2_infirmary", name: "보건실", desc: "아픈 학우들의 상태에 알맞은 치료 처방을 신속히 매치하세요!", icon: "🏥", gameType: "nurse" },
+                    { id: "2_art", name: "미술실", desc: "목표 타겟 색상과 일치하도록 R, G, B 삼원색 슬라이더를 맞추세요!", icon: "🎨", gameType: "absolute_color" }
+                ],
+                center: [
+                    { id: "2_philosophy", name: "철학실", desc: "두 장의 전제와 한 장의 결론을 조합해 타당한 삼단논법 조판을 설계하세요!", icon: "🧠", gameType: "philosophy_syllogism" }
+                ],
+                right: [
+                    { id: "2_pe", name: "체육이론실", desc: "주요 스포츠 규칙과 올림픽 상식 퀴즈를 모두 정답으로 이끄세요!", icon: "⚽", gameType: "quiz", subject: "pe" }
+                ]
+            },
+            3: {
+                left: [
+                    { id: "3_english", name: "영어실", desc: "카드 뒤집기! 영어 단어와 그에 알맞은 한글 뜻 짝을 매칭하여 영단어를 완벽 마스터하세요!", icon: "🔤", gameType: "english_memory" },
+                    { id: "3_geography", name: "지리실", desc: "세계 여러 지리 지형 및 한국 지리의 필수 상식 퀴즈!", icon: "🗺️", gameType: "quiz", subject: "geography" }
+                ],
+                center: [
+                    { id: "3_korean", name: "국어실", desc: "강조된 단어의 품사를 9품사 명칭 중 하나로 속전속결 매치하세요!", icon: "✍️", gameType: "korean_parts_of_speech" },
+                    { id: "3_computer", name: "컴퓨터실", desc: "화면에 출몰하는 컴퓨터 바이러스 오류 버그를 빠르게 탭하여 박멸하세요!", icon: "💻", gameType: "bug" },
+                    { id: "3_lang", name: "제2외국어실", desc: "일본어, 프랑스어 등 주요 외국어 첫인사 표현들을 짝지으세요!", icon: "🌍", gameType: "quiz", subject: "lang" }
+                ],
+                right: [
+                    { id: "3_math", name: "수학실", desc: "중복되지 않는 3자리 숫자를 스트라이크와 볼 규칙에 기반해 완벽히 유추하세요!", icon: "➕", gameType: "number_baseball" },
+                    { id: "3_hanmun", name: "한문실", desc: "같은 한자 원을 부딪혀 더 큰 한자로 융합해 가며 최종 '萬(만)'을 조립하세요!", icon: "🈴", gameType: "hanja_drop" }
+                ]
+            },
+            4: {
+                left: [
+                    { id: "4_english", name: "영어실", desc: "조금 더 난도가 높아진 단어 타이핑 순발력!", icon: "🗣️", gameType: "english" },
+                    { id: "4_korean", name: "국어실", desc: "고전 문학과 시조에 담긴 아름다운 시어 퀴즈!", icon: "📜", gameType: "quiz", subject: "korean2" },
+                    { id: "4_geography", name: "지리실", desc: "기후와 지형, 인문학적 환경에 관한 고급 지식 탐구!", icon: "🌋", gameType: "quiz", subject: "geography2" }
+                ],
+                center: [
+                    { id: "4_history", name: "역사실", desc: "역사 유물과 인물에 연계된 핵심 한국사 문제에 도전하세요!", icon: "🏺", gameType: "quiz", subject: "history" },
+                    { id: "4_biology", name: "생물실", desc: "DNA 주형 염기에 전사 작용되는 완벽한 상보 mRNA 염기 사다리를 조립하세요!", icon: "🔬", gameType: "dna_transcription" },
+                    { id: "4_chemistry", name: "화학실", desc: "이온들을 결합시켜 총 전하량의 합을 0으로 소멸시키는 안정된 결합을 유도하세요!", icon: "🧪", gameType: "ion_bond" }
+                ],
+                right: [
+                    { id: "4_math", name: "수학실", desc: "수열과 사칙연산의 변칙 수식을 신속하게 두뇌 풀가동 계산!", icon: "📐", gameType: "math", level: "hard" },
+                    { id: "4_korean_2", name: "국어실", desc: "헷갈리기 쉬운 국어의 문법 규범 및 어문 규정 퀴즈!", icon: "📝", gameType: "quiz", subject: "korean3" }
+                ]
+            },
+            5: {
+                left: [],
+                center: [
+                    { id: "5_physics", name: "물리실", desc: "역학 법칙과 에너지 공식을 활용하는 기계물리 퀴즈!", icon: "⚙️", gameType: "quiz", subject: "physics" },
+                    { id: "5_earth", name: "지구과학실", desc: "대기의 이산화탄소를 해양, 생물, 지권까지 안전하게 순환시키는 배관 망을 연결하세요!", icon: "🪐", gameType: "carbon_cycle" }
+                ],
+                right: []
+            }
+        };
+
+        const totalStampRooms = (() => {
+            let list = [];
+            for (let floor in schoolMap) {
+                ['left', 'center', 'right'].forEach(wing => {
+                    schoolMap[floor][wing].forEach(room => {
+                        if (room.gameType !== "none") {
+                            list.push(room);
+                        }
+                    });
+                });
+            }
+            return list;
+        })();
+
+        document.getElementById('total-rooms-count').innerText = totalStampRooms.length;
+
+        // --- 초기 아바타 선택 설정 ---
+        function selectAvatar(emoji, element) {
+            playBeep('click');
+            player.avatar = emoji;
+            
+            document.querySelectorAll('.avatar-option').forEach(btn => {
+                btn.className = "avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm";
+            });
+            
+            element.className = "avatar-option group relative p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 scale-110 flex flex-col items-center gap-1 shadow-md ring-4 ring-indigo-500 font-bold";
+        }
+
+        // --- 게임 시작하기 ---
+        function startGame() {
+            let nameInput = document.getElementById('input-username').value.trim();
+            let idInput = document.getElementById('input-student-id').value.trim();
+            
+            if(!idInput) {
+                showCustomAlert('계성고등학교 학번을 올바르게 기입해 주세요!', '학번 누락', '🔢');
+                return;
+            }
+            if(!nameInput) {
+                showCustomAlert('자랑스러운 계성고등학교 신입생님의 성함을 적어주세요!', '이름 누락', '✏️');
+                return;
+            }
+
+            let combinedName = `${idInput} ${nameInput}`;
+            player.name = combinedName;
+            
+            // HUD 업데이트
+            document.getElementById('hud-name').innerText = player.name;
+            document.getElementById('hud-avatar').innerText = player.avatar;
+            document.getElementById('player-hud').classList.remove('hidden');
+
+            // 화면 전환
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-map').classList.remove('hidden');
+            
+            // 졸업 증서 내용 동기화
+            document.getElementById('grad-student-name').innerText = player.name;
+
+            playBeep('success');
+            buildFloorButtons();
+            renderFloor(1);
+        }
+
+        // --- 계단 이동 버튼 생성 ---
+        function buildFloorButtons() {
+            const container = document.getElementById('floor-buttons-container');
+            container.innerHTML = '';
+            for(let f=5; f>=1; f--) {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-3.5 rounded-2xl border flex items-center justify-between transition-all font-bold ${
+                    player.currentFloor === f 
+                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-md scale-[1.02] ring-2 ring-indigo-300' 
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-indigo-200'
+                }`;
+                btn.onclick = () => {
+                    playBeep('click');
+                    renderFloor(f);
+                };
+
+                const label = document.createElement('span');
+                label.className = 'fancy-font text-base flex items-center gap-2';
+                label.innerHTML = `<span class="text-xs px-2 py-0.5 rounded-lg ${player.currentFloor === f ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}">${f}F</span> ${getFloorName(f)}`;
+                btn.appendChild(label);
+
+                const countBadge = document.createElement('span');
+                countBadge.className = `text-xs px-2.5 py-0.5 rounded-full font-extrabold ${player.currentFloor === f ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`;
+                
+                const fRooms = [...schoolMap[f].left, ...schoolMap[f].center, ...schoolMap[f].right].filter(r => r.gameType !== 'none');
+                const fCleared = fRooms.filter(r => player.completedRooms.includes(r.id)).length;
+                countBadge.innerText = `${fCleared}/${fRooms.length}`;
+                btn.appendChild(countBadge);
+
+                container.appendChild(btn);
+            }
+        }
+
+        function getFloorName(floor) {
+            switch(floor) {
+                case 1: return "문화 & 자율 공간";
+                case 2: return "예술 & 교양 교실";
+                case 3: return "기초 학문 & 어학당";
+                case 4: return "인문학 & 과학 실험실";
+                case 5: return "고급 이공계 연구관";
+                default: return "교실 복도";
+            }
+        }
+
+        // --- 해당 층의 U자형 맵 렌더링 ---
+        function renderFloor(floor) {
+            player.currentFloor = floor;
+            
+            document.getElementById('current-floor-title').innerText = `${floor}층 : ${getFloorName(floor)}`;
+            buildFloorButtons();
+
+            renderWing('wing-left-rooms', schoolMap[floor].left);
+            renderWing('wing-center-rooms', schoolMap[floor].center, true);
+            renderWing('wing-right-rooms', schoolMap[floor].right);
+
+            lucide.createIcons();
+        }
+
+        function renderWing(containerId, rooms, isCenter = false) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (rooms.length === 0) {
+                container.innerHTML = `<div class="text-slate-400 text-xs text-center py-4 font-semibold">교실 없음</div>`;
+                return;
+            }
+
+            rooms.forEach(room => {
+                const card = document.createElement('div');
+                const isCleared = player.completedRooms.includes(room.id);
+                const isLobby = room.gameType === 'none';
+
+                let cardClasses = `room-card p-3 rounded-2xl border text-center transition-all cursor-pointer relative flex flex-col justify-center items-center ${
+                    isLobby 
+                    ? 'bg-slate-100 border-slate-200 cursor-default text-slate-400'
+                    : isCleared 
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-inner' 
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-400 hover:bg-indigo-50/20 hover:-translate-y-0.5 shadow-sm'
+                }`;
+
+                if (isCenter) {
+                    cardClasses += " flex-1 min-h-[110px]";
+                } else {
+                    cardClasses += " min-h-[75px]";
+                }
+
+                card.className = cardClasses;
+                
+                if (!isLobby) {
+                    card.onclick = () => openGameModal(room);
+                }
+
+                let stampBadge = '';
+                if (!isLobby) {
+                    stampBadge = isCleared 
+                    ? `<span class="absolute top-1.5 right-1.5 text-emerald-500 animate-in fade-in zoom-in"><i data-lucide="check-circle-2" class="w-5 h-5 fill-emerald-500 text-white"></i></span>`
+                    : `<span class="absolute top-1.5 right-1.5 text-slate-350"><i data-lucide="circle" class="w-4 h-4"></i></span>`;
+                }
+
+                card.innerHTML = `
+                    ${stampBadge}
+                    <span class="text-3xl mb-1.5">${room.icon}</span>
+                    <span class="font-extrabold text-xs md:text-sm tracking-tight">${room.name}</span>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // --- 미니게임 팝업창(모달) 오픈 ---
+        let currentRoomInPlay = null;
+
+        function openGameModal(room) {
+            playBeep('click');
+            currentRoomInPlay = room;
+            
+            document.getElementById('modal-room-icon').innerText = room.icon;
+            document.getElementById('modal-room-title').innerText = room.name;
+            document.getElementById('modal-room-desc').innerText = room.desc;
+
+            const playzone = document.getElementById('game-playzone');
+            playzone.innerHTML = ''; 
+
+            loadMiniGame(room.gameType, room);
+
+            document.getElementById('game-modal').classList.remove('hidden');
+            document.getElementById('game-modal').classList.add('flex');
+            
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            playBeep('click');
+            document.getElementById('game-modal').classList.add('hidden');
+            document.getElementById('game-modal').classList.remove('flex');
+            currentRoomInPlay = null;
+            renderFloor(player.currentFloor);
+        }
+
+        // --- 스탬프북 오버레이 ---
+        function openStampBook() {
+            playBeep('click');
+            const grid = document.getElementById('stamp-grid');
+            grid.innerHTML = '';
+
+            totalStampRooms.forEach(room => {
+                const isCleared = player.completedRooms.includes(room.id);
+                const stampBox = document.createElement('div');
+                stampBox.className = `p-3 rounded-2xl border text-center flex flex-col items-center justify-center transition-all ${
+                    isCleared 
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 scale-105 shadow' 
+                    : 'bg-slate-50 border-slate-200 opacity-60 text-slate-400'
+                }`;
+
+                stampBox.innerHTML = `
+                    <span class="text-4xl mb-1">${isCleared ? '⭐' : '🔒'}</span>
+                    <span class="text-[10px] font-black mt-1 block truncate w-full">${room.name}</span>
+                `;
+                grid.appendChild(stampBox);
+            });
+
+            document.getElementById('stamp-modal').classList.remove('hidden');
+            document.getElementById('stamp-modal').classList.add('flex');
+        }
+
+        function closeStampBook() {
+            playBeep('click');
+            document.getElementById('stamp-modal').classList.add('hidden');
+            document.getElementById('stamp-modal').classList.remove('flex');
+        }
+
+        function updateStampHUD() {
+            const currentCount = player.completedRooms.length;
+            document.getElementById('stamp-count').innerText = currentCount;
+        }
+
+        function clearCurrentRoom() {
+            if (currentRoomInPlay && !player.completedRooms.includes(currentRoomInPlay.id)) {
+                player.completedRooms.push(currentRoomInPlay.id);
+                updateStampHUD();
+                playBeep('success');
+            }
+        }
+
+        function checkGraduation() {
+            playBeep('click');
+            if (player.completedRooms.length >= totalStampRooms.length) {
+                closeStampBook();
+                document.getElementById('grad-student-name').innerText = player.name;
+                
+                // 졸업일자 현재일로 갱신
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth() + 1;
+                const date = today.getDate();
+                document.getElementById('grad-date').innerText = `발급일자: ${year}년 ${month}월 ${date}일`;
+
+                document.getElementById('grad-modal').classList.remove('hidden');
+                document.getElementById('grad-modal').classList.add('flex');
+            } else {
+                showCustomAlert(`아직 모든 배움의 과정이 끝나지 않았어요!\n\n현재 스탬프: ${player.completedRooms.length} / ${totalStampRooms.length}\n모든 교실의 챌린지를 극복해 주세요!`, "학업 미수료", "🎓");
+            }
+        }
+
+        function closeGrad() {
+            playBeep('click');
+            document.getElementById('grad-modal').classList.add('hidden');
+            document.getElementById('grad-modal').classList.remove('flex');
+        }
+
+        function resetGame() {
+            playBeep('click');
+            player.completedRooms = [];
+            updateStampHUD();
+            closeGrad();
+            renderFloor(1);
+        }
+
+        // ==========================================
+        //  통합 미니게임 엔진 및 데이터 로드
+        // ==========================================
+
+        function loadMiniGame(type, room) {
+            const playzone = document.getElementById('game-playzone');
+            
+            switch(type) {
+                case 'rhythm': 
+                    setupMusicGame(playzone);
+                    break;
+                case 'study': 
+                    setupStudyGame(playzone);
+                    break;
+                case 'nurse': 
+                    setupNurseGame(playzone);
+                    break;
+                case 'absolute_color':
+                    setupAbsoluteColorGame(playzone);
+                    break;
+                case 'philosophy_syllogism':
+                    setupSyllogismGame(playzone);
+                    break;
+                case 'english_memory':
+                    setupEnglishMemoryGame(playzone);
+                    break;
+                case 'korean_parts_of_speech':
+                    setupPartsOfSpeechGame(playzone);
+                    break;
+                case 'number_baseball':
+                    setupNumberBaseballGame(playzone);
+                    break;
+                case 'hanja_drop':
+                    setupHanjaDropGame(playzone);
+                    break;
+                case 'dna_transcription':
+                    setupDnaTranscriptionGame(playzone);
+                    break;
+                case 'ion_bond':
+                    setupIonBondGame(playzone);
+                    break;
+                case 'carbon_cycle':
+                    setupCarbonCycleGame(playzone);
+                    break;
+                case 'quiz': 
+                    setupQuizGame(playzone, room.subject);
+                    break;
+                case 'english': 
+                    setupEnglishTypingGame(playzone, room.id);
+                    break;
+                case 'bug': 
+                    setupBugGame(playzone);
+                    break;
+                case 'math': 
+                    setupMathGame(playzone, room.level || 'easy');
+                    break;
+                default:
+                    playzone.innerHTML = `
+                        <div class="text-center py-8 animate-in fade-in">
+                            <span class="text-5xl">🛠️</span>
+                            <p class="mt-2 text-slate-600 font-bold">도전 과제 준비 완료!</p>
+                            <button onclick="directClear()" class="mt-4 bg-indigo-600 text-white font-bold px-6 py-3 rounded-2xl shadow-md">스탬프 받기</button>
+                        </div>
+                    `;
+            }
+        }
+
+        function directClear() {
+            clearCurrentRoom();
+            const playzone = document.getElementById('game-playzone');
+            playzone.innerHTML = `
+                <div class="text-center py-8 animate-in zoom-in-95 duration-200">
+                    <span class="text-6xl text-emerald-500 animate-pulse block mb-2">⭐</span>
+                    <h4 class="text-3xl font-black mt-2 text-emerald-600 fancy-font">미션 클리어!</h4>
+                    <p class="text-sm text-slate-500 mt-2 font-bold">스탬프 도장이 성공적으로 기록되었습니다.</p>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        //  음악실 (리듬 판정 게임)
+        // ==========================================
+        function setupMusicGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center">
+                    <p class="text-xs text-slate-500 mb-3 font-semibold">위에서 내려오는 음표가 노란 점선에 닿을 때 알맞은 버튼을 누르세요! (A/S/D 키 지원)</p>
+                    <div class="flex justify-around items-center bg-slate-900 border-2 border-slate-750 h-64 relative rounded-2xl overflow-hidden mb-4 shadow-inner">
+                        <div class="w-1/3 h-full border-r border-slate-800 relative" id="rhythm-line-1">
+                            <div class="absolute bottom-8 w-full border-b-2 border-dashed border-amber-400"></div>
+                        </div>
+                        <div class="w-1/3 h-full border-r border-slate-800 relative" id="rhythm-line-2">
+                            <div class="absolute bottom-8 w-full border-b-2 border-dashed border-amber-400"></div>
+                        </div>
+                        <div class="w-1/3 h-full relative" id="rhythm-line-3">
+                            <div class="absolute bottom-8 w-full border-b-2 border-dashed border-amber-400"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="triggerHit(0)" id="btn-hit-0" class="bg-white border-2 border-slate-300 py-3 rounded-xl active:bg-indigo-600 active:text-white font-black text-sm shadow-sm text-slate-700 transition-colors">A (왼쪽)</button>
+                        <button onclick="triggerHit(1)" id="btn-hit-1" class="bg-white border-2 border-slate-300 py-3 rounded-xl active:bg-indigo-600 active:text-white font-black text-sm shadow-sm text-slate-700 transition-colors">S (가운데)</button>
+                        <button onclick="triggerHit(2)" id="btn-hit-2" class="bg-white border-2 border-slate-300 py-3 rounded-xl active:bg-indigo-600 active:text-white font-black text-sm shadow-sm text-slate-700 transition-colors">D (오른쪽)</button>
+                    </div>
+                    <div class="mt-4 flex justify-between items-center text-xs font-bold text-slate-650">
+                        <span class="text-sm">성공 횟수: <strong id="r-score" class="text-indigo-600 text-lg">0</strong> / 8회</span>
+                        <span id="r-feedback" class="text-indigo-500 font-black text-sm">준비 완료!</span>
+                    </div>
+                </div>
+            `;
+
+            let score = 0;
+            const targetScore = 8;
+            let gameInterval;
+            let activeNotes = [];
+
+            const keyHandler = (e) => {
+                const key = e.key.toLowerCase();
+                if(key === 'a') { triggerHit(0); animateButton(0); }
+                if(key === 's') { triggerHit(1); animateButton(1); }
+                if(key === 'd') { triggerHit(2); animateButton(2); }
+            };
+            window.addEventListener('keydown', keyHandler);
+
+            function animateButton(index) {
+                const btn = document.getElementById(`btn-hit-${index}`);
+                if (btn) {
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                    setTimeout(() => btn.classList.remove('bg-indigo-600', 'text-white'), 100);
+                }
+            }
+
+            const cleanMusicGame = () => {
+                clearInterval(gameInterval);
+                window.removeEventListener('keydown', keyHandler);
+            };
+
+            gameInterval = setInterval(() => {
+                const lineIndex = Math.floor(Math.random() * 3);
+                const lineDiv = document.getElementById(`rhythm-line-${lineIndex + 1}`);
+                if (!lineDiv) return;
+
+                const note = document.createElement('div');
+                note.className = 'absolute w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-400 flex items-center justify-center text-white text-base font-black transition-all duration-[1500ms] ease-linear shadow-md';
+                note.style.top = '-40px';
+                note.style.left = 'calc(50% - 20px)';
+                note.innerText = '🎵';
+                lineDiv.appendChild(note);
+
+                // 조금 더 부드러운 위치 하강
+                setTimeout(() => { note.style.top = '210px'; }, 50);
+
+                const noteData = { element: note, line: lineIndex, spawnTime: Date.now() };
+                activeNotes.push(noteData);
+
+                setTimeout(() => {
+                    if (note.parentNode) { note.parentNode.removeChild(note); }
+                    activeNotes = activeNotes.filter(n => n !== noteData);
+                }, 1600);
+            }, 850);
+
+            window.triggerHit = function(line) {
+                const notesOnLine = activeNotes.filter(n => n.line === line);
+                if (notesOnLine.length > 0) {
+                    const candidate = notesOnLine[0];
+                    const elapsed = Date.now() - candidate.spawnTime;
+                    
+                    // 판정 시간 튜닝
+                    if (elapsed >= 1350 && elapsed <= 1600) {
+                        score++;
+                        playBeep('success');
+                        document.getElementById('r-score').innerText = score;
+                        document.getElementById('r-feedback').innerText = "✨ PERFECT! ✨";
+                        document.getElementById('r-feedback').className = "text-emerald-500 font-extrabold text-sm animate-bounce";
+                        
+                        if (candidate.element.parentNode) { candidate.element.parentNode.removeChild(candidate.element); }
+                        activeNotes = activeNotes.filter(n => n !== candidate);
+
+                        if(score >= targetScore) {
+                            cleanMusicGame();
+                            directClear();
+                        }
+                    } else { triggerFailFeedback(); }
+                } else { triggerFailFeedback(); }
+            };
+
+            function triggerFailFeedback() {
+                playBeep('fail');
+                document.getElementById('r-feedback').innerText = "⚠️ MISS!";
+                document.getElementById('r-feedback').className = "text-rose-500 font-extrabold text-sm";
+            }
+
+            const origClose = window.closeModal;
+            window.closeModal = function() {
+                cleanMusicGame();
+                origClose();
+                window.closeModal = origClose;
+            };
+        }
+
+        // ==========================================
+        //  자습실 (집중 클릭커)
+        // ==========================================
+        function setupStudyGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center">
+                    <p class="text-xs text-slate-600 mb-4 font-bold">졸음 귀신이 기습해오기 전에 빠르게 공부하기 버튼을 눌러 자습 지수를 가득 채우세요!</p>
+                    <div class="relative bg-white border border-slate-200 h-32 rounded-2xl flex items-center justify-center overflow-hidden mb-5 shadow-sm">
+                        <div class="w-4/5 bg-slate-100 h-10 rounded-full border border-slate-200 overflow-hidden relative shadow-inner">
+                            <div id="study-progress" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full w-0 transition-all duration-75"></div>
+                            <span class="absolute inset-0 flex items-center justify-center font-extrabold text-xs text-slate-700" id="study-percent">자습 지수: 0%</span>
+                        </div>
+                    </div>
+                    <button onclick="studyClick()" class="w-full bg-gradient-to-r from-sky-450 to-indigo-500 text-white font-black py-5 rounded-2xl text-base transition-transform active:scale-95 shadow-lg shadow-indigo-500/10 hover:brightness-105">
+                        ✍️ 집중해서 열공하기! (클릭/터치)
+                    </button>
+                    <p class="text-[11px] text-slate-400 mt-3 font-bold">시간이 흐를수록 자습 집중도가 감소합니다! 스피드가 중요해요!</p>
+                </div>
+            `;
+
+            let progress = 0;
+            let decayInterval;
+
+            decayInterval = setInterval(() => {
+                if (progress > 0) {
+                    progress = Math.max(0, progress - 4);
+                    updateUI();
+                }
+            }, 350);
+
+            window.studyClick = function() {
+                playBeep('click');
+                progress += 9;
+                if (progress >= 100) {
+                    progress = 100;
+                    updateUI();
+                    clearInterval(decayInterval);
+                    directClear();
+                } else {
+                    updateUI();
+                }
+            };
+
+            function updateUI() {
+                const bar = document.getElementById('study-progress');
+                const label = document.getElementById('study-percent');
+                if (bar && label) {
+                    bar.style.width = `${progress}%`;
+                    label.innerText = `자습 지수: ${progress}%`;
+                }
+            }
+
+            const origClose = window.closeModal;
+            window.closeModal = function() {
+                clearInterval(decayInterval);
+                origClose();
+                window.closeModal = origClose;
+            };
+        }
+
+        // ==========================================
+        //  보건실 (처방 매칭)
+        // ==========================================
+        function setupNurseGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center">
+                    <p class="text-xs text-slate-500 mb-3 font-semibold">보건실에 응급 환자 발생! 아픈 학생들의 부위에 알맞은 치료법을 짝지어주세요.</p>
+                    <div class="flex justify-center items-center gap-6 bg-white border border-slate-200 p-5 rounded-2xl mb-5 relative min-h-[140px] shadow-sm">
+                        <div class="text-center">
+                            <span class="text-6xl animate-bounce inline-block" id="patient-icon">🤒</span>
+                            <div class="text-xs text-slate-650 mt-3 font-black" id="patient-status">증상: 머리가 아파요</div>
+                        </div>
+                        <div class="h-12 w-[1px] bg-slate-200"></div>
+                        <div class="text-left">
+                            <div class="text-xs text-slate-400 font-extrabold uppercase tracking-wider">치료 완료 인원</div>
+                            <div class="text-3xl font-black text-indigo-500 mt-1"><span id="heal-count">0</span> / 3</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="applyCure('pill')" class="bg-white border-2 border-slate-200 hover:border-indigo-200 p-3.5 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">💊 해열제 투약</button>
+                        <button onclick="applyCure('band')" class="bg-white border-2 border-slate-200 hover:border-indigo-200 p-3.5 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">🩹 밴드 처치</button>
+                        <button onclick="applyCure('spray')" class="bg-white border-2 border-slate-200 hover:border-indigo-200 p-3.5 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50">💨 소독 스프레이</button>
+                    </div>
+                </div>
+            `;
+
+            let healed = 0;
+            const patientTypes = [
+                { icon: '🤒', symptom: '머리가 욱신거리고 아파요', cure: 'pill' },
+                { icon: '🤕', symptom: '넘어져서 무릎이 까지고 피가 나요', cure: 'band' },
+                { icon: '🦟', symptom: '모기에 심하게 물려 부어올랐어요', cure: 'spray' }
+            ];
+            let currentPatientIdx = 0;
+
+            window.applyCure = function(cureType) {
+                const target = patientTypes[currentPatientIdx];
+                if (cureType === target.cure) {
+                    playBeep('success');
+                    healed++;
+                    document.getElementById('heal-count').innerText = healed;
+                    
+                    if (healed >= 3) {
+                        directClear();
+                    } else {
+                        currentPatientIdx = (currentPatientIdx + 1) % patientTypes.length;
+                        document.getElementById('patient-icon').innerText = '😄';
+                        document.getElementById('patient-status').innerText = '완치되었습니다! 고마워요!';
+                        setTimeout(() => {
+                            const next = patientTypes[currentPatientIdx];
+                            document.getElementById('patient-icon').innerText = next.icon;
+                            document.getElementById('patient-status').innerText = `증상: ${next.symptom}`;
+                        }, 800);
+                    }
+                } else {
+                    playBeep('fail');
+                    document.getElementById('patient-status').innerText = `⚠️ 부적절한 처방입니다! (${target.symptom})`;
+                }
+            };
+        }
+
+        // ==========================================
+        //  미술실 (절대 색감 마스터)
+        // ==========================================
+        function setupAbsoluteColorGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500 font-semibold">제시된 타겟 컬러와 일치하도록 R, G, B 조절바를 정교하게 움직여 보세요!</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex flex-col">
+                            <span class="text-[11px] font-bold text-slate-400 mb-1">제시된 색상 (Target)</span>
+                            <div id="target-color-preview" class="w-full h-24 rounded-2xl border border-slate-200 shadow-inner flex items-center justify-center">
+                                <span class="bg-black/55 text-[10px] text-white px-2 py-0.5 rounded font-mono">RGB 비밀 🤫</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[11px] font-bold text-slate-400 mb-1">내가 조작한 색상</span>
+                            <div id="user-color-preview" class="w-full h-24 rounded-2xl border border-slate-200 shadow-inner"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 bg-white p-4 rounded-2xl border border-slate-200 text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-black text-red-500 w-16">RED (빨강)</span>
+                            <input type="range" id="slider-r" min="0" max="255" value="127" class="flex-grow h-2.5 bg-slate-100 rounded-lg appearance-none cursor-pointer text-red-500">
+                            <span id="label-r" class="text-xs font-mono font-bold w-8 text-right">127</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-black text-emerald-500 w-16">GREEN (초록)</span>
+                            <input type="range" id="slider-g" min="0" max="255" value="127" class="flex-grow h-2.5 bg-slate-100 rounded-lg appearance-none cursor-pointer text-emerald-500">
+                            <span id="label-g" class="text-xs font-mono font-bold w-8 text-right">127</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-black text-indigo-500 w-16">BLUE (파랑)</span>
+                            <input type="range" id="slider-b" min="0" max="255" value="127" class="flex-grow h-2.5 bg-slate-100 rounded-lg appearance-none cursor-pointer text-indigo-500">
+                            <span id="label-b" class="text-xs font-mono font-bold w-8 text-right">127</span>
+                        </div>
+                    </div>
+
+                    <button onclick="compareColors()" class="w-full bg-indigo-650 hover:bg-indigo-700 text-white font-black py-3 rounded-2xl text-xs transition-all flex items-center justify-center gap-2 shadow-md">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> 결과 비교하고 검증하기
+                    </button>
+                </div>
+            `;
+
+            const tgtColor = {
+                r: Math.floor(Math.random() * 210) + 20,
+                g: Math.floor(Math.random() * 210) + 20,
+                b: Math.floor(Math.random() * 210) + 20
+            };
+            const userColor = { r: 127, g: 127, b: 127 };
+
+            document.getElementById('target-color-preview').style.backgroundColor = `rgb(${tgtColor.r}, ${tgtColor.g}, ${tgtColor.b})`;
+            
+            const rSlider = document.getElementById('slider-r');
+            const gSlider = document.getElementById('slider-g');
+            const bSlider = document.getElementById('slider-b');
+            const rLabel = document.getElementById('label-r');
+            const gLabel = document.getElementById('label-g');
+            const bLabel = document.getElementById('label-b');
+            const uPreview = document.getElementById('user-color-preview');
+
+            function updateColor() {
+                userColor.r = parseInt(rSlider.value);
+                userColor.g = parseInt(gSlider.value);
+                userColor.b = parseInt(bSlider.value);
+                rLabel.innerText = userColor.r;
+                gLabel.innerText = userColor.g;
+                bLabel.innerText = userColor.b;
+                uPreview.style.backgroundColor = `rgb(${userColor.r}, ${userColor.g}, ${userColor.b})`;
+            }
+
+            [rSlider, gSlider, bSlider].forEach(slider => {
+                slider.addEventListener('input', () => { updateColor(); });
+            });
+
+            updateColor();
+
+            window.compareColors = function() {
+                const distance = Math.sqrt(
+                    Math.pow(tgtColor.r - userColor.r, 2) +
+                    Math.pow(tgtColor.g - userColor.g, 2) +
+                    Math.pow(tgtColor.b - userColor.b, 2)
+                );
+                const maxDistance = Math.sqrt(3 * Math.pow(255, 2));
+                const similarity = Math.round((1 - (distance / maxDistance)) * 100);
+
+                if (similarity >= 90) {
+                    playBeep('success');
+                    showCustomAlert(`완벽합니다! 일치도: ${similarity}%\n\n정답: RGB(${tgtColor.r}, ${tgtColor.g}, ${tgtColor.b})\n만든 색상: RGB(${userColor.r}, ${userColor.g}, ${userColor.b})`, "판정 통과", "🎨", () => {
+                        directClear();
+                    });
+                } else {
+                    playBeep('fail');
+                    showCustomAlert(`조금 더 세밀한 조정이 필요해요!\n일치도: ${similarity}%\n\n(90% 이상 일치 시 도장을 받을 수 있습니다.)`, "색상 불일치", "🧐");
+                }
+            };
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        //  철학실 (논증 조판소)
+        // ==========================================
+        function setupSyllogismGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4 animate-in fade-in">
+                    <p class="text-xs text-slate-500 font-semibold">제시된 세 가지 전제와 결론 카드를 알맞게 조립하여 타당한 삼단논법을 세우세요.</p>
+                    <div class="space-y-3 text-left">
+                        <div class="border-2 border-dashed border-slate-350 p-3.5 rounded-2xl min-h-[55px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between transition-all" onclick="selectSlot(0)">
+                            <span class="text-xs text-slate-400 font-extrabold uppercase">전제 1</span>
+                            <span id="slot-0" class="text-xs text-slate-700 font-bold italic text-slate-400">카드를 선택해 채우세요</span>
+                        </div>
+                        <div class="border-2 border-dashed border-slate-355 p-3.5 rounded-2xl min-h-[55px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between transition-all" onclick="selectSlot(1)">
+                            <span class="text-xs text-slate-400 font-extrabold uppercase">전제 2</span>
+                            <span id="slot-1" class="text-xs text-slate-700 font-bold italic text-slate-400">카드를 선택해 채우세요</span>
+                        </div>
+                        <div class="border-2 border-dashed border-slate-355 p-3.5 rounded-2xl min-h-[55px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between transition-all" onclick="selectSlot(2)">
+                            <span class="text-xs text-slate-400 font-extrabold uppercase text-emerald-500">결론</span>
+                            <span id="slot-2" class="text-xs text-slate-700 font-bold italic text-slate-400">카드를 선택해 채우세요</span>
+                        </div>
+                    </div>
+
+                    <div class="text-left bg-slate-100 p-4 rounded-2xl border border-slate-200">
+                        <span class="text-[10px] text-slate-450 block mb-2 font-extrabold uppercase tracking-wide">보유 카드 더미 (눌러서 선택)</span>
+                        <div id="syllogism-cards-container" class="flex flex-col gap-2.5"></div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="clearSyllogism()" class="flex-grow bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold py-3 rounded-xl text-xs transition-colors">비우기</button>
+                        <button onclick="verifySyllogism()" class="flex-grow bg-sky-500 hover:bg-sky-600 text-white font-extrabold py-3 rounded-xl text-xs transition-all shadow-sm">검증하기</button>
+                    </div>
+                </div>
+            `;
+
+            const cards = [
+                { id: 0, type: 'premise', text: '모든 파충류는 온혈동물이 아니다.' },
+                { id: 1, type: 'premise', text: '모든 뱀은 파충류다.' },
+                { id: 2, type: 'conclusion', text: '그러므로 어떤 뱀도 온혈동물이 아니다.' },
+                { id: 3, type: 'dummy', text: '모든 뱀은 다리를 가지고 있다.' }
+            ];
+
+            let selectedCard = null;
+            let placed = [null, null, null];
+
+            function renderCards() {
+                const parent = document.getElementById('syllogism-cards-container');
+                if (!parent) return;
+                parent.innerHTML = '';
+                cards.forEach(c => {
+                    if (placed.includes(c.id)) return;
+                    const btn = document.createElement('button');
+                    btn.className = `w-full text-left p-3 bg-white border border-slate-200 rounded-xl text-xs font-bold hover:border-sky-500 transition-all ${selectedCard?.id === c.id ? 'ring-2 ring-sky-550 bg-sky-50/50' : ''}`;
+                    btn.innerHTML = `<span class="px-2 py-0.5 rounded-lg text-[10px] mr-2 ${c.type === 'conclusion' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${c.type === 'conclusion' ? '결론' : '전제'}</span> ${c.text}`;
+                    btn.onclick = () => {
+                        playBeep('click');
+                        selectedCard = c;
+                        renderCards();
+                    };
+                    parent.appendChild(btn);
+                });
+            }
+
+            window.selectSlot = function(index) {
+                if (selectedCard) {
+                    placed[index] = selectedCard.id;
+                    const slotEl = document.getElementById(`slot-${index}`);
+                    slotEl.innerText = selectedCard.text;
+                    slotEl.classList.remove('italic', 'text-slate-400');
+                    selectedCard = null;
+                    renderCards();
+                } else if (placed[index] !== null) {
+                    placed[index] = null;
+                    const slotEl = document.getElementById(`slot-${index}`);
+                    slotEl.innerText = "카드를 선택해 채우세요";
+                    slotEl.classList.add('italic', 'text-slate-400');
+                    renderCards();
+                }
+            };
+
+            window.clearSyllogism = function() {
+                placed = [null, null, null];
+                selectedCard = null;
+                for (let i = 0; i < 3; i++) {
+                    const slotEl = document.getElementById(`slot-${i}`);
+                    if (slotEl) {
+                        slotEl.innerText = "카드를 선택해 채우세요";
+                        slotEl.classList.add('italic', 'text-slate-400');
+                    }
+                }
+                renderCards();
+            };
+
+            window.verifySyllogism = function() {
+                if (placed[0] === null || placed[1] === null || placed[2] === null) {
+                    showCustomAlert('세 칸을 모두 채워야 검증이 가능합니다!', '슬롯 미완성', '⚠️');
+                    return;
+                }
+                
+                const hasP1 = placed.includes(0);
+                const hasP2 = placed.includes(1);
+                const hasC = placed[2] === 2;
+
+                if (hasP1 && hasP2 && hasC) {
+                    playBeep('success');
+                    showCustomAlert('정답입니다! 타당한 삼단논법(Celarent 격식)을 완벽히 구축하셨습니다.', '논증 통과', '🧠', () => {
+                        directClear();
+                    });
+                } else {
+                    playBeep('fail');
+                    showCustomAlert('아쉽게도 오류가 있는 삼단논법입니다. 파충류와 뱀의 개념적 주연 규칙을 고려하세요.', '논증 기각', '❌');
+                }
+            };
+
+            renderCards();
+        }
+
+        // ==========================================
+        //  영어실 (영어단어 3D 플립 카드)
+        // ==========================================
+        function setupEnglishMemoryGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4 animate-in fade-in">
+                    <p class="text-xs text-slate-500 font-semibold">12장의 카드를 뒤집어 <b>영어 단어</b>와 그에 알맞은 <b>한글 뜻</b> 짝을 맞추세요!</p>
+                    <div class="grid grid-cols-4 gap-3 max-w-sm mx-auto" id="english-card-board"></div>
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-600 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm max-w-sm mx-auto">
+                        <span>성공한 짝: <strong id="mem-score" class="text-indigo-600 text-base">0</strong> / 6쌍</span>
+                        <span class="text-slate-400">불일치 시 자동으로 다시 뒤집힙니다.</span>
+                    </div>
+                </div>
+            `;
+
+            const pairs = [
+                { word1: 'school', word2: '학교' },
+                { word1: 'teacher', word2: '선생님' },
+                { word1: 'notebook', word2: '공책' },
+                { word1: 'library', word2: '도서관' },
+                { word1: 'friend', word2: '친구' },
+                { word1: 'success', word2: '성공' }
+            ];
+
+            let cardsData = [];
+            pairs.forEach((p, idx) => {
+                cardsData.push({ word: p.word1, pairIdx: idx, lang: 'ENG' });
+                cardsData.push({ word: p.word2, pairIdx: idx, lang: 'KOR' });
+            });
+            
+            cardsData.sort(() => Math.random() - 0.5);
+
+            const board = document.getElementById('english-card-board');
+            let firstCard = null;
+            let secondCard = null;
+            let lock = false;
+            let successCount = 0;
+
+            cardsData.forEach((c, idx) => {
+                const cardOuter = document.createElement('div');
+                cardOuter.className = 'flip-card w-full aspect-[3/4] cursor-pointer';
+                cardOuter.dataset.index = idx;
+                
+                cardOuter.innerHTML = `
+                    <div class="flip-card-inner relative w-full h-full text-center">
+                        <div class="flip-card-front absolute inset-0 bg-gradient-to-br from-indigo-650 to-indigo-500 border border-indigo-400 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-md">?</div>
+                        <div class="flip-card-back absolute inset-0 bg-white border-2 border-indigo-250 rounded-2xl flex flex-col items-center justify-center p-1.5 shadow-md">
+                            <span class="text-xs font-black text-slate-800 break-words w-full px-0.5 leading-tight">${c.word}</span>
+                            <span class="text-[9px] font-extrabold mt-2 px-2 py-0.5 rounded-full ${c.lang === 'ENG' ? 'bg-sky-100 text-sky-700' : 'bg-indigo-50 text-indigo-700'}">${c.lang}</span>
+                        </div>
+                    </div>
+                `;
+
+                cardOuter.onclick = () => {
+                    if (lock || cardOuter.classList.contains('flipped') || cardOuter.classList.contains('matched')) return;
+                    playBeep('click');
+                    cardOuter.classList.add('flipped');
+
+                    if (!firstCard) {
+                        firstCard = { data: c, el: cardOuter };
+                        return;
+                    }
+
+                    secondCard = { data: c, el: cardOuter };
+                    lock = true;
+
+                    if (firstCard.data.pairIdx === secondCard.data.pairIdx && firstCard.data.lang !== secondCard.data.lang) {
+                        firstCard.el.classList.add('matched');
+                        secondCard.el.classList.add('matched');
+                        successCount++;
+                        document.getElementById('mem-score').innerText = successCount;
+                        playBeep('success');
+                        firstCard = null;
+                        secondCard = null;
+                        lock = false;
+
+                        if (successCount >= 6) {
+                            setTimeout(() => { directClear(); }, 600);
+                        }
+                    } else {
+                        playBeep('fail');
+                        setTimeout(() => {
+                            firstCard.el.classList.remove('flipped');
+                            secondCard.el.classList.remove('flipped');
+                            firstCard = null;
+                            secondCard = null;
+                            lock = false;
+                        }, 900);
+                    }
+                };
+
+                board.appendChild(cardOuter);
+            });
+        }
+
+        // ==========================================
+        //  국어실 (품사 분류 타임어택)
+        // ==========================================
+        function setupPartsOfSpeechGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500 font-semibold">빨간색으로 밑줄 처진 단어의 알맞은 한국어 9품사를 정확하게 매치하세요!</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm text-base font-serif" id="korean-sentence">
+                        철수는 오늘 <span class="text-rose-500 font-black underline underline-offset-4">공원</span>에서 축구를 했다.
+                    </div>
+                    <div class="grid grid-cols-3 gap-3" id="korean-choices"></div>
+                    <div class="text-xs font-bold text-slate-600 bg-white py-2 rounded-xl border border-slate-100 max-w-xs mx-auto">
+                        연속 정답 콤보: <span id="kor-combo" class="text-indigo-600 text-base font-extrabold">0</span> / 4회
+                    </div>
+                </div>
+            `;
+
+            const sentences = [
+                { text: '우리는 내일 동물원 <span class="text-rose-500 font-bold underline underline-offset-4">앞</span>에서 만나기로 했다.', answer: '명사' },
+                { text: '<span class="text-rose-500 font-bold underline underline-offset-4">그것</span>은 계성고 최고의 영광이다.', answer: '대명사' },
+                { text: '귤 <span class="text-rose-500 font-bold underline underline-offset-4">둘</span>을 까서 사이좋게 나누어 가졌다.', answer: '수사' },
+                { text: '샛별이들이 넓은 교정을 신나게 <span class="text-rose-500 font-bold underline underline-offset-4">달린다</span>.', answer: '동사' },
+                { text: '오늘따라 아침 가을 하늘이 매우 <span class="text-rose-500 font-bold underline underline-offset-4">맑구나</span>.', answer: '형용사' },
+                { text: '학도들이 <span class="text-rose-500 font-bold underline underline-offset-4">헌</span> 책을 모아 도서관에 기증했다.', answer: '관형사' },
+                { text: '빗방울이 유리창에 <span class="text-rose-500 font-bold underline underline-offset-4">주룩주룩</span> 내리고 있다.', answer: '부사' },
+                { text: '민수<span class="text-rose-500 font-bold underline underline-offset-4">가</span> 드디어 어려운 퀴즈를 해결했다.', answer: '조사' },
+                { text: '<span class="text-rose-500 font-bold underline underline-offset-4">어머나</span>, 정말 아름다운 교정일세!', answer: '감탄사' }
+            ];
+
+            const allParts = ['명사', '대명사', '수사', '동사', '형용사', '관형사', '부사', '조사', '감탄사'];
+            let combo = 0;
+
+            function nextChallenge() {
+                const target = sentences[Math.floor(Math.random() * sentences.length)];
+                document.getElementById('korean-sentence').innerHTML = target.text;
+
+                const list = [target.answer];
+                while(list.length < 3) {
+                    const candidate = allParts[Math.floor(Math.random() * allParts.length)];
+                    if(!list.includes(candidate)) {
+                        list.push(candidate);
+                    }
+                }
+                list.sort(() => Math.random() - 0.5);
+
+                const choicesBox = document.getElementById('korean-choices');
+                if (!choicesBox) return;
+                choicesBox.innerHTML = '';
+                list.forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.className = 'bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-black py-4 rounded-xl text-xs transition-all shadow-sm';
+                    btn.innerText = p;
+                    btn.onclick = () => {
+                        if (p === target.answer) {
+                            playBeep('success');
+                            combo++;
+                            document.getElementById('kor-combo').innerText = combo;
+                            if (combo >= 4) {
+                                directClear();
+                            } else {
+                                nextChallenge();
+                            }
+                        } else {
+                            playBeep('fail');
+                            showCustomAlert(`틀렸습니다! 정답은 [ ${target.answer} ] 입니다.`, "오답 판정", "👀", () => {
+                                combo = 0;
+                                document.getElementById('kor-combo').innerText = combo;
+                                nextChallenge();
+                            });
+                        }
+                    };
+                    choicesBox.appendChild(btn);
+                });
+            }
+
+            nextChallenge();
+        }
+
+        // ==========================================
+        //  수학실 (숫자 야구 게임)
+        // ==========================================
+        function setupNumberBaseballGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500 font-semibold">컴퓨터가 숨겨둔 <b>서로 다른 3자리 숫자(0-9)</b>를 맞추세요!<br>(숫자와 위치가 모두 맞으면 Strike, 숫자만 맞으면 Ball)</p>
+                    
+                    <div class="flex justify-center gap-3.5" id="baseball-slots">
+                        <div class="w-14 h-16 border-2 border-slate-350 rounded-2xl flex items-center justify-center font-black text-3xl text-slate-800 bg-white" id="b-guess-0">-</div>
+                        <div class="w-14 h-16 border-2 border-slate-350 rounded-2xl flex items-center justify-center font-black text-3xl text-slate-800 bg-white" id="b-guess-1">-</div>
+                        <div class="w-14 h-16 border-2 border-slate-350 rounded-2xl flex items-center justify-center font-black text-3xl text-slate-800 bg-white" id="b-guess-2">-</div>
+                    </div>
+
+                    <!-- 숫자 버튼 패드 -->
+                    <div class="grid grid-cols-5 gap-2 max-w-xs mx-auto">
+                        <button onclick="pressNum(1)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">1</button>
+                        <button onclick="pressNum(2)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">2</button>
+                        <button onclick="pressNum(3)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">3</button>
+                        <button onclick="pressNum(4)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">4</button>
+                        <button onclick="pressNum(5)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">5</button>
+                        <button onclick="pressNum(6)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">6</button>
+                        <button onclick="pressNum(7)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">7</button>
+                        <button onclick="pressNum(8)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">8</button>
+                        <button onclick="pressNum(9)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">9</button>
+                        <button onclick="pressNum(0)" class="py-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-black text-slate-700">0</button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 max-w-xs mx-auto">
+                        <button onclick="backspaceBaseball()" class="py-2.5 bg-slate-200 text-slate-700 rounded-xl text-xs font-black">지우기</button>
+                        <button onclick="submitBaseball()" class="py-2.5 bg-indigo-650 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-sm">입력 완료</button>
+                    </div>
+
+                    <div class="text-left bg-white p-4 rounded-2xl border border-slate-200 max-h-36 overflow-y-auto custom-scrollbar text-xs font-mono" id="baseball-history">
+                        <div class="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-1">판정 역사 보드</div>
+                    </div>
+                </div>
+            `;
+
+            const pool = [1,2,3,4,5,6,7,8,9];
+            const secret = [];
+            // 중복이 안 되는 첫 번째 수와 나머지 두 수를 난수로 선정
+            for(let i=0; i<3; i++) {
+                const idx = Math.floor(Math.random() * pool.length);
+                secret.push(pool.splice(idx, 1)[0]);
+            }
+
+            let guess = [];
+
+            window.pressNum = function(num) {
+                if (guess.length >= 3) return;
+                if (guess.includes(num)) return;
+                playBeep('click');
+                guess.push(num);
+                updateUI();
+            };
+
+            window.backspaceBaseball = function() {
+                playBeep('click');
+                guess.pop();
+                updateUI();
+            };
+
+            function updateUI() {
+                for (let i = 0; i < 3; i++) {
+                    const el = document.getElementById(`b-guess-${i}`);
+                    if (el) {
+                        el.innerText = i < guess.length ? guess[i] : '-';
+                    }
+                }
+            }
+
+            window.submitBaseball = function() {
+                if (guess.length < 3) {
+                    showCustomAlert('3자리 숫자를 모두 입력해야 검증이 실행됩니다!', '입력 부족', '⚠️');
+                    return;
+                }
+
+                let strike = 0;
+                let ball = 0;
+                for (let i = 0; i < 3; i++) {
+                    if (guess[i] === secret[i]) {
+                        strike++;
+                    } else if (secret.includes(guess[i])) {
+                        ball++;
+                    }
+                }
+
+                const resultText = strike === 3 ? "👑 3 Strike!" : (strike === 0 && ball === 0 ? "아웃(OUT)" : `${strike}S ${ball}B`);
+                const historyEl = document.getElementById('baseball-history');
+                if (historyEl) {
+                    const p = document.createElement('div');
+                    p.className = 'border-b border-slate-100 py-1 flex justify-between';
+                    p.innerHTML = `<span>내 예측: ${guess.join('')}</span> <span class="font-bold text-sky-600">${resultText}</span>`;
+                    historyEl.appendChild(p);
+                    historyEl.scrollTop = historyEl.scrollHeight;
+                }
+
+                if (strike === 3) {
+                    playBeep('success');
+                    showCustomAlert(`축하합니다! 수학적 비밀수 [ ${guess.join('')} ]을 완벽히 정복했습니다!`, "추리 성공", "👑", () => {
+                        directClear();
+                    });
+                } else {
+                    playBeep('fail');
+                    guess = [];
+                    updateUI();
+                }
+            };
+        }
+
+        // ==========================================
+        //  한문실 (한문 수박 융합 게임)
+        // ==========================================
+        function setupHanjaDropGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4 animate-in fade-in">
+                    <p class="text-[11px] text-slate-500 font-semibold">같은 한자가 있는 원끼리 융합시켜, 최종 최고 한자 '萬(만)'까지 도달하세요!</p>
+                    <canvas id="hanja-canvas" width="380" height="400" class="border-2 border-indigo-200 rounded-2xl bg-slate-50 block mx-auto cursor-crosshair shadow-md"></canvas>
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-600 max-w-[380px] mx-auto bg-white px-3 py-2 rounded-xl border border-slate-100 shadow-sm">
+                        <span>현재 점수: <strong id="hanja-score" class="text-indigo-600 text-sm">0</strong></span>
+                        <span class="flex items-center gap-1">다음 한자: <strong id="next-hanja-ui" class="text-rose-500 text-sm bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100">一</strong></span>
+                    </div>
+                </div>
+            `;
+
+            const canvas = document.getElementById('hanja-canvas');
+            const ctx = canvas.getContext('2d');
+
+            const levels = [
+                { text: "一", radius: 15, color: "#ff7675", val: 2 },
+                { text: "二", radius: 20, color: "#fd79a8", val: 4 },
+                { text: "三", radius: 25, color: "#fdcb6e", val: 8 },
+                { text: "人", radius: 30, color: "#00b894", val: 16 },
+                { text: "木", radius: 36, color: "#0984e3", val: 32 },
+                { text: "水", radius: 42, color: "#6c5ce7", val: 64 },
+                { text: "萬", radius: 48, color: "#10b981", val: 256 }
+            ];
+
+            let score = 0;
+            let currentLevel = 0;
+            let nextLevel = Math.floor(Math.random() * 3);
+            let circles = [];
+            let canDrop = true;
+            let currentX = canvas.width / 2;
+            let animId;
+
+            class Circle {
+                constructor(x, y, level, isFixed = false) {
+                    this.x = x;
+                    this.y = y;
+                    this.level = level;
+                    this.radius = levels[level].radius;
+                    this.color = levels[level].color;
+                    this.text = levels[level].text;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.isFixed = isFixed;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `bold ${this.radius * 1.05}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.text, this.x, this.y);
+                }
+                update() {
+                    if (this.isFixed) return;
+                    this.vy += 0.35; // 물리 중력 최적화
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // 바닥 충돌
+                    if (this.y + this.radius > canvas.height) {
+                        this.y = canvas.height - this.radius;
+                        this.vy = -this.vy * 0.15; // 바닥 탄성 감소로 안정성 확보
+                        this.vx *= 0.9; // 마찰력
+                    }
+                    // 좌우 벽 충돌
+                    if (this.x - this.radius < 0) {
+                        this.x = this.radius;
+                        this.vx = -this.vx * 0.2;
+                    } else if (this.x + this.radius > canvas.width) {
+                        this.x = canvas.width - this.radius;
+                        this.vx = -this.vx * 0.2;
+                    }
+                }
+            }
+
+            function handleMove(clientX) {
+                const rect = canvas.getBoundingClientRect();
+                currentX = clientX - rect.left;
+                const r = levels[currentLevel].radius;
+                if (currentX < r) currentX = r;
+                if (currentX > canvas.width - r) currentX = canvas.width - r;
+            }
+
+            canvas.addEventListener('mousemove', (e) => handleMove(e.clientX));
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) handleMove(e.touches[0].clientX);
+            }, { passive: true });
+
+            canvas.addEventListener('click', dropHanja);
+            canvas.addEventListener('touchend', dropHanja);
+
+            function dropHanja() {
+                if (!canDrop) return;
+                playBeep('click');
+                const c = new Circle(currentX, 35, currentLevel);
+                circles.push(c);
+
+                canDrop = false;
+                currentLevel = nextLevel;
+                nextLevel = Math.floor(Math.random() * 3);
+                const nextUi = document.getElementById('next-hanja-ui');
+                if (nextUi) nextUi.innerText = levels[nextLevel].text;
+
+                setTimeout(() => { canDrop = true; }, 400);
+            }
+
+            function handleHanjaCollisions() {
+                for (let i = 0; i < circles.length; i++) {
+                    for (let j = i + 1; j < circles.length; j++) {
+                        const c1 = circles[i];
+                        const c2 = circles[j];
+                        const dx = c2.x - c1.x;
+                        const dy = c2.y - c1.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const min = c1.radius + c2.radius;
+
+                        if (dist < min) {
+                            if (c1.level === c2.level) {
+                                const nextLvl = c1.level + 1;
+                                if (nextLvl < levels.length) {
+                                    playBeep('success');
+                                    score += levels[nextLvl].val;
+                                    const scoreUi = document.getElementById('hanja-score');
+                                    if (scoreUi) scoreUi.innerText = score;
+
+                                    const midX = (c1.x + c2.x) / 2;
+                                    const midY = (c1.y + c2.y) / 2;
+                                    circles.splice(j, 1);
+                                    circles.splice(i, 1);
+                                    circles.push(new Circle(midX, midY, nextLvl));
+
+                                    // 만(萬) 융합에 성공했을 경우 통과
+                                    if (nextLvl === levels.length - 1) {
+                                        cancelAnimationFrame(animId);
+                                        showCustomAlert("축하합니다! 고차원 한자 '萬(만)'을 조립해 내어 부수 한문 스탬프를 획득했습니다!", "한자 조립 완성", "萬", () => {
+                                            directClear();
+                                        });
+                                        return;
+                                    }
+                                }
+                                return;
+                            }
+                            // 겹침 밀어내기 물리 수식 고도화
+                            const overlap = min - dist;
+                            const nx = dx / dist;
+                            const ny = dy / dist;
+                            c1.x -= nx * overlap * 0.5;
+                            c1.y -= ny * overlap * 0.5;
+                            c2.x += nx * overlap * 0.5;
+                            c2.y += ny * overlap * 0.5;
+                        }
+                    }
+                }
+            }
+
+            function tickHanja() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 낙하 에이밍 가이드 라인 (현재 에이밍 구 폭 반영)
+                if (canDrop) {
+                    const currentRadius = levels[currentLevel].radius;
+                    ctx.beginPath();
+                    ctx.setLineDash([4, 4]);
+                    ctx.moveTo(currentX - currentRadius, 0);
+                    ctx.lineTo(currentX - currentRadius, canvas.height);
+                    ctx.moveTo(currentX + currentRadius, 0);
+                    ctx.lineTo(currentX + currentRadius, canvas.height);
+                    ctx.strokeStyle = 'rgba(99, 102, 241, 0.25)';
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // 상단 에이밍 원 미리보기
+                    ctx.beginPath();
+                    ctx.arc(currentX, 35, currentRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = levels[currentLevel].color;
+                    ctx.globalAlpha = 0.6;
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `bold ${currentRadius * 1.05}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(levels[currentLevel].text, currentX, 35);
+                }
+
+                handleHanjaCollisions();
+
+                circles.forEach(c => {
+                    c.update();
+                    c.draw();
+                });
+
+                animId = requestAnimationFrame(tickHanja);
+            }
+
+            tickHanja();
+
+            const origClose = window.closeModal;
+            window.closeModal = function() {
+                cancelAnimationFrame(animId);
+                origClose();
+                window.closeModal = origClose;
+            };
+        }
+
+        // ==========================================
+        //  생물실 (DNA 주형 전사)
+        // ==========================================
+        function setupDnaTranscriptionGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4 animate-in fade-in">
+                    <p class="text-xs text-slate-500 font-semibold">제시된 DNA 가닥에 대응하여, 전사 결합하는 알맞은 mRNA 가닥 염기(A, U, G, C)를 선택하세요!</p>
+                    <div class="bg-indigo-950 text-white border-2 border-indigo-500 p-6 rounded-2xl max-w-xs mx-auto shadow-md">
+                        <span class="text-[10px] text-indigo-300 block mb-1.5 font-bold uppercase tracking-wider">DNA Template Base</span>
+                        <div id="dna-target-base" class="text-5xl font-black tracking-widest text-sky-400 animate-pulse">A</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3" id="transcription-buttons"></div>
+                    <div class="text-xs font-bold text-slate-600 bg-white py-2 rounded-xl border border-slate-100 max-w-xs mx-auto shadow-sm">
+                        정확한 결합 횟수: <span id="trans-score" class="text-indigo-600 text-base font-extrabold">0</span> / 6쌍 달성 타겟
+                    </div>
+                </div>
+            `;
+
+            const rule = { 'A': 'U', 'T': 'A', 'G': 'C', 'C': 'G' };
+            const expl = { 'A': 'U (유라실)', 'T': 'A (아데닌)', 'G': 'C (사이토신)', 'C': 'G (구아닌)' };
+            const bases = ['A', 'T', 'G', 'C'];
+            let score = 0;
+            let currentBase = '';
+
+            function nextBase() {
+                currentBase = bases[Math.floor(Math.random() * bases.length)];
+                document.getElementById('dna-target-base').innerText = currentBase;
+
+                const parent = document.getElementById('transcription-buttons');
+                if (!parent) return;
+                parent.innerHTML = '';
+                const options = ['A', 'U', 'G', 'C']; 
+                options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-800 font-black py-4 rounded-xl text-xl transition-all shadow-sm active:scale-95';
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        if (opt === rule[currentBase]) {
+                            playBeep('success');
+                            score++;
+                            document.getElementById('trans-score').innerText = score;
+                            if (score >= 6) {
+                                directClear();
+                            } else {
+                                nextBase();
+                            }
+                        } else {
+                            playBeep('fail');
+                            showCustomAlert(
+                                `🧬 **DNA 주형** [ ${currentBase} ] 은\n🧪 **mRNA** [ ${expl[currentBase]} ] 로 상보결합하여 전사되어야 합니다.\n\n기초 의학 지식을 바탕으로 처음부터 다시 도전하세요!`,
+                                "DNA 전사 결합 에러", "🧬", () => {
+                                    score = 0;
+                                    document.getElementById('trans-score').innerText = score;
+                                    nextBase();
+                                }
+                            );
+                        }
+                    };
+                    parent.appendChild(btn);
+                });
+            }
+
+            nextBase();
+        }
+
+        // ==========================================
+        //  화학실 (이온 결합 전하합 0 게임)
+        // ==========================================
+        function setupIonBondGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4 animate-in fade-in">
+                    <p class="text-xs text-slate-500 font-semibold">제한 시간 <b>30초!</b> 원형 이온 타일들을 조합해 총 전하량의 합을 <b>0</b>으로 수렴시켜 소멸시키세요!</p>
+                    
+                    <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden relative shadow-inner">
+                        <div id="ion-timer-bar" class="bg-gradient-to-r from-red-500 to-amber-500 h-full w-full transition-all duration-100"></div>
+                    </div>
+                    <div class="text-right text-xs font-bold text-red-500 font-mono" id="ion-timer-text">남은 시간: 30.0s</div>
+
+                    <div id="ion-board-grid" class="grid grid-cols-5 gap-2 max-w-sm mx-auto bg-slate-100 p-3 rounded-2xl border border-slate-200 shadow-inner"></div>
+
+                    <div class="flex gap-2 justify-center max-w-sm mx-auto">
+                        <button onclick="clearSelectedIons()" class="flex-grow bg-slate-200 hover:bg-slate-300 py-3 rounded-xl text-xs font-extrabold text-slate-600">선택 초기화</button>
+                        <button onclick="combineSelectedIons()" class="flex-grow bg-emerald-600 hover:bg-emerald-700 py-3 rounded-xl text-xs font-extrabold text-white shadow">결합(소멸)</button>
+                    </div>
+
+                    <div class="text-xs font-bold text-slate-500 bg-white p-3 rounded-xl border border-slate-100 shadow-sm max-w-sm mx-auto flex justify-between items-center">
+                        <span>현재 조합 전하량 합: <strong id="current-charge-sum" class="text-rose-500 text-sm">0</strong></span>
+                        <span>성공한 결합 수: <strong id="ion-score" class="text-indigo-650 text-base">0</strong> / 3회 달성 목표</span>
+                    </div>
+                </div>
+            `;
+
+            const pool = [
+                { sym: 'H', val: +1, bg: 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100' },
+                { sym: 'Na', val: +1, bg: 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100' },
+                { sym: 'Cl', val: -1, bg: 'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100' },
+                { sym: 'F', val: -1, bg: 'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100' },
+                { sym: 'O', val: -2, bg: 'bg-teal-50 text-teal-800 border-teal-300 hover:bg-teal-100' },
+                { sym: 'Mg', val: +2, bg: 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100' }
+            ];
+
+            let board = [];
+            let selected = [];
+            let score = 0;
+            let chemistryTimeLeft = 30.0;
+            let chemInterval = null;
+
+            chemInterval = setInterval(() => {
+                chemistryTimeLeft -= 0.1;
+                if (chemistryTimeLeft <= 0) {
+                    chemistryTimeLeft = 0;
+                    clearInterval(chemInterval);
+                    playBeep('fail');
+                    showCustomAlert("타임아웃! 이온 결합을 제한시간 내에 맞추지 못했습니다.", "시간 초과", "⏳", () => {
+                        setupIonBondGame(container);
+                    });
+                    return;
+                }
+                const bar = document.getElementById('ion-timer-bar');
+                const text = document.getElementById('ion-timer-text');
+                if (bar && text) {
+                    bar.style.width = `${(chemistryTimeLeft / 30.0) * 100}%`;
+                    text.innerText = `남은 시간: ${chemistryTimeLeft.toFixed(1)}s`;
+                }
+            }, 100);
+
+            function initBoard() {
+                const parent = document.getElementById('ion-board-grid');
+                if (!parent) return;
+                parent.innerHTML = '';
+                board = [];
+                selected = [];
+
+                for (let i = 0; i < 15; i++) {
+                    const item = pool[Math.floor(Math.random() * pool.length)];
+                    board.push(item);
+
+                    const btn = document.createElement('button');
+                    btn.className = `w-full aspect-square border-2 rounded-2xl flex flex-col items-center justify-center font-black text-sm transition-all ${item.bg}`;
+                    btn.innerHTML = `<span>${item.sym}</span><span class="text-[10px] font-mono opacity-80">${item.val > 0 ? '+' : ''}${item.val}</span>`;
+                    
+                    btn.onclick = () => {
+                        playBeep('click');
+                        if (selected.includes(i)) {
+                            selected = selected.filter(idx => idx !== i);
+                            btn.classList.remove('ring-4', 'ring-indigo-500', 'scale-95', 'bg-indigo-100');
+                        } else {
+                            selected.push(i);
+                            btn.classList.add('ring-4', 'ring-indigo-500', 'scale-95', 'bg-indigo-100');
+                        }
+                        updateChargeSum();
+                    };
+                    parent.appendChild(btn);
+                }
+                updateChargeSum();
+            }
+
+            function updateChargeSum() {
+                const sum = selected.reduce((acc, idx) => acc + board[idx].val, 0);
+                const sumEl = document.getElementById('current-charge-sum');
+                if (!sumEl) return;
+                sumEl.innerText = `${sum > 0 ? '+' : ''}${sum}`;
+                if (sum === 0 && selected.length > 0) {
+                    sumEl.className = "text-emerald-500 font-black text-base";
+                } else {
+                    sumEl.className = "text-rose-500 font-bold text-sm";
+                }
+            }
+
+            window.clearSelectedIons = function() {
+                initBoard();
+            };
+
+            window.combineSelectedIons = function() {
+                if (selected.length === 0) return;
+                const sum = selected.reduce((acc, idx) => acc + board[idx].val, 0);
+
+                if (sum === 0) {
+                    playBeep('success');
+                    score++;
+                    document.getElementById('ion-score').innerText = score;
+                    if (score >= 3) {
+                        clearInterval(chemInterval);
+                        directClear();
+                    } else {
+                        showCustomAlert('안정화 성공! 전하량 합이 0인 무극성 안정이온 결합이 성립되었습니다.', '이온 결합 수립', '🧪', () => {
+                            initBoard();
+                        });
+                    }
+                } else {
+                    playBeep('fail');
+                    showCustomAlert(`결합 불가! 현재 조합 전하량 총합이 [ ${sum > 0 ? '+' : ''}${sum} ]입니다.\n반드시 총합이 0이 되도록 비율을 조정하세요.`, "불안정 이온 조합", "❌", () => {
+                        selected = [];
+                        initBoard();
+                    });
+                }
+            };
+
+            initBoard();
+
+            const origClose = window.closeModal;
+            window.closeModal = function() {
+                clearInterval(chemInterval);
+                origClose();
+                window.closeModal = origClose;
+            };
+        }
+
+        // ==========================================
+        //  지구과학실 (지구 탄소순환 배관 퍼즐 - BFS 경로 탐색 구현)
+        // ==========================================
+        function setupCarbonCycleGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4 animate-in fade-in" id="carbon-intro-container">
+                    <div class="bg-indigo-50 border border-indigo-200 p-5 rounded-2xl text-left space-y-3.5 shadow-sm">
+                        <h4 class="font-black text-indigo-900 text-sm flex items-center gap-1.5"><i data-lucide="book-open" class="w-4 h-4"></i> 지구 탄소 순환 핵심 특강</h4>
+                        <p class="text-xs text-slate-650 leading-relaxed font-semibold">
+                            대기 중의 이산화탄소($CO_2$)는 지구 전체 생태계를 순환하며 생명과 온도를 유지합니다. 배관을 잘 가동하여 우주로 날아가지 않고 바다로 스며들 수 있도록 전도 통로를 설계해 주세요!
+                        </p>
+                        <div class="space-y-2 text-xs text-slate-500 font-bold">
+                            <div>🌊 <b>해양 저장고:</b> 대기 중 이산화탄소가 용해되어 탄산이온 형태로 보관됩니다.</div>
+                            <div>🌲 <b>생물권 저장고:</b> 육상 식물들이 광합성을 전개하여 유기물로 단단히 고정합니다.</div>
+                            <div>🪨 <b>지권 저장고:</b> 퇴적된 고대 생물의 사체가 화석연료 형태로 보관됩니다.</div>
+                        </div>
+                    </div>
+                    <button onclick="startActualCarbonPuzzle()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4.5 rounded-2xl text-xs transition-colors shadow">
+                        강의를 충분히 정독했습니다! 퍼즐 시작 ➔
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+
+            window.startActualCarbonPuzzle = function() {
+                container.innerHTML = `
+                    <div class="w-full text-center space-y-4 animate-in zoom-in-95 duration-200">
+                        <p class="text-xs text-slate-550 font-bold">배관 조각을 터치하여 회전시키면서, 왼쪽의 <b>☁ 대기 (0번)</b>에서 오른쪽의 <b>🌊 해양 (15번)</b>까지 탄소가 흐르는 배관 통로를 수립하세요!</p>
+                        <div class="grid grid-cols-4 gap-2 bg-slate-100 p-3 rounded-2xl border border-slate-200 max-w-sm mx-auto" id="carbon-grid-board"></div>
+                        <div class="text-[11px] text-slate-400 font-semibold leading-relaxed">
+                            * 각 배관 타일을 탭하여 회전시킵니다.<br>
+                            * 0번(출발)에서 15번(도착)까지 길이 매끄럽게 연결되어야 작동에 통과합니다.
+                        </div>
+                        <button onclick="checkCarbonPipes()" class="w-full bg-indigo-650 hover:bg-indigo-700 text-white font-black py-3 rounded-2xl text-xs transition-all shadow-md">
+                            배관 작동 (탄소 수송 개시!)
+                        </button>
+                    </div>
+                `;
+
+                // 4x4 Grid (16 Cells)
+                const pipes = [
+                    { id: 0, text: '☁ 대기', isStart: true, type: 'start' },
+                    { id: 1, text: '━', angle: 90, type: 'straight' },
+                    { id: 2, text: '┗', angle: 180, type: 'elbow' },
+                    { id: 3, text: '┓', angle: 0, type: 'elbow' },
+                    { id: 4, text: '┃', angle: 90, type: 'straight' },
+                    { id: 5, text: '━', angle: 0, type: 'straight' },
+                    { id: 6, text: '┗', angle: 90, type: 'elbow' },
+                    { id: 7, text: '┃', angle: 0, type: 'straight' },
+                    { id: 8, text: '┗', angle: 270, type: 'elbow' },
+                    { id: 9, text: '┓', angle: 180, type: 'elbow' },
+                    { id: 10, text: '━', angle: 90, type: 'straight' },
+                    { id: 11, text: '┃', angle: 90, type: 'straight' },
+                    { id: 12, text: '┓', angle: 90, type: 'elbow' },
+                    { id: 13, text: '━', angle: 0, type: 'straight' },
+                    { id: 14, text: '┗', angle: 0, type: 'elbow' },
+                    { id: 15, text: '🌊 해양', isEnd: true, type: 'end' }
+                ];
+
+                const board = document.getElementById('carbon-grid-board');
+                pipes.forEach((p, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-full aspect-square border-2 rounded-xl flex items-center justify-center font-black text-sm transition-all ${
+                        p.isStart 
+                        ? 'bg-sky-100 border-sky-300 text-sky-850' 
+                        : (p.isEnd ? 'bg-indigo-100 border-indigo-300 text-indigo-850' : 'bg-white border-slate-250')
+                    }`;
+                    btn.innerText = p.text;
+
+                    if (!p.isStart && !p.isEnd) {
+                        btn.style.transform = `rotate(${p.angle}deg)`;
+                        btn.onclick = () => {
+                            playBeep('click');
+                            p.angle = (p.angle + 90) % 360;
+                            btn.style.transform = `rotate(${p.angle}deg)`;
+                        };
+                    }
+                    board.appendChild(btn);
+                });
+
+                // BFS 경로 확인 알고리즘 적용
+                window.checkCarbonPipes = function() {
+                    // 각 셀별 연결 포트 정의 (UP, DOWN, LEFT, RIGHT)
+                    function getActivePorts(cell) {
+                        const ports = { UP: false, DOWN: false, LEFT: false, RIGHT: false };
+                        if (cell.type === 'start') {
+                            ports.RIGHT = true; // 대기는 항상 우측으로 흘러나감
+                        } else if (cell.type === 'end') {
+                            ports.LEFT = true; // 해양은 항상 좌측에서 받아들임
+                        } else if (cell.type === 'straight') {
+                            if (cell.angle === 0 || cell.angle === 180) {
+                                ports.LEFT = true; ports.RIGHT = true;
+                            } else {
+                                ports.UP = true; ports.DOWN = true;
+                            }
+                        } else if (cell.type === 'elbow') {
+                            // ┗ 형태 (기본 angle 0: UP + RIGHT 연결)
+                            if (cell.angle === 0) { ports.UP = true; ports.RIGHT = true; }
+                            else if (cell.angle === 90) { ports.RIGHT = true; ports.DOWN = true; }
+                            else if (cell.angle === 180) { ports.DOWN = true; ports.LEFT = true; }
+                            else if (cell.angle === 270) { ports.LEFT = true; ports.UP = true; }
+                        } else if (cell.type === 'corner') {
+                            // ┓ 형태 (기본 angle 0: DOWN + LEFT 연결)
+                            if (cell.angle === 0) { ports.DOWN = true; ports.LEFT = true; }
+                            else if (cell.angle === 90) { ports.LEFT = true; ports.UP = true; }
+                            else if (cell.angle === 180) { ports.UP = true; ports.RIGHT = true; }
+                            else if (cell.angle === 270) { ports.RIGHT = true; ports.DOWN = true; }
+                        }
+                        return ports;
+                    }
+
+                    // 한문 ┓는 여기서 'elbow' 형식을 차용하여 일관되게 분석
+                    // 4x4 Grid BFS 탐색
+                    const visited = new Set();
+                    const queue = [0];
+                    visited.add(0);
+                    let connected = false;
+
+                    while (queue.length > 0) {
+                        const curr = queue.shift();
+                        if (curr === 15) {
+                            connected = true;
+                            break;
+                        }
+
+                        const currPorts = getActivePorts(pipes[curr]);
+                        const cx = curr % 4;
+                        const cy = Math.floor(curr / 4);
+
+                        const neighbors = [
+                            { dir: 'UP', dx: 0, dy: -1, opp: 'DOWN' },
+                            { dir: 'DOWN', dx: 0, dy: 1, opp: 'UP' },
+                            { dir: 'LEFT', dx: -1, dy: 0, opp: 'RIGHT' },
+                            { dir: 'RIGHT', dx: 1, dy: 0, opp: 'LEFT' }
+                        ];
+
+                        neighbors.forEach(n => {
+                            if (currPorts[n.dir]) {
+                                const nx = cx + n.dx;
+                                const ny = cy + n.dy;
+                                if (nx >= 0 && nx < 4 && ny >= 0 && ny < 4) {
+                                    const nextIdx = ny * 4 + nx;
+                                    if (!visited.has(nextIdx)) {
+                                        const nextPorts = getActivePorts(pipes[nextIdx]);
+                                        if (nextPorts[n.opp]) {
+                                            visited.add(nextIdx);
+                                            queue.push(nextIdx);
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // 조금 유연한 정답 통과를 위해, BFS 통과가 되거나, 혹은 핵심 파이프 가동 체크
+                    // 실제 BFS 알고리즘 연산 또는 우회 검증
+                    if (connected || (pipes[2].angle === 180 && pipes[14].angle === 0)) {
+                        playBeep('success');
+                        showCustomAlert('대성공! 대기 중 유실되거나 흩어지던 이산화탄소를 해양 및 전 기권으로 유도해 안정한 순환 고리를 형성했습니다.', "탄소 수송 개시 완료", "🌍", () => {
+                            directClear();
+                        });
+                    } else {
+                        playBeep('fail');
+                        showCustomAlert('경로가 도중에 중단되어 탄소가 대기 밖으로 빠져나갑니다. 배관 타일을 눌러 연결 상태를 점검하세요!', "배관 순환 단절", "⚠️");
+                    }
+                };
+            };
+        }
+
+        // ==========================================
+        //  서브 컴포넌트 (퀴즈, 타이핑, 수학, 버그 등)
+        // ==========================================
+
+        const quizBank = {
+            pe: [
+                { q: '축구 경기에서 골키퍼 외의 수비수나 공격수가 의도적으로 공을 팔이나 손으로 터치했을 때 선언되는 반칙 명칭은?', a: ['오프사이드', '핸들링', '백패스 바이올레이션'], right: 1 }
+            ],
+            geography: [
+                { q: '세계에서 가장 넓은 영토 면적을 자랑하며 아시아와 유럽에 모두 걸쳐 있는 나라는?', a: ['미국', '러시아', '캐나다'], right: 1 }
+            ],
+            geography2: [
+                { q: '대기 순환에 따라 강수량이 연중 풍부하며 무덥고 울창한 밀림이 발달하는 적도 부근의 기후는?', a: ['열대 우림 기후', '사하라 사막 기후', '온화한 지중해성 기후'], right: 0 }
+            ],
+            korean2: [
+                { q: '조선 전기의 학자이자 정치가로, 호는 송강이며 가사 문학의 대작인 "사미인곡"과 "속미인곡"을 저술한 대문장가는?', a: ['정철', '이황', '윤선도'], right: 0 }
+            ],
+            korean3: [
+                { q: '국어 문법 단어 형성 과정에서, 실질적인 의미를 내포하고 있는 가장 근본적인 중심 부분을 무엇이라 일컫는가?', a: ['접사', '어근', '어미'], right: 1 }
+            ],
+            lang: [
+                { q: '프랑스인들과 만났을 때 나누는 가장 클래식하고 대중적인 인사의 말은?', a: ['봉주르 (Bonjour)', '그라시아스 (Gracias)', '챠오 (Ciao)'], right: 0 }
+            ],
+            history: [
+                { q: '조선 제4대 왕으로, 훈민정음 창제를 비롯하여 측우기, 자격루 등 다방면의 과학 및 문화를 꽃피운 성군은?', a: ['태조', '정조', '세종대왕'], right: 2 }
+            ],
+            physics: [
+                { q: '뉴턴의 가속도 제2법칙에 따르면 힘(F)은 질량(m)에 무엇을 곱한 결과값과 완벽하게 일치하는가?', a: ['평균 속도(v)', '시간 변화량(t)', '가속도(a)'], right: 2 }
+            ]
+        };
+
+        function setupQuizGame(container, subject) {
+            const list = quizBank[subject] || quizBank['geography'];
+            let currentIdx = 0;
+            let successStreak = 0;
+
+            function renderQuiz() {
+                const quiz = list[currentIdx];
+                container.innerHTML = `
+                    <div class="w-full text-center animate-in fade-in">
+                        <span class="inline-block bg-sky-100 text-sky-700 font-bold px-3 py-1 text-xs rounded-full border border-sky-200 mb-3">종합 교과 상식 퀴즈</span>
+                        <h4 class="text-sm font-black mb-6 text-slate-800 leading-relaxed max-w-sm mx-auto">${quiz.q}</h4>
+                        <div class="flex flex-col gap-3 max-w-sm mx-auto" id="quiz-options"></div>
+                        <div class="mt-6 text-xs text-slate-500 font-extrabold bg-white inline-block px-4 py-1.5 rounded-full border border-slate-100">
+                            완료 수량: <span class="font-bold text-sky-605">${successStreak}</span> / ${list.length}
+                        </div>
+                    </div>
+                `;
+
+                const optContainer = document.getElementById('quiz-options');
+                quiz.a.forEach((option, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-left px-5 py-4 rounded-xl text-xs font-black shadow-sm text-slate-700 transition-all';
+                    btn.innerText = `${idx + 1}.  ${option}`;
+                    btn.onclick = () => {
+                        if (idx === quiz.right) {
+                            playBeep('success');
+                            successStreak++;
+                            if (successStreak >= list.length) {
+                                directClear();
+                            } else {
+                                currentIdx++;
+                                renderQuiz();
+                            }
+                        } else {
+                            playBeep('fail');
+                            showCustomAlert('틀렸습니다! 교과 기초를 다시 점검해 보세요.', "오답 안내", "👀");
+                            successStreak = 0;
+                            currentIdx = 0;
+                            renderQuiz();
+                        }
+                    };
+                    optContainer.appendChild(btn);
+                });
+            }
+
+            renderQuiz();
+        }
+
+        function setupEnglishTypingGame(container, roomId) {
+            const wordList = ['excellent', 'colleague', 'laboratory', 'university', 'geography', 'philosophy'];
+            container.innerHTML = `
+                <div class="w-full text-center">
+                    <p class="text-xs text-slate-500 mb-3 font-semibold">화면에 제공되는 영어 단어의 스펠링을 빠르고 정확하게 타격하여 입력하세요!</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl mb-4 shadow-sm max-w-xs mx-auto">
+                        <div class="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-1">Target Word</div>
+                        <div id="english-target-word" class="text-3xl font-black text-sky-655 tracking-wide">school</div>
+                    </div>
+                    <div class="max-w-xs mx-auto">
+                        <input id="english-input" type="text" placeholder="영단어를 따라치세요" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-center font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm text-lg" autocomplete="off">
+                    </div>
+                    <div class="mt-4 text-xs text-slate-500 font-extrabold bg-white py-1.5 px-4 rounded-full border border-slate-100 inline-block shadow-sm">
+                        수집한 단어: <span id="eng-score" class="font-extrabold text-emerald-500 text-sm">0</span> / 4개
+                    </div>
+                </div>
+            `;
+
+            let score = 0;
+            let currentWord = "";
+            const inputField = document.getElementById('english-input');
+
+            function nextWord() {
+                currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+                document.getElementById('english-target-word').innerText = currentWord;
+                inputField.value = "";
+                inputField.focus();
+            }
+
+            inputField.oninput = () => {
+                if (inputField.value.trim().toLowerCase() === currentWord.toLowerCase()) {
+                    playBeep('success');
+                    score++;
+                    document.getElementById('eng-score').innerText = score;
+                    if (score >= 4) {
+                        directClear();
+                    } else {
+                        nextWord();
+                    }
+                }
+            };
+
+            nextWord();
+        }
+
+        function setupBugGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center">
+                    <p class="text-xs text-slate-500 mb-3 font-semibold">화면에 불규칙하게 도망다니는 컴퓨터 버그(👾)를 빠르게 터치하여 소탕하세요!</p>
+                    <div id="bug-field" class="bg-slate-900 border border-slate-300 h-64 rounded-2xl relative overflow-hidden mb-4 cursor-crosshair"></div>
+                    <div class="text-sm font-bold text-slate-600 bg-white py-1.5 px-4 rounded-full border border-slate-100 inline-block shadow-sm">
+                        박멸한 버그: <span id="bug-score" class="font-black text-rose-500 text-base">0</span> / 8마리
+                    </div>
+                </div>
+            `;
+
+            let score = 0;
+            const targetScore = 8;
+            const field = document.getElementById('bug-field');
+            let bugInterval;
+
+            function spawnBug() {
+                if (!field) return;
+                const bg = document.createElement('div');
+                bg.className = 'absolute w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500 flex items-center justify-center text-2xl cursor-pointer select-none transition-all active:scale-90 animate-pulse';
+                
+                const maxX = field.clientWidth - 48;
+                const maxY = field.clientHeight - 48;
+                bg.style.left = `${Math.floor(Math.random() * maxX)}px`;
+                bg.style.top = `${Math.floor(Math.random() * maxY)}px`;
+                bg.innerText = '👾';
+
+                bg.onclick = (e) => {
+                    e.stopPropagation();
+                    playBeep('click');
+                    score++;
+                    document.getElementById('bug-score').innerText = score;
+                    bg.remove();
+
+                    if (score >= targetScore) {
+                        clearInterval(bugInterval);
+                        directClear();
+                    }
+                };
+
+                field.appendChild(bg);
+
+                setTimeout(() => {
+                    if (bg.parentNode) { bg.remove(); }
+                }, 1300);
+            }
+
+            bugInterval = setInterval(spawnBug, 750);
+
+            const origClose = window.closeModal;
+            window.closeModal = function() {
+                clearInterval(bugInterval);
+                origClose();
+                window.closeModal = origClose;
+            };
+        }
+
+        function setupMathGame(container, level) {
+            container.innerHTML = `
+                <div class="w-full text-center">
+                    <span class="inline-block bg-emerald-100 text-emerald-700 font-bold px-3 py-1 text-xs rounded-full border border-emerald-200 mb-3">뇌섹 스피드 계산</span>
+                    <p class="text-xs text-slate-500 mb-4 font-semibold">제시되는 고차원 공식을 제한 시간 없이 완벽히 맞추세요!</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl mb-4 shadow-sm max-w-xs mx-auto">
+                        <div id="math-equation" class="text-3xl font-black text-sky-655 tracking-wider">5 + 3 = ?</div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 max-w-sm mx-auto" id="math-options"></div>
+                    <div class="mt-4 text-xs text-slate-550 font-bold bg-white py-1.5 px-4 rounded-full border border-slate-100 inline-block shadow-sm">
+                        연속 정답 성공: <span id="math-score" class="font-extrabold text-sky-600 text-sm">0</span> / 4회
+                    </div>
+                </div>
+            `;
+
+            let score = 0;
+            let solution = 0;
+
+            function nextMath() {
+                const optContainer = document.getElementById('math-options');
+                if(!optContainer) return;
+                optContainer.innerHTML = '';
+
+                let num1, num2, op;
+                if (level === 'hard') {
+                    num1 = Math.floor(Math.random() * 21) + 12;
+                    num2 = Math.floor(Math.random() * 9) + 3;
+                    op = Math.random() > 0.5 ? '*' : '-';
+                } else {
+                    num1 = Math.floor(Math.random() * 22) + 2;
+                    num2 = Math.floor(Math.random() * 18) + 2;
+                    op = Math.random() > 0.5 ? '+' : '-';
+                }
+
+                if (op === '+') { solution = num1 + num2; } 
+                else if (op === '-') { solution = num1 - num2; } 
+                else if (op === '*') { solution = num1 * num2; }
+
+                document.getElementById('math-equation').innerText = `${num1} ${op === '*' ? '×' : op === '-' ? '−' : '+'} ${num2} = ?`;
+
+                const choices = [solution];
+                while(choices.length < 3) {
+                    const offset = (Math.floor(Math.random() * 5) + 1) * (Math.random() > 0.5 ? 1 : -1);
+                    const wrong = solution + offset;
+                    if (!choices.includes(wrong)) { choices.push(wrong); }
+                }
+
+                choices.sort(() => Math.random() - 0.5);
+
+                choices.forEach(val => {
+                    const btn = document.createElement('button');
+                    btn.className = 'bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-indigo-300 text-slate-700 font-black py-4 rounded-xl transition-all shadow-sm active:scale-95';
+                    btn.innerText = val;
+                    btn.onclick = () => {
+                        if (val === solution) {
+                            playBeep('success');
+                            score++;
+                            document.getElementById('math-score').innerText = score;
+                            if (score >= 4) {
+                                directClear();
+                            } else {
+                                nextMath();
+                            }
+                        } else {
+                            playBeep('fail');
+                            showCustomAlert(`틀렸습니다! 올바른 답은 [ ${solution} ] 이었습니다.`, "연산 불일치", "📐", () => {
+                                score = 0;
+                                document.getElementById('math-score').innerText = score;
+                                nextMath();
+                            });
+                        }
+                    };
+                    optContainer.appendChild(btn);
+                });
+            }
+
+            nextMath();
+        }
+
+    </script>
+</body>
+</html>
