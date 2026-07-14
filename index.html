@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -9,6 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDK Compat 라이브러리 (클릭 버그 해결을 위해 동적 모듈 대신 표준 호환 모드로 로드) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;750;800&family=Pretendard:wght@400;600;700;800&display=swap');
         
@@ -412,13 +417,9 @@
         <p>© 2026 계성고등학교 코드 크래프트 동아리. All rights reserved.</p>
     </footer>
 
-    <!-- Firebase SDK 및 전체 게임 구동 스크립트 모듈 연동 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Firebase 초기화 & 룰 1 및 3 준수 ---
+    <!-- 게임 컨트롤 시스템 스크립트 -->
+    <script>
+        // --- Firebase 초기화 & 룰 1 및 3 완전 준수 ---
         const defaultAppId = "kyesung-star-tour-2026";
         const appId = typeof __app_id !== 'undefined' ? __app_id : defaultAppId;
         
@@ -430,36 +431,37 @@
             try {
                 if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                     const firebaseConfig = JSON.parse(__firebase_config);
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
+                    // Compat SDK를 이용한 안전한 초기화
+                    const app = firebase.initializeApp(firebaseConfig);
+                    auth = firebase.auth();
+                    db = firebase.firestore();
 
-                    // 인증 먼저 수행
+                    // Rule 3: Auth Before Queries
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
+                        await auth.signInWithCustomToken(__initial_auth_token);
                     } else {
-                        await signInAnonymously(auth);
+                        await auth.signInAnonymously();
                     }
                     firebaseReady = true;
-                    console.log("Firebase & Firestore Ready");
+                    console.log("Firebase Compat SDK Ready");
                 }
             } catch (e) {
                 console.error("Firebase Initialization Fail, falling back to local-only", e);
             }
         };
 
-        // 즉시 실행
+        // 로드 시 즉시 시작
         initFirebase();
 
-        // --- 클라우드 세션 보존용 데이터베이스 제어기 ---
+        // --- 클라우드 진행 상황 복구 시스템 ---
         async function loadStudentProgress(studentId, realName) {
             if (!firebaseReady || !db) return null;
-            const docId = `${studentId}_${realName}`.replace(/[^a-zA-Z0-9가-힣_]/g, ""); // 안전한 key 생성
+            const docId = `${studentId}_${realName}`.replace(/[^a-zA-Z0-9가-힣_]/g, ""); 
             try {
-                // Rule 1 준수하는 엄격한 Firestore 경로 사용
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_progress', docId);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
+                // Rule 1: 엄격한 컬렉션 경로 지정 준수
+                const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('student_progress').doc(docId);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
                     return docSnap.data();
                 }
             } catch (e) {
@@ -472,9 +474,9 @@
             if (!firebaseReady || !db) return;
             const docId = `${studentId}_${realName}`.replace(/[^a-zA-Z0-9가-힣_]/g, "");
             try {
-                // Rule 1 준수하는 엄격한 Firestore 경로 사용
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_progress', docId);
-                await setDoc(docRef, {
+                // Rule 1: 엄격한 컬렉션 경로 지정 준수
+                const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('student_progress').doc(docId);
+                await docRef.set({
                     studentId,
                     realName,
                     completedRooms,
@@ -496,87 +498,132 @@
             completedRooms: [] 
         };
 
-        // --- 교실 데이터 보드맵 ---
+        // --- 사운드 효과 ---
+        let audioCtx = null;
+        function playBeep(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'success') {
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); 
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); 
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'fail') {
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime); 
+                    osc.frequency.setValueAtTime(160, audioCtx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch(e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        // --- 커스텀 모달 알리미 ---
+        let alertCallback = null;
+        function showCustomAlert(message, title = "안내", icon = "💡", callback = null) {
+            document.getElementById('custom-alert-icon').innerText = icon;
+            document.getElementById('custom-alert-title').innerText = title;
+            document.getElementById('custom-alert-message').innerHTML = message;
+            alertCallback = callback;
+            
+            const modal = document.getElementById('custom-alert-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function closeCustomAlert() {
+            const modal = document.getElementById('custom-alert-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            if (alertCallback) {
+                alertCallback();
+                alertCallback = null;
+            }
+        }
+
+        // --- 전역 함수 명시적 바인딩 ---
+        window.closeCustomAlert = closeCustomAlert;
+
+        // --- 복도 및 교실 데이터 ---
         const schoolMap = {
             1: {
-                left: [
-                    { id: "1_music", name: "음악실", desc: "도레미~ 내려오는 음표 리듬을 정확한 판정 타이밍에 연주하세요!", icon: "🎵", gameType: "rhythm" }
-                ],
-                center: [
-                    { id: "1_lobby", name: "중앙 로비", desc: "넓고 쾌적한 계성고등학교의 로비입니다. (스탬프가 존재하지 않는 자유 공간)", icon: "🚪", gameType: "none" }
-                ],
-                right: [
-                    { id: "1_study", name: "자습실", desc: "공부하기 버튼을 반복 터치해 몰려드는 졸음을 이겨내고 집중도를 채우세요!", icon: "📖", gameType: "study" }
-                ]
+                left: [{ id: "1_music", name: "음악실", desc: "도레미~ 타이밍에 맞춰 노트를 연주하세요!", icon: "🎵", gameType: "rhythm" }],
+                center: [{ id: "1_lobby", name: "중앙 로비", desc: "쾌적한 계성고등학교의 로비입니다.", icon: "🚪", gameType: "none" }],
+                right: [{ id: "1_study", name: "자습실", desc: "집중력을 채워 자습 한도를 100%로 올리세요!", icon: "📖", gameType: "study" }]
             },
             2: {
                 left: [
-                    { id: "2_infirmary", name: "보건실", desc: "내방하는 학생의 아픈 증상에 맞는 정확한 의료 도구를 신속 매치하세요!", icon: "🏥", gameType: "nurse" },
-                    { id: "2_art", name: "미술실", desc: "R, G, B 삼원색 조절 슬라이더를 정밀 조작해 제시된 타겟 색을 일치시키세요!", icon: "🎨", gameType: "absolute_color" }
+                    { id: "2_infirmary", name: "보건실", desc: "아픈 학우들의 상태에 알맞은 치료 처방을 신속히 매치하세요!", icon: "🏥", gameType: "nurse" },
+                    { id: "2_art", name: "미술실", desc: "R, G, B 삼원색 슬라이더를 일치시키세요!", icon: "🎨", gameType: "absolute_color" }
                 ],
-                center: [
-                    { id: "2_philosophy", name: "철학실", desc: "두 전제 카드와 타당한 결론 카드를 조합해 무오류 삼단논법 회로를 설계하세요!", icon: "🧠", gameType: "philosophy_syllogism" }
-                ],
-                right: [
-                    { id: "2_pe", name: "체육이론실", desc: "체육 활동 수칙과 스포츠 교과 전공 상식 퀴즈를 돌파하세요!", icon: "⚽", gameType: "quiz", subject: "pe" }
-                ]
+                center: [{ id: "2_philosophy", name: "철학실", desc: "타당한 삼단논법 조판을 설계하세요!", icon: "🧠", gameType: "philosophy_syllogism" }],
+                right: [{ id: "2_pe", name: "체육이론실", desc: "스포츠 규칙과 올림픽 상식 퀴즈!", icon: "⚽", gameType: "quiz", subject: "pe" }]
             },
             3: {
                 left: [
-                    { id: "3_english", name: "영어실", desc: "뒤집힌 영어 단어 카드와 올바른 한글 번역 뜻을 짝지어 매칭해 뒤집으세요!", icon: "🔤", gameType: "english_memory" },
-                    { id: "3_geography", name: "지리실", desc: "세계 여러 지리 지형 및 기후 필수 상식 퀴즈!", icon: "🗺️", gameType: "quiz", subject: "geography" }
+                    { id: "3_english", name: "영어실", desc: "영어 단어와 한글 뜻 짝을 매칭하세요!", icon: "🔤", gameType: "english_memory" },
+                    { id: "3_geography", name: "지리실", desc: "세계 여러 지리 지형 필수 상식 퀴즈!", icon: "🗺️", gameType: "quiz", subject: "geography" }
                 ],
                 center: [
-                    { id: "3_korean", name: "국어실", desc: "제시된 문장 안의 밑줄 단어 품사를 9품사 상식에서 골라 판정하세요!", icon: "✍️", gameType: "korean_parts_of_speech" },
-                    { id: "3_computer", name: "컴퓨터실", desc: "화면에 빠르게 침투하는 시스템 바이러스 버그를 연타하여 영구 격리하세요!", icon: "💻", gameType: "bug" },
-                    { id: "3_lang", name: "제2외국어실", desc: "일본어, 프랑스어 등 글로벌 필수 외국어 생활 회화 매칭!", icon: "🌍", gameType: "quiz", subject: "lang" }
+                    { id: "3_korean", name: "국어실", desc: "단어의 품사를 속전속결 매치하세요!", icon: "✍️", gameType: "korean_parts_of_speech" },
+                    { id: "3_computer", name: "컴퓨터실", desc: "컴퓨터 바이러스 오류 버그를 빠르게 박멸하세요!", icon: "💻", gameType: "bug" },
+                    { id: "3_lang", name: "제2외국어실", desc: "주요 외국어 첫인사 표현들을 짝지으세요!", icon: "🌍", gameType: "quiz", subject: "lang" }
                 ],
                 right: [
-                    { id: "3_math", name: "수학실", desc: "중복이 배제된 3자리 비밀수를 스트라이크와 볼 판정 규칙으로 맞추세요!", icon: "➕", gameType: "number_baseball" },
-                    { id: "3_hanmun", name: "한문실", desc: "한자 물리 원반들을 병합 낙하시켜 최고의 '萬(만)'을 합성해 내세요!", icon: "🈴", gameType: "hanja_drop" }
+                    { id: "3_math", name: "수학실", desc: "숫자 야구 미션에 도전하세요!", icon: "➕", gameType: "number_baseball" },
+                    { id: "3_hanmun", name: "한문실", desc: "같은 한자를 융합해 가며 최종 '萬(만)'을 조립하세요!", icon: "🈴", gameType: "hanja_drop" }
                 ]
             },
             4: {
                 left: [
-                    { id: "4_english", name: "영어실", desc: "무작위 정밀 출현 단어를 오타 없이 속사포 스피드로 타이핑하세요!", icon: "🗣️", gameType: "english" },
-                    { id: "4_korean", name: "국어실", desc: "고전 명작 문학과 전통 향가, 시조 지식 퀴즈!", icon: "📜", gameType: "quiz", subject: "korean2" },
+                    { id: "4_english", name: "영어실", desc: "단어 타이핑 순발력!", icon: "🗣️", gameType: "english" },
+                    { id: "4_korean", name: "국어실", desc: "고전 문학과 시조에 담긴 아름다운 시어 퀴즈!", icon: "📜", gameType: "quiz", subject: "korean2" },
                     { id: "4_geography", name: "지리실", desc: "기후와 지형, 인문학적 환경 탐구!", icon: "🌋", gameType: "quiz", subject: "geography2" }
                 ],
                 center: [
-                    { id: "4_history", name: "역사실", desc: "우리의 위대한 역사 인물과 찬란한 전통 유물에 관한 한국사 퀴즈!", icon: "🏺", gameType: "quiz", subject: "history" },
-                    { id: "4_biology", name: "생물실", desc: "제시된 DNA 주형 염기 가닥에 전사 매칭되는 올바른 mRNA 전사체를 구성하세요!", icon: "🔬", gameType: "dna_transcription" },
-                    { id: "4_chemistry", name: "화학실", desc: "서로 다른 하전 상태의 이온을 조합하여 총 전하량의 합이 0이 되는 안정한 결합을 도출하세요!", icon: "🧪", gameType: "ion_bond" }
+                    { id: "4_history", name: "역사실", desc: "핵심 한국사 문제에 도전하세요!", icon: "🏺", gameType: "quiz", subject: "history" },
+                    { id: "4_biology", name: "생물실", desc: "mRNA 염기 사다리를 조립하세요!", icon: "🔬", gameType: "dna_transcription" },
+                    { id: "4_chemistry", name: "화학실", desc: "이온들을 결합시켜 안정된 결합을 유도하세요!", icon: "🧪", gameType: "ion_bond" }
                 ],
                 right: [
-                    { id: "4_math", name: "수학실", desc: "제시되는 등식 수식과 복합 연산 암산 문제를 번개처럼 푸세요!", icon: "📐", gameType: "math", level: "hard" },
-                    { id: "4_korean_2", name: "국어실", desc: "헷갈리기 쉬운 국어의 문법 규범 및 어문 규정 퀴즈!", icon: "📝", gameType: "quiz", subject: "korean3" }
+                    { id: "4_math", name: "수학실", desc: "수열과 사칙연산 수식을 계산하세요!", icon: "📐", gameType: "math", level: "hard" },
+                    { id: "4_korean_2", name: "국어실", desc: "헷갈리기 쉬운 국어의 문법 퀴즈!", icon: "📝", gameType: "quiz", subject: "korean3" }
                 ]
             },
             5: {
                 left: [],
                 center: [
-                    { id: "5_physics", name: "물리실", desc: "에너지 보존 공식과 기학적 힘의 물리 퀴즈를 해결하세요!", icon: "⚙️", gameType: "quiz", subject: "physics" },
-                    { id: "5_earth", name: "지구과학실", desc: "배관 타일을 회전시켜 대기권의 탄소를 해양, 지권, 생물권으로 안전 순환되도록 이으세요!", icon: "🪐", gameType: "carbon_cycle" }
+                    { id: "5_physics", name: "물리실", desc: "역학 법칙과 에너지 공식 퀴즈!", icon: "⚙️", gameType: "quiz", subject: "physics" },
+                    { id: "5_earth", name: "지구과학실", desc: "탄소 순환 배관 망을 연결하세요!", icon: "🪐", gameType: "carbon_cycle" }
                 ],
                 right: []
             }
         };
 
-        const totalStampRooms = (() => {
-            let list = [];
-            for (let floor in schoolMap) {
-                ['left', 'center', 'right'].forEach(wing => {
-                    schoolMap[floor][wing].forEach(room => {
-                        if (room.gameType !== "none") list.push(room);
-                    });
-                });
-            }
-            return list;
-        })();
-
-        document.getElementById('total-rooms-count').innerText = totalStampRooms.length;
-
-        window.selectAvatar = function(emoji, element) {
+        function selectAvatar(emoji, element) {
             playBeep('click');
             window.player.avatar = emoji;
             
@@ -585,9 +632,10 @@
             });
             
             element.className = "avatar-option group relative p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 scale-110 flex flex-col items-center gap-1 shadow-md ring-4 ring-indigo-500 font-bold";
-        };
+        }
+        window.selectAvatar = selectAvatar;
 
-        window.startGame = async function() {
+        async function startGame() {
             let nameInput = document.getElementById('input-username').value.trim();
             let idInput = document.getElementById('input-student-id').value.trim();
             
@@ -604,7 +652,7 @@
             window.player.realName = nameInput;
             window.player.name = `${idInput} ${nameInput}`;
             
-            // --- 클라우드 진행 데이터 자동 조회 및 로드 ---
+            // --- 클라우드 동기화 기록 확인 ---
             let hasSavedProgress = false;
             const savedData = await loadStudentProgress(idInput, nameInput);
             if (savedData) {
@@ -626,10 +674,11 @@
             renderFloor(1);
 
             if (hasSavedProgress) {
-                showCustomAlert(`반가워요, ${nameInput} 학생!<br>이전에 저장된 데이터(${window.player.completedRooms.length}개의 스탬프)를 찾아 도장첩을 복구했습니다!`, "진행 데이터 로드 완료", "📂");
+                showCustomAlert(`반가워요, ${nameInput} 학생!<br>이전에 완료했던 데이터(${window.player.completedRooms.length}개의 스탬프)를 찾아 도장첩을 온전히 복구했습니다!`, "도장 기록 복구됨", "📂");
                 updateStampHUD();
             }
-        };
+        }
+        window.startGame = startGame;
 
         function buildFloorButtons() {
             const container = document.getElementById('floor-buttons-container');
@@ -746,10 +795,7 @@
             });
         }
 
-        // --- 모달 제어 ---
-        let currentRoomInPlay = null;
-
-        window.openGameModal = function(room) {
+        function openGameModal(room) {
             playBeep('click');
             currentRoomInPlay = room;
             
@@ -766,17 +812,19 @@
             document.getElementById('game-modal').classList.add('flex');
             
             lucide.createIcons();
-        };
+        }
+        window.openGameModal = openGameModal;
 
-        window.closeModal = function() {
+        function closeModal() {
             playBeep('click');
             document.getElementById('game-modal').classList.add('hidden');
             document.getElementById('game-modal').classList.remove('flex');
             currentRoomInPlay = null;
             renderFloor(window.player.currentFloor);
-        };
+        }
+        window.closeModal = closeModal;
 
-        window.openStampBook = function() {
+        function openStampBook() {
             playBeep('click');
             const grid = document.getElementById('stamp-grid');
             grid.innerHTML = '';
@@ -799,13 +847,15 @@
 
             document.getElementById('stamp-modal').classList.remove('hidden');
             document.getElementById('stamp-modal').classList.add('flex');
-        };
+        }
+        window.openStampBook = openStampBook;
 
-        window.closeStampBook = function() {
+        function closeStampBook() {
             playBeep('click');
             document.getElementById('stamp-modal').classList.add('hidden');
             document.getElementById('stamp-modal').classList.remove('flex');
-        };
+        }
+        window.closeStampBook = closeStampBook;
 
         function updateStampHUD() {
             const currentCount = window.player.completedRooms.length;
@@ -818,7 +868,7 @@
                 updateStampHUD();
                 playBeep('success');
 
-                // 실시간으로 클라우드 저장소에 진행 상황 동기화
+                // 클라우드 저장소에 실시간 동기화
                 await saveStudentProgress(
                     window.player.studentId,
                     window.player.realName,
@@ -828,26 +878,27 @@
             }
         }
 
-        window.checkGraduation = function() {
+        function checkGraduation() {
             playBeep('click');
             if (window.player.completedRooms.length >= totalStampRooms.length) {
-                window.closeStampBook();
+                closeStampBook();
                 document.getElementById('grad-student-name').innerText = window.player.name;
                 document.getElementById('grad-modal').classList.remove('hidden');
                 document.getElementById('grad-modal').classList.add('flex');
             } else {
                 showCustomAlert(`아직 모든 배움의 과정이 끝나지 않았어요!<br>현재 스탬프: ${window.player.completedRooms.length} / ${totalStampRooms.length}<br>모든 교실의 챌린지를 극복해 주세요!`, "학업 미수료", "🎓");
             }
-        };
+        }
+        window.checkGraduation = checkGraduation;
 
-        window.closeGrad = function() {
+        function closeGrad() {
             playBeep('click');
             document.getElementById('grad-modal').classList.add('hidden');
             document.getElementById('grad-modal').classList.remove('flex');
-        };
+        }
+        window.closeGrad = closeGrad;
 
-        // --- 완벽한 리셋 (로그인 화면으로 돌아가기) ---
-        window.resetGame = function() {
+        function resetGame() {
             playBeep('click');
             
             window.player = {
@@ -864,7 +915,7 @@
             
             const firstAvatarBtn = document.querySelectorAll('.avatar-option')[0];
             if (firstAvatarBtn) {
-                window.selectAvatar('🧑‍🎓', firstAvatarBtn);
+                selectAvatar('🧑‍🎓', firstAvatarBtn);
             }
             
             updateStampHUD();
@@ -873,13 +924,13 @@
             document.getElementById('screen-map').classList.add('hidden');
             document.getElementById('screen-login').classList.remove('hidden');
             
-            window.closeGrad();
-        };
+            closeGrad();
+        }
+        window.resetGame = resetGame;
 
         // ==========================================
-        //  통합 미니게임 엔진
+        //  미니게임 로더
         // ==========================================
-
         function loadMiniGame(type, room) {
             const playzone = document.getElementById('game-playzone');
             
@@ -943,7 +994,7 @@
             }
         }
 
-        window.directClear = async function() {
+        async function directClear() {
             await clearCurrentRoom();
             const playzone = document.getElementById('game-playzone');
             playzone.innerHTML = `
@@ -953,7 +1004,8 @@
                     <p class="text-xs text-slate-500 mt-1">스탬프 도장이 쾅 찍혔습니다. 다음 교실로 전진하세요!</p>
                 </div>
             `;
-        };
+        }
+        window.directClear = directClear;
 
         // ==========================================
         //  개별 게임 1: 음악실 (리듬)
@@ -1129,7 +1181,7 @@
         function setupNurseGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-2">보건실에 내방한 아픈 학생들의 부위에 가장 알맞은 치료 처방을 짝지어 주세요.</p>
+                    <p class="text-xs text-slate-500 mb-2">보건실에 내방한 아픈 학생들의 부위와 증상에 가장 알맞은 치료 처방을 짝지어 주세요.</p>
                     <div class="flex justify-center items-center gap-6 bg-white border border-slate-200 p-4 rounded-xl mb-4 relative min-h-[130px] shadow-sm">
                         <div class="text-center">
                             <span class="text-5xl animate-bounce inline-block" id="patient-icon">🤒</span>
@@ -2113,7 +2165,6 @@
                     </div>
                 `;
 
-                // 초기 상태가 이미 완성된 상태가 아니도록 비뚤어지게 초기값 각도 구성
                 const pipes = [
                     { id: 0, text: '☁ 대기', isStart: true },
                     { id: 1, text: '┃', angle: 90 },
@@ -2168,9 +2219,8 @@
         }
 
         // ==========================================
-        //  보조 게임 패널 구현 (퀴즈, 영단어, 암산, 바이러스)
+        //  보조 과제용 퀴즈 뱅크
         // ==========================================
-
         const quizBank = {
             pe: [
                 { q: '축구에서 골키퍼 외 야외 선수가 고의로 팔이나 손에 공을 접촉시켰을 때 발생하는 반칙은?', a: ['오프사이드', '핸들링 반칙', '간접 프리킥'], right: 1 }
@@ -2433,8 +2483,10 @@
             nextMath();
         }
 
+        // 실행 마운트 시 Lucide 아이콘 초기화 렌더링
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>
-
-```
