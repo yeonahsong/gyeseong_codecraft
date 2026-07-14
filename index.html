@@ -412,76 +412,84 @@
         <p>© 2026 계성고등학교 코드 크래프트 동아리. All rights reserved.</p>
     </footer>
 
-    <script>
-        // --- 사운드 효과 ---
-        let audioCtx = null;
+    <!-- Firebase SDK 및 전체 게임 구동 스크립트 모듈 연동 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase 초기화 & 룰 1 및 3 준수 ---
+        const defaultAppId = "kyesung-star-tour-2026";
+        const appId = typeof __app_id !== 'undefined' ? __app_id : defaultAppId;
         
-        function playBeep(type) {
+        let db = null;
+        let auth = null;
+        let firebaseReady = false;
+
+        const initFirebase = async () => {
             try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
 
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                if (type === 'click') {
-                    osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
-                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.08);
-                } else if (type === 'success') {
-                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); 
-                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); 
-                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.3);
-                } else if (type === 'fail') {
-                    osc.frequency.setValueAtTime(220, audioCtx.currentTime); 
-                    osc.frequency.setValueAtTime(160, audioCtx.currentTime + 0.12);
-                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.3);
+                    // 인증 먼저 수행
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    firebaseReady = true;
+                    console.log("Firebase & Firestore Ready");
                 }
-            } catch(e) {
-                console.log("Audio play error", e);
+            } catch (e) {
+                console.error("Firebase Initialization Fail, falling back to local-only", e);
             }
+        };
+
+        // 즉시 실행
+        initFirebase();
+
+        // --- 클라우드 세션 보존용 데이터베이스 제어기 ---
+        async function loadStudentProgress(studentId, realName) {
+            if (!firebaseReady || !db) return null;
+            const docId = `${studentId}_${realName}`.replace(/[^a-zA-Z0-9가-힣_]/g, ""); // 안전한 key 생성
+            try {
+                // Rule 1 준수하는 엄격한 Firestore 경로 사용
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_progress', docId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    return docSnap.data();
+                }
+            } catch (e) {
+                console.error("클라우드 진행 상황 로드 에러", e);
+            }
+            return null;
         }
 
-        // --- 커스텀 모달 알리미 ---
-        let alertCallback = null;
-        function showCustomAlert(message, title = "안내", icon = "💡", callback = null) {
-            document.getElementById('custom-alert-icon').innerText = icon;
-            document.getElementById('custom-alert-title').innerText = title;
-            document.getElementById('custom-alert-message').innerHTML = message;
-            alertCallback = callback;
-            
-            const modal = document.getElementById('custom-alert-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-        
-        function closeCustomAlert() {
-            const modal = document.getElementById('custom-alert-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            if (alertCallback) {
-                alertCallback();
-                alertCallback = null;
+        async function saveStudentProgress(studentId, realName, completedRooms, avatar) {
+            if (!firebaseReady || !db) return;
+            const docId = `${studentId}_${realName}`.replace(/[^a-zA-Z0-9가-힣_]/g, "");
+            try {
+                // Rule 1 준수하는 엄격한 Firestore 경로 사용
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_progress', docId);
+                await setDoc(docRef, {
+                    studentId,
+                    realName,
+                    completedRooms,
+                    avatar,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (e) {
+                console.error("클라우드 진행 상황 동기화 에러", e);
             }
         }
 
         // --- 플레이어 기본 변수 ---
-        let player = {
+        window.player = {
+            studentId: "",
+            realName: "",
             name: "학생",
             avatar: "🎒",
             currentFloor: 1,
@@ -541,7 +549,7 @@
                 ],
                 right: [
                     { id: "4_math", name: "수학실", desc: "제시되는 등식 수식과 복합 연산 암산 문제를 번개처럼 푸세요!", icon: "📐", gameType: "math", level: "hard" },
-                    { id: "4_korean_2", name: "국어실", desc: "혼란을 유발하는 표준 한글 맞춤법 문장 성분 구별법 퀴즈!", icon: "📝", gameType: "quiz", subject: "korean3" }
+                    { id: "4_korean_2", name: "국어실", desc: "헷갈리기 쉬운 국어의 문법 규범 및 어문 규정 퀴즈!", icon: "📝", gameType: "quiz", subject: "korean3" }
                 ]
             },
             5: {
@@ -568,18 +576,18 @@
 
         document.getElementById('total-rooms-count').innerText = totalStampRooms.length;
 
-        function selectAvatar(emoji, element) {
+        window.selectAvatar = function(emoji, element) {
             playBeep('click');
-            player.avatar = emoji;
+            window.player.avatar = emoji;
             
             document.querySelectorAll('.avatar-option').forEach(btn => {
                 btn.className = "avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm";
             });
             
             element.className = "avatar-option group relative p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 scale-110 flex flex-col items-center gap-1 shadow-md ring-4 ring-indigo-500 font-bold";
-        }
+        };
 
-        function startGame() {
+        window.startGame = async function() {
             let nameInput = document.getElementById('input-username').value.trim();
             let idInput = document.getElementById('input-student-id').value.trim();
             
@@ -592,20 +600,36 @@
                 return;
             }
 
-            player.name = `${idInput} ${nameInput}`;
+            window.player.studentId = idInput;
+            window.player.realName = nameInput;
+            window.player.name = `${idInput} ${nameInput}`;
             
-            document.getElementById('hud-name').innerText = player.name;
-            document.getElementById('hud-avatar').innerText = player.avatar;
+            // --- 클라우드 진행 데이터 자동 조회 및 로드 ---
+            let hasSavedProgress = false;
+            const savedData = await loadStudentProgress(idInput, nameInput);
+            if (savedData) {
+                window.player.completedRooms = savedData.completedRooms || [];
+                window.player.avatar = savedData.avatar || window.player.avatar;
+                hasSavedProgress = true;
+            }
+
+            document.getElementById('hud-name').innerText = window.player.name;
+            document.getElementById('hud-avatar').innerText = window.player.avatar;
             document.getElementById('player-hud').classList.remove('hidden');
             document.getElementById('screen-login').classList.add('hidden');
             document.getElementById('screen-map').classList.remove('hidden');
             
-            document.getElementById('grad-student-name').innerText = player.name;
+            document.getElementById('grad-student-name').innerText = window.player.name;
 
             playBeep('success');
             buildFloorButtons();
             renderFloor(1);
-        }
+
+            if (hasSavedProgress) {
+                showCustomAlert(`반가워요, ${nameInput} 학생!<br>이전에 저장된 데이터(${window.player.completedRooms.length}개의 스탬프)를 찾아 도장첩을 복구했습니다!`, "진행 데이터 로드 완료", "📂");
+                updateStampHUD();
+            }
+        };
 
         function buildFloorButtons() {
             const container = document.getElementById('floor-buttons-container');
@@ -613,7 +637,7 @@
             for(let f=5; f>=1; f--) {
                 const btn = document.createElement('button');
                 btn.className = `w-full text-left p-3 rounded-xl border flex items-center justify-between transition-all font-bold ${
-                    player.currentFloor === f 
+                    window.player.currentFloor === f 
                     ? 'bg-indigo-600 text-white border-indigo-400 shadow-md scale-[1.02]' 
                     : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`;
@@ -624,14 +648,14 @@
 
                 const label = document.createElement('span');
                 label.className = 'fancy-font text-base flex items-center gap-2';
-                label.innerHTML = `<span class="text-xs px-1.5 py-0.5 rounded ${player.currentFloor === f ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}">${f}F</span> ${getFloorName(f)}`;
+                label.innerHTML = `<span class="text-xs px-1.5 py-0.5 rounded ${window.player.currentFloor === f ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}">${f}F</span> ${getFloorName(f)}`;
                 btn.appendChild(label);
 
                 const countBadge = document.createElement('span');
-                countBadge.className = `text-xs px-2 py-0.5 rounded-full ${player.currentFloor === f ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`;
+                countBadge.className = `text-xs px-2 py-0.5 rounded-full ${window.player.currentFloor === f ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`;
                 
                 const fRooms = [...schoolMap[f].left, ...schoolMap[f].center, ...schoolMap[f].right].filter(r => r.gameType !== 'none');
-                const fCleared = fRooms.filter(r => player.completedRooms.includes(r.id)).length;
+                const fCleared = fRooms.filter(r => window.player.completedRooms.includes(r.id)).length;
                 countBadge.innerText = `${fCleared}/${fRooms.length}`;
                 btn.appendChild(countBadge);
 
@@ -651,7 +675,7 @@
         }
 
         function renderFloor(floor) {
-            player.currentFloor = floor;
+            window.player.currentFloor = floor;
             
             document.getElementById('current-floor-title').innerText = `${floor}층 복도 : ${getFloorName(floor)}`;
             buildFloorButtons();
@@ -663,9 +687,6 @@
             lucide.createIcons();
         }
 
-        /* 5층 등 특정 층에 교실이 없는 동(예의동/실력동)도 건물의 전체 구조(외곽선과 타이틀)를 유지합니다.
-           불필요한 '비어있음' 텍스트만 보이지 않게 깔끔한 여백으로 유지하여 스카이라인 형태를 균형감 있게 보존합니다.
-        */
         function renderWing(containerId, rooms, isCenter = false, wrapperId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -673,7 +694,6 @@
             const parentWing = document.getElementById(wrapperId);
 
             if (rooms.length === 0) {
-                // 방은 없지만 기둥(예의동, 실력동, 봉사동) 건물 형태는 그대로 남겨두어 U자형을 유지합니다.
                 if (parentWing) {
                     parentWing.classList.remove('invisible', 'h-0', 'py-0');
                 }
@@ -686,7 +706,7 @@
 
             rooms.forEach(room => {
                 const card = document.createElement('div');
-                const isCleared = player.completedRooms.includes(room.id);
+                const isCleared = window.player.completedRooms.includes(room.id);
                 const isLobby = room.gameType === 'none';
 
                 let cardClasses = `room-card p-3 rounded-xl border text-center transition-all cursor-pointer relative flex flex-col justify-center items-center ${
@@ -729,7 +749,7 @@
         // --- 모달 제어 ---
         let currentRoomInPlay = null;
 
-        function openGameModal(room) {
+        window.openGameModal = function(room) {
             playBeep('click');
             currentRoomInPlay = room;
             
@@ -746,23 +766,23 @@
             document.getElementById('game-modal').classList.add('flex');
             
             lucide.createIcons();
-        }
+        };
 
-        function closeModal() {
+        window.closeModal = function() {
             playBeep('click');
             document.getElementById('game-modal').classList.add('hidden');
             document.getElementById('game-modal').classList.remove('flex');
             currentRoomInPlay = null;
-            renderFloor(player.currentFloor);
-        }
+            renderFloor(window.player.currentFloor);
+        };
 
-        function openStampBook() {
+        window.openStampBook = function() {
             playBeep('click');
             const grid = document.getElementById('stamp-grid');
             grid.innerHTML = '';
 
             totalStampRooms.forEach(room => {
-                const isCleared = player.completedRooms.includes(room.id);
+                const isCleared = window.player.completedRooms.includes(room.id);
                 const stampBox = document.createElement('div');
                 stampBox.className = `p-3 rounded-lg border text-center flex flex-col items-center justify-center ${
                     isCleared 
@@ -779,50 +799,60 @@
 
             document.getElementById('stamp-modal').classList.remove('hidden');
             document.getElementById('stamp-modal').classList.add('flex');
-        }
+        };
 
-        function closeStampBook() {
+        window.closeStampBook = function() {
             playBeep('click');
             document.getElementById('stamp-modal').classList.add('hidden');
             document.getElementById('stamp-modal').classList.remove('flex');
-        }
+        };
 
         function updateStampHUD() {
-            const currentCount = player.completedRooms.length;
+            const currentCount = window.player.completedRooms.length;
             document.getElementById('stamp-count').innerText = currentCount;
         }
 
-        function clearCurrentRoom() {
-            if (currentRoomInPlay && !player.completedRooms.includes(currentRoomInPlay.id)) {
-                player.completedRooms.push(currentRoomInPlay.id);
+        async function clearCurrentRoom() {
+            if (currentRoomInPlay && !window.player.completedRooms.includes(currentRoomInPlay.id)) {
+                window.player.completedRooms.push(currentRoomInPlay.id);
                 updateStampHUD();
                 playBeep('success');
+
+                // 실시간으로 클라우드 저장소에 진행 상황 동기화
+                await saveStudentProgress(
+                    window.player.studentId,
+                    window.player.realName,
+                    window.player.completedRooms,
+                    window.player.avatar
+                );
             }
         }
 
-        function checkGraduation() {
+        window.checkGraduation = function() {
             playBeep('click');
-            if (player.completedRooms.length >= totalStampRooms.length) {
-                closeStampBook();
-                document.getElementById('grad-student-name').innerText = player.name;
+            if (window.player.completedRooms.length >= totalStampRooms.length) {
+                window.closeStampBook();
+                document.getElementById('grad-student-name').innerText = window.player.name;
                 document.getElementById('grad-modal').classList.remove('hidden');
                 document.getElementById('grad-modal').classList.add('flex');
             } else {
-                showCustomAlert(`아직 모든 배움의 과정이 끝나지 않았어요!\n현재 스탬프: ${player.completedRooms.length} / ${totalStampRooms.length}\n모든 교실의 챌린지를 극복해 주세요!`, "학업 미수료", "🎓");
+                showCustomAlert(`아직 모든 배움의 과정이 끝나지 않았어요!<br>현재 스탬프: ${window.player.completedRooms.length} / ${totalStampRooms.length}<br>모든 교실의 챌린지를 극복해 주세요!`, "학업 미수료", "🎓");
             }
-        }
+        };
 
-        function closeGrad() {
+        window.closeGrad = function() {
             playBeep('click');
             document.getElementById('grad-modal').classList.add('hidden');
             document.getElementById('grad-modal').classList.remove('flex');
-        }
+        };
 
         // --- 완벽한 리셋 (로그인 화면으로 돌아가기) ---
-        function resetGame() {
+        window.resetGame = function() {
             playBeep('click');
             
-            player = {
+            window.player = {
+                studentId: "",
+                realName: "",
                 name: "학생",
                 avatar: "🎒",
                 currentFloor: 1,
@@ -834,7 +864,7 @@
             
             const firstAvatarBtn = document.querySelectorAll('.avatar-option')[0];
             if (firstAvatarBtn) {
-                selectAvatar('🧑‍🎓', firstAvatarBtn);
+                window.selectAvatar('🧑‍🎓', firstAvatarBtn);
             }
             
             updateStampHUD();
@@ -843,8 +873,8 @@
             document.getElementById('screen-map').classList.add('hidden');
             document.getElementById('screen-login').classList.remove('hidden');
             
-            closeGrad();
-        }
+            window.closeGrad();
+        };
 
         // ==========================================
         //  통합 미니게임 엔진
@@ -906,15 +936,15 @@
                     playzone.innerHTML = `
                         <div class="text-center py-8">
                             <span class="text-4xl">🛠️</span>
-                            <p class="mt-2 text-slate-600 font-bold">도전 과제 준비 완료!</p>
+                            <p class="mt-2 text-slate-650 font-bold">도전 과제 준비 완료!</p>
                             <button onclick="directClear()" class="mt-4 bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md">스탬프 받기</button>
                         </div>
                     `;
             }
         }
 
-        function directClear() {
-            clearCurrentRoom();
+        window.directClear = async function() {
+            await clearCurrentRoom();
             const playzone = document.getElementById('game-playzone');
             playzone.innerHTML = `
                 <div class="text-center py-8">
@@ -923,7 +953,7 @@
                     <p class="text-xs text-slate-500 mt-1">스탬프 도장이 쾅 찍혔습니다. 다음 교실로 전진하세요!</p>
                 </div>
             `;
-        }
+        };
 
         // ==========================================
         //  개별 게임 1: 음악실 (리듬)
@@ -1099,7 +1129,7 @@
         function setupNurseGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-2">보건실에 내방한 아픈 학생들의 부위와 증상에 가장 알맞은 치료 처방을 짝지어 주세요.</p>
+                    <p class="text-xs text-slate-500 mb-2">보건실에 내방한 아픈 학생들의 부위에 가장 알맞은 치료 처방을 짝지어 주세요.</p>
                     <div class="flex justify-center items-center gap-6 bg-white border border-slate-200 p-4 rounded-xl mb-4 relative min-h-[130px] shadow-sm">
                         <div class="text-center">
                             <span class="text-5xl animate-bounce inline-block" id="patient-icon">🤒</span>
@@ -2062,14 +2092,14 @@
                             <div>🪨 <b>지권 저장고:</b> 오랜 세월 퇴적되어 지층 깊이 화석 연료 형태로 밀봉됩니다.</div>
                         </div>
                     </div>
-                    <button onclick="startActualCarbonPuzzle()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow">
+                    <button id="start-carbon-puzzle-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow">
                         수업 이수 완료! 미션 시작 ➔
                     </button>
                 </div>
             `;
             lucide.createIcons();
 
-            window.startActualCarbonPuzzle = function() {
+            document.getElementById('start-carbon-puzzle-btn').onclick = function() {
                 container.innerHTML = `
                     <div class="w-full text-center space-y-4">
                         <p class="text-xs text-slate-500">배관 조각을 탭하여 회전시킴으로써, 왼쪽의 <b>☁ 대기</b>에서 오른쪽의 <b>🌊 해양, 🌲 생물, 🪨 지권</b>까지 탄소 순환로를 완성하세요!</p>
@@ -2077,7 +2107,7 @@
                         <div class="text-xs text-slate-400">
                             * 각 배관 타일을 클릭하여 방향을 일치시키세요.
                         </div>
-                        <button onclick="checkCarbonPipes()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow">
+                        <button id="check-carbon-pipes-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow">
                             탄소 수송 시작
                         </button>
                     </div>
@@ -2120,14 +2150,14 @@
                     board.appendChild(btn);
                 });
 
-                window.checkCarbonPipes = function() {
+                document.getElementById('check-carbon-pipes-btn').onclick = function() {
                     const isCorrect = (pipes[2].angle === 0 || pipes[2].angle === 180) &&
                                       (pipes[14].angle === 0 || pipes[14].angle === 180);
 
                     if (isCorrect) {
                         playBeep('success');
                         showCustomAlert('순환 연결 성공! 탄소가 유실됨 없이 각 대기권과 해양 저장로 사이를 온전하게 왕복 순환합니다.', "수송 성공", "🌍", () => {
-                            directClear();
+                            window.directClear();
                         });
                     } else {
                         playBeep('fail');
@@ -2146,7 +2176,7 @@
                 { q: '축구에서 골키퍼 외 야외 선수가 고의로 팔이나 손에 공을 접촉시켰을 때 발생하는 반칙은?', a: ['오프사이드', '핸들링 반칙', '간접 프리킥'], right: 1 }
             ],
             geography: [
-                { q: '세계에서 국경선 내 가장 광대하고 큰 영토 면적을 가진 주권 국가는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 }
+                { q: '세계에서 국경선 내 가장 광대하고 큰 영토 면적을 자랑하는 국가는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 }
             ],
             geography2: [
                 { q: '적도 인근 열대 지방에서 일 년 내내 수증기가 풍부하고 비가 일정하게 많이 쏟아지는 기후 유형은?', a: ['열대 우림 기후', '사막 기후', '지중해성 기후'], right: 0 }
@@ -2196,7 +2226,7 @@
                             playBeep('success');
                             successStreak++;
                             if (successStreak >= list.length) {
-                                directClear();
+                                window.directClear();
                             } else {
                                 currentIdx++;
                                 renderQuiz();
@@ -2258,7 +2288,7 @@
                     score++;
                     document.getElementById('eng-score').innerText = score;
                     if (score >= 4) {
-                        directClear();
+                        window.directClear();
                     } else {
                         nextWord();
                     }
@@ -2304,7 +2334,7 @@
 
                     if (score >= targetScore) {
                         clearInterval(bugInterval);
-                        directClear();
+                        window.directClear();
                     }
                 };
 
@@ -2384,7 +2414,7 @@
                             score++;
                             document.getElementById('math-score').innerText = score;
                             if (score >= 4) {
-                                directClear();
+                                window.directClear();
                             } else {
                                 nextMath();
                             }
