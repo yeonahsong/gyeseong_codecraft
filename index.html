@@ -52,7 +52,7 @@
             grid-row: 1;
             border: 3px solid #818cf8;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: opacity 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         /* 실력동: 오른쪽 세로상단 */
@@ -61,7 +61,7 @@
             grid-row: 1;
             border: 3px solid #818cf8;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: opacity 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         /* 봉사동: 하단 전체 가로를 관통하는 통합 윙 */
@@ -70,7 +70,7 @@
             grid-row: 2;
             border: 3px solid #4f46e5;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: opacity 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         /* 중정 야외 광장: 가운데 위 */
@@ -251,7 +251,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <span id="current-floor-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full border border-indigo-200">현재 위치</span>
-                        <h2 id="current-floor-title" class="text-3xl font-black fancy-font mt-1 text-slate-800">1층</h2>
+                        <h2 id="current-floor-title" class="text-3xl font-black fancy-font mt-1 text-slate-800">1층 복도</h2>
                     </div>
                     <div class="flex items-center gap-2 text-xs font-bold text-slate-500">
                         <span class="inline-block w-3 h-3 bg-rose-400 rounded-full"></span> 미클리어
@@ -334,9 +334,7 @@
             </div>
 
             <!-- 게임 플레이 존 -->
-            <div id="game-playzone" class="p-6 flex-grow flex flex-col items-center justify-center min-h-[380px] max-h-[80vh] overflow-y-auto custom-scrollbar relative bg-slate-50">
-                <!-- 개별 게임 템플릿 마운트 -->
-            </div>
+            <div id="game-playzone" class="p-6 flex-grow flex flex-col items-center justify-center min-h-[380px] max-h-[80vh] overflow-y-auto custom-scrollbar relative bg-slate-50"></div>
 
             <!-- 푸터 -->
             <div class="bg-slate-100 p-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
@@ -527,14 +525,14 @@
                 ],
                 right: [
                     { id: "3_math", name: "수학실", desc: "중복이 배제된 3자리 비밀수를 스트라이크와 볼 판정 규칙으로 맞추세요!", icon: "➕", gameType: "number_baseball" },
-                    { id: "3_hanmun", name: "한문실", desc: "한자 물리 원반들을 병합 낙하시켜 최고의 '萬(만)' 자를 합성해 내세요!", icon: "🈴", gameType: "hanja_drop" }
+                    { id: "3_hanmun", name: "한문실", desc: "한자 물리 원반들을 병합 낙하시켜 최고의 '萬(만)'을 합성해 내세요!", icon: "🈴", gameType: "hanja_drop" }
                 ]
             },
             4: {
                 left: [
                     { id: "4_english", name: "영어실", desc: "무작위 정밀 출현 단어를 오타 없이 속사포 스피드로 타이핑하세요!", icon: "🗣️", gameType: "english" },
                     { id: "4_korean", name: "국어실", desc: "고전 명작 문학과 전통 향가, 시조 지식 퀴즈!", icon: "📜", gameType: "quiz", subject: "korean2" },
-                    { id: "4_geography", name: "지리실", desc: "인류 기후와 고급 인문 지리 연계 핵심 질문들!", icon: "🌋", gameType: "quiz", subject: "geography2" }
+                    { id: "4_geography", name: "지리실", desc: "기후와 지형, 인문학적 환경 탐구!", icon: "🌋", gameType: "quiz", subject: "geography2" }
                 ],
                 center: [
                     { id: "4_history", name: "역사실", desc: "우리의 위대한 역사 인물과 찬란한 전통 유물에 관한 한국사 퀴즈!", icon: "🏺", gameType: "quiz", subject: "history" },
@@ -655,33 +653,34 @@
         function renderFloor(floor) {
             player.currentFloor = floor;
             
-            document.getElementById('current-floor-title').innerText = `${floor}층 : ${getFloorName(floor)}`;
+            document.getElementById('current-floor-title').innerText = `${floor}층 복도 : ${getFloorName(floor)}`;
             buildFloorButtons();
 
-            renderWing('wing-left-rooms', schoolMap[floor].left);
-            renderWing('wing-center-rooms', schoolMap[floor].center, true);
-            renderWing('wing-right-rooms', schoolMap[floor].right);
+            renderWing('wing-left-rooms', schoolMap[floor].left, false, 'wrapper-left-wing');
+            renderWing('wing-center-rooms', schoolMap[floor].center, true, 'wrapper-bottom-connector');
+            renderWing('wing-right-rooms', schoolMap[floor].right, false, 'wrapper-right-wing');
 
             lucide.createIcons();
         }
 
-        /* 교실 유무에 따라 해당 건물(동) 블록 자체를 투명 및 숨김 처리
-           "비어있음" 가이드 텍스트를 제거하여 한결 깔끔하고 세련된 U자 레이아웃 유지
+        /* 5층 등 특정 층에 교실이 없는 동(예의동/실력동)도 건물의 전체 구조(외곽선과 타이틀)를 유지합니다.
+           불필요한 '비어있음' 텍스트만 보이지 않게 깔끔한 여백으로 유지하여 스카이라인 형태를 균형감 있게 보존합니다.
         */
-        function renderWing(containerId, rooms, isCenter = false) {
+        function renderWing(containerId, rooms, isCenter = false, wrapperId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
 
-            const parentWing = container.closest('.left-wing, .right-wing, .bottom-connector');
-            
+            const parentWing = document.getElementById(wrapperId);
+
             if (rooms.length === 0) {
+                // 방은 없지만 기둥(예의동, 실력동, 봉사동) 건물 형태는 그대로 남겨두어 U자형을 유지합니다.
                 if (parentWing) {
-                    parentWing.classList.add('invisible', 'h-0', 'py-0', 'border-0');
+                    parentWing.classList.remove('invisible', 'h-0', 'py-0');
                 }
                 return;
             } else {
                 if (parentWing) {
-                    parentWing.classList.remove('invisible', 'h-0', 'py-0', 'border-0');
+                    parentWing.classList.remove('invisible', 'h-0', 'py-0');
                 }
             }
 
@@ -1040,7 +1039,7 @@
         function setupStudyGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
-                    <p class="text-xs text-slate-650 mb-4 font-bold">공부하기 버튼을 마구 눌러 자습 지수를 채우고 잠을 극복해 내세요!</p>
+                    <p class="text-xs text-slate-655 mb-4 font-bold">공부하기 버튼을 마구 눌러 자습 지수를 채우고 잠을 극복해 내세요!</p>
                     <div class="relative bg-white border border-slate-200 h-28 rounded-xl flex items-center justify-center overflow-hidden mb-4 shadow-sm">
                         <div class="w-4/5 bg-slate-100 h-8 rounded-full border border-slate-200 overflow-hidden relative">
                             <div id="study-progress" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-full w-0 transition-all duration-100"></div>
