@@ -877,7 +877,8 @@
                     <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-left text-xs text-slate-600 leading-relaxed whitespace-pre-line">
                         ${getRoomRules(room.gameType)}
                     </div>
-                    <button onclick="startGameAction('${room.gameType}', '${room.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95 text-xs">
+                    <!-- 중요: 미션 연동 중복 해결을 위해 퀴즈과목(subject) 인자를 세 번째 파라미터로 명시 전달 전개 -->
+                    <button onclick="startGameAction('${room.gameType}', '${room.id}', '${room.subject || ''}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95 text-xs">
                         챌린지 시작하기 🎮
                     </button>
                 </div>
@@ -918,15 +919,11 @@
             }
         }
 
-        window.startGameAction = function(gameType, roomId) {
+        window.startGameAction = function(gameType, roomId, subject) {
             const playzone = document.getElementById('game-playzone');
             playzone.innerHTML = '';
             
-            const dummyRoom = { gameType: gameType, id: roomId };
-            // 보조 외국어일 시 subject 주입을 위해 예외 처리
-            if (roomId === '3_lang') {
-                dummyRoom.subject = 'lang';
-            }
+            const dummyRoom = { gameType: gameType, id: roomId, subject: subject };
             loadMiniGame(gameType, dummyRoom);
         };
 
