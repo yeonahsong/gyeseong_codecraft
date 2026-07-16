@@ -188,7 +188,7 @@
         <section id="screen-login" class="max-w-lg mx-auto bg-white/90 backdrop-blur border border-indigo-100 p-8 rounded-2xl shadow-xl my-8">
             <div class="text-center mb-6">
                 <span class="text-6xl inline-block animate-bounce mb-3">🏫</span>
-                <h2 class="text-3xl font-black fancy-font text-indigo-600">계성고 탐험대 모집</h2>
+                <h2 class="text-3xl font-black fancy-font text-indigo-650">계성고 탐험대 모집</h2>
                 <p class="text-slate-500 text-sm mt-1">계성고등학교 가상 투어에 참가할 캐릭터를 등록하세요!</p>
             </div>
             
@@ -265,7 +265,7 @@
                 </div>
 
                 <!-- 
-                  계성고 독창적 U자형 건물 동적 구현 그리드
+                  계성고 독창적 U자형 건물 그리드
                   - 예의동: 왼쪽 1열 상단
                   - 실력동: 오른쪽 3열 상단
                   - 봉사동: 하단 전체 가로폭 통관 점유
@@ -338,7 +338,7 @@
                 </button>
             </div>
 
-            <!-- 게임 플레이 존 -->
+            <!-- 게임 플레이 및 인트로 대기 영역 -->
             <div id="game-playzone" class="p-6 flex-grow flex flex-col items-center justify-center min-h-[380px] max-h-[80vh] overflow-y-auto custom-scrollbar relative bg-slate-50"></div>
 
             <!-- 푸터 -->
@@ -611,7 +611,7 @@
                     { id: "2_art", name: "미술실", desc: "R, G, B 삼원색 슬라이더를 일치시키세요!", icon: "🎨", gameType: "absolute_color" }
                 ],
                 center: [{ id: "2_philosophy", name: "철학실", desc: "타당한 삼단논법 조판을 설계하세요!", icon: "🧠", gameType: "philosophy_syllogism" }],
-                right: [{ id: "2_pe", name: "체육이론실", desc: "스포츠 규칙과 올림픽 상식 퀴즈!", icon: "⚽", gameType: "quiz", subject: "pe" }]
+                right: [{ id: "2_pe", name: "체육실", desc: "정밀한 시간 조절 감각에 도전하여 스탬프를 획득하세요!", icon: "⚽", gameType: "pe_timer" }]
             },
             3: {
                 left: [
@@ -621,7 +621,7 @@
                 center: [
                     { id: "3_korean", name: "국어실", desc: "단어의 품사를 속전속결 매치하세요!", icon: "✍️", gameType: "korean_parts_of_speech" },
                     { id: "3_computer", name: "컴퓨터실", desc: "컴퓨터 바이러스 오류 버그를 빠르게 박멸하세요!", icon: "💻", gameType: "bug" },
-                    { id: "3_lang", name: "제2외국어실", desc: "주요 외국어 첫인사 표현들을 짝지으세요!", icon: "🌍", gameType: "quiz", subject: "lang" }
+                    { id: "3_lang", name: "제2외국어실", desc: "다정한 일본어 첫인사 표현들을 골라 짝지으세요!", icon: "🌍", gameType: "quiz", subject: "lang" }
                 ],
                 right: [
                     { id: "3_math", name: "수학실", desc: "숫자 야구 미션에 도전하세요!", icon: "➕", gameType: "number_baseball" },
@@ -859,7 +859,8 @@
             const playzone = document.getElementById('game-playzone');
             playzone.innerHTML = ''; 
 
-            loadMiniGame(room.gameType, room);
+            // 시작 전 설명 팝업을 먼저 노출하여 유저가 게임 규칙을 쉽게 확인하도록 유도
+            showGameIntroPopup(room, playzone);
 
             document.getElementById('game-modal').classList.remove('hidden');
             document.getElementById('game-modal').classList.add('flex');
@@ -867,6 +868,67 @@
             lucide.createIcons();
         }
         window.openGameModal = openGameModal;
+
+        function showGameIntroPopup(room, playzone) {
+            let introHtml = `
+                <div class="text-center p-6 max-w-md mx-auto space-y-4">
+                    <span class="text-5xl block animate-bounce">${room.icon}</span>
+                    <h3 class="text-xl font-bold text-slate-800 fancy-font">${room.name} 미션 가이드</h3>
+                    <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-left text-xs text-slate-600 leading-relaxed whitespace-pre-line">
+                        ${getRoomRules(room.gameType)}
+                    </div>
+                    <button onclick="startGameAction('${room.gameType}', '${room.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95 text-xs">
+                        챌린지 시작하기 🎮
+                    </button>
+                </div>
+            `;
+            playzone.innerHTML = introHtml;
+        }
+
+        function getRoomRules(gameType) {
+            switch(gameType) {
+                case 'rhythm':
+                    return "음악실 미션:\n• 위에서 내려오는 음표가 노란색 점선 판정선과 만날 때 정확히 아래의 [A], [S], [D] 버튼을 터치하거나 키보드로 누르세요.\n• 판정이 많이 보완되어 리듬을 타고 누르면 쉽게 8점을 달성하여 스탬프를 얻을 수 있습니다!";
+                case 'study':
+                    return "자습실 미션:\n• 공부하기 버튼을 연속으로 클릭하여 우측 자습 집중도 지수를 100%까지 채우세요!\n• 시간이 지날수록 집중력이 감소하므로 번개 같은 순발력 터치가 필요합니다!";
+                case 'nurse':
+                    return "보건실 미션:\n• 머리가 아프거나, 상처가 나거나, 가려워하는 3명의 환자 학생의 증상에 알맞은 정답 처방 버튼을 짝지어 매칭하세요!";
+                case 'absolute_color':
+                    return "미술실 미션:\n• 제시된 'Target' 색상 블록과 나의 색상 블록이 똑같아지도록 하단 [R / G / B] 삼원색 슬라이더를 정교하게 조절하세요!\n• 90% 이상 일치하면 합격입니다!";
+                case 'philosophy_syllogism':
+                    return "철학실 미션:\n• 카드 목록을 보고 순서대로 전제 1, 전제 2, 결론 슬롯을 터치하여 채워 넣으세요!\n• 논리적이고 타당한 전제 구도를 수립하고 검증하면 통과됩니다.";
+                case 'english_memory':
+                    return "영어실 미션:\n• 카드판을 뒤집어 영단어와 알맞은 한글 해석 단어를 매칭하세요.\n• 게임 시작 시 최초 2초 동안 카드가 모두 오픈되어 짝을 볼 수 있으니 머릿속으로 빨리 기억해 보세요!";
+                case 'korean_parts_of_speech':
+                    return "국어실 미션:\n• 문장에서 밑줄 쳐진 한국어 단어의 올바른 9품사를 찾으세요!\n• 중복 없이 순차적으로 진행되는 문장 퀴즈 4개를 완벽하게 맞추면 스탬프를 받습니다.";
+                case 'number_baseball':
+                    return "수학실 미션:\n• 0부터 9까지의 수로 이루어진 서로 다른 3자리 숫자를 맞추는 야구 게임입니다.\n• 수와 자릿수가 모두 일치하면 Strike, 수만 일치하면 Ball 판정을 보고 숨은 정답을 추리하세요!";
+                case 'hanja_drop':
+                    return "한문실 미션:\n• 화면을 누른 채 드래그하여 떨어뜨릴 자리를 정하고, 손을 떼어 한자를 투하하세요.\n• 동일한 한자끼리 충돌하면 더 높은 단계의 한자로 융합됩니다.\n• 萬(만)까지 합성하면 스탬프를 획득합니다!";
+                case 'dna_transcription':
+                    return "생물실 미션:\n• 주형 DNA에 전사되는 알맞은 mRNA 가닥 염기를 상보결합 법칙(A-U, T-A, G-C, C-G)에 근거해 조립하세요.\n• 6쌍을 성공해야 합니다!";
+                case 'ion_bond':
+                    return "화학실 미션:\n• 제한 시간 30초 내에 격자 속 원소들을 조합해 전체 전하량의 합이 '0'인 안정한 상태를 만들어 소멸시키세요. 3회 완료 시 성공입니다.";
+                case 'carbon_cycle':
+                    return "지구과학실 미션:\n• 이산화탄소가 대기에서 해양 및 생물권으로 잘 순환되도록 배관 타일들을 올바르게 회전시키세요!\n• 언제든지 방향을 [초기화]할 수 있으며, 옆에 상시 부착된 힌트 조감도 예시를 참고하여 쉽게 극복할 수 있습니다.";
+                case 'pe_timer':
+                    return "체육실 미션:\n• 평정심을 유지하며 정확한 '5초' 타이머 감각에 도전하세요!\n• 흘러가는 시간 숫자를 보고 정확히 4.85초 ~ 5.15초 (오차범위 0.15초) 내에 멈추면 성공입니다.";
+                default:
+                    return "제시되는 교과 도전을 멋지게 돌파하고 스탬프를 얻으세요!";
+            }
+        }
+
+        window.startGameAction = function(gameType, roomId) {
+            const playzone = document.getElementById('game-playzone');
+            playzone.innerHTML = '';
+            
+            const dummyRoom = { gameType: gameType, id: roomId };
+            // 보조 외국어일 시 subject 주입을 위해 예외 처리
+            if (roomId === '3_lang') {
+                dummyRoom.subject = 'lang';
+            }
+            loadMiniGame(gameType, dummyRoom);
+        };
 
         function closeModal() {
             playBeep('click');
@@ -909,6 +971,15 @@
             document.getElementById('stamp-modal').classList.remove('flex');
         }
         window.closeStampBook = closeStampBook;
+
+        function updateStampHUD() {
+            const currentCount = window.player.completedRooms.length;
+            const stampCountEl = document.getElementById('stamp-count');
+            if (stampCountEl) stampCountEl.innerText = currentCount;
+            
+            const totalCountEl = document.getElementById('total-rooms-count');
+            if (totalCountEl) totalCountEl.innerText = totalStampRooms.length;
+        }
 
         async function clearCurrentRoom() {
             if (currentRoomInPlay && !window.player.completedRooms.includes(currentRoomInPlay.id)) {
@@ -1019,6 +1090,9 @@
                 case 'carbon_cycle':
                     setupCarbonCycleGame(playzone);
                     break;
+                case 'pe_timer':
+                    setupPeTimerGame(playzone);
+                    break;
                 case 'quiz': 
                     setupQuizGame(playzone, room.subject);
                     break;
@@ -1056,7 +1130,7 @@
         window.directClear = directClear;
 
         // ==========================================
-        //  개별 게임 1: 음악실 (리듬)
+        //  개별 게임 1: 음악실 (리듬) - 판정 범위 보완
         // ==========================================
         function setupMusicGame(container) {
             container.innerHTML = `
@@ -1125,13 +1199,14 @@
                 }, 1600);
             }, 1000);
 
+            // 판정 범위를 1200ms~1650ms로 더 넓혀 리듬 판정을 쉽게 만듦
             window.triggerHit = function(line) {
                 const notesOnLine = activeNotes.filter(n => n.line === line);
                 if (notesOnLine.length > 0) {
                     const candidate = notesOnLine[0];
                     const elapsed = Date.now() - candidate.spawnTime;
                     
-                    if (elapsed >= 1300 && elapsed <= 1600) {
+                    if (elapsed >= 1200 && elapsed <= 1650) {
                         score++;
                         playBeep('success');
                         document.getElementById('r-score').innerText = score;
@@ -1493,16 +1568,16 @@
         }
 
         // ==========================================
-        //  개별 게임 6: 영어실 (카드 짝 맞추기)
+        //  개별 게임 6: 영어실 (카드 짝 맞추기) - 2초 미리 오픈 후 숨기기 적용
         // ==========================================
         function setupEnglishMemoryGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <p class="text-xs text-slate-500">카드 12장 중 2장을 골라 <b>영어 단어</b>와 그에 알맞은 <b>한글 번역</b> 짝을 맞춰 뒤집으세요!</p>
+                    <p class="text-xs text-slate-500">기회 제공! <b>2초 뒤집기 찬스</b> 후, 카드 뒤집기 짝 맞추기가 진행됩니다!</p>
                     <div class="grid grid-cols-4 gap-2.5 max-w-sm mx-auto" id="english-card-board"></div>
                     <div class="flex justify-between items-center text-xs font-bold text-slate-500">
                         <span>매치 완료: <strong id="mem-score" class="text-indigo-650 text-sm">0</strong> / 6쌍</span>
-                        <span class="text-slate-400">틀리면 다시 카드가 가려집니다.</span>
+                        <span id="mem-status" class="text-rose-500">기억하기 찬스 진행 중...</span>
                     </div>
                 </div>
             `;
@@ -1527,12 +1602,12 @@
             const board = document.getElementById('english-card-board');
             let firstCard = null;
             let secondCard = null;
-            let lock = false;
+            let lock = true; // 최초 보여주는 중에는 뒤집기 방지 lock
             let successCount = 0;
 
             cardsData.forEach((c, idx) => {
                 const cardOuter = document.createElement('div');
-                cardOuter.className = 'flip-card w-full aspect-[3/4] cursor-pointer';
+                cardOuter.className = 'flip-card w-full aspect-[3/4] cursor-pointer flipped'; // 처음엔 앞면 노출
                 cardOuter.dataset.index = idx;
                 
                 cardOuter.innerHTML = `
@@ -1546,7 +1621,13 @@
                 `;
 
                 cardOuter.onclick = () => {
-                    if (lock || cardOuter.classList.contains('flipped') || cardOuter.classList.contains('matched')) return;
+                    if (lock || cardOuter.classList.contains('matched') || !cardOuter.classList.contains('flipped')) {
+                        // 뒤집힌 상태가 아니면 뒤집는다.
+                        if (lock || cardOuter.classList.contains('matched')) return;
+                    } else {
+                        return; // 이미 보여지고 있으면 무시
+                    }
+
                     playBeep('click');
                     cardOuter.classList.add('flipped');
 
@@ -1585,10 +1666,23 @@
 
                 board.appendChild(cardOuter);
             });
+
+            // 2.2초 후에 모든 카드 감춘 후 시작되도록 설계
+            setTimeout(() => {
+                document.querySelectorAll('.flip-card').forEach(el => {
+                    el.classList.remove('flipped');
+                });
+                lock = false;
+                const status = document.getElementById('mem-status');
+                if (status) {
+                    status.innerText = "게임 진행 중! 짝을 맞추세요";
+                    status.className = "text-emerald-500 font-bold";
+                }
+            }, 2200);
         }
 
         // ==========================================
-        //  개별 게임 7: 국어실 (9품사 맞추기)
+        //  개별 게임 7: 국어실 (9품사 맞추기) - 출제 문제 중복 완벽 차단
         // ==========================================
         function setupPartsOfSpeechGame(container) {
             container.innerHTML = `
@@ -1612,7 +1706,7 @@
                 { text: '귤 <span class="text-rose-500 font-bold underline">하나</span>를 까먹었다.', answer: '수사' },
                 { text: '아이가 마당에서 신나게 <span class="text-rose-500 font-bold underline">달린다</span>.', answer: '동사' },
                 { text: '가을 하늘이 유난히 맑고 <span class="text-rose-500 font-bold underline">푸르다</span>.', answer: '형용사' },
-                { text: '엄마가 <span class="text-rose-500 font-bold underline">헌</span> 헌 옷들을 정리하셨다.', answer: '관형사' },
+                { text: '엄마가 <span class="text-rose-500 font-bold underline">헌</span> 옷들을 정리하셨다.', answer: '관형사' },
                 { text: '빗방울이 마당으로 <span class="text-rose-500 font-bold underline">주룩주룩</span> 쏟아졌다.', answer: '부사' },
                 { text: '영희<span class="text-rose-500 font-bold underline">야</span>, 이리 와서 밥 먹으렴.', answer: '조사' },
                 { text: '<span class="text-rose-500 font-bold underline">어머나</span>, 장미꽃이 정말 아름답네요!', answer: '감탄사' }
@@ -1620,9 +1714,21 @@
 
             const allParts = ['명사', '대명사', '수사', '동사', '형용사', '관형사', '부사', '조사', '감탄사'];
             let combo = 0;
+            let usedIndexes = []; // 이번 스테이지 도전에 출제되었던 문제 배열 인덱스 보존하여 중복 차단
 
             function nextChallenge() {
-                const target = sentences[Math.floor(Math.random() * sentences.length)];
+                // 더이상 출제할 새로운 질문이 없으면 인덱스 목록 초기화
+                if (usedIndexes.length >= sentences.length) {
+                    usedIndexes = [];
+                }
+
+                let randomIdx = Math.floor(Math.random() * sentences.length);
+                while (usedIndexes.includes(randomIdx)) {
+                    randomIdx = Math.floor(Math.random() * sentences.length);
+                }
+                
+                usedIndexes.push(randomIdx);
+                const target = sentences[randomIdx];
                 document.getElementById('korean-sentence').innerHTML = target.text;
 
                 const list = [target.answer];
@@ -1655,6 +1761,7 @@
                             playBeep('fail');
                             showCustomAlert('틀렸습니다! 품사 문법 체계를 다시 검토해 보세요.', "오답 안내", "👀");
                             combo = 0;
+                            usedIndexes = []; // 틀리면 처음부터 출제풀 초기화
                             document.getElementById('kor-combo').innerText = combo;
                             nextChallenge();
                         }
@@ -1695,7 +1802,7 @@
 
                     <div class="grid grid-cols-2 gap-2 max-w-xs mx-auto">
                         <button onclick="backspaceBaseball()" class="py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">지우기</button>
-                        <button onclick="submitBaseball()" class="py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold">판정 입력</button>
+                        <button onclick="submitBaseball()" class="py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold">입력 완료</button>
                     </div>
 
                     <div class="text-left bg-white p-3 rounded-xl border border-slate-200 max-h-36 overflow-y-auto custom-scrollbar text-xs font-mono" id="baseball-history">
@@ -1764,7 +1871,7 @@
 
                 if (strike === 3) {
                     playBeep('success');
-                    showCustomAlert(`축하합니다! 수학적 무작위 수 [ ${guess.join('')} ] 을 모두 밝혀내셨습니다.`, "추리 수립", "👑", () => {
+                    showCustomAlert(`축하합니다! 수학적 무작위 수 [ ` + guess.join('') + ' ] 을 모두 밝혀내셨습니다.', "추리 수립", "👑", () => {
                         directClear();
                     });
                 } else {
@@ -1776,17 +1883,18 @@
         }
 
         // ==========================================
-        //  개별 게임 9: 한문실 (한자 수박 게임)
+        //  개별 게임 9: 한문실 (한자 수박 게임) - 드래그 앤 릴리즈 조작 메커니즘 완벽 패치
         // ==========================================
         function setupHanjaDropGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
                     <p class="text-[11px] text-slate-500">한문 원형 블록을 떨어뜨려 동일한 한자끼리 충돌 융합시키고, 최종 '萬(만)'까지 도달하세요!</p>
-                    <div class="w-full overflow-hidden flex justify-center">
-                        <canvas id="hanja-canvas" width="400" height="420" class="max-w-full h-auto border border-slate-300 rounded-xl bg-slate-50 block cursor-crosshair shadow-inner"></canvas>
-                    </div>
-                    <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                    <div class="flex justify-between items-center max-w-sm mx-auto bg-white p-2 rounded-xl border border-slate-200 text-xs font-bold shadow-sm">
                         <span>현재 점수: <strong id="hanja-score" class="text-indigo-650 text-sm">0</strong></span>
+                    </div>
+                    <div class="w-full overflow-hidden flex justify-center">
+                        <!-- 터치 동작 시 웹 화면이 스크롤되거나 원치 않게 팅기는 것을 막기 위해 touch-action: none 지정 -->
+                        <canvas id="hanja-canvas" width="400" height="420" class="max-w-full h-auto border border-slate-300 rounded-xl bg-slate-50 block cursor-crosshair shadow-inner" style="touch-action: none;"></canvas>
                     </div>
                 </div>
             `;
@@ -1810,6 +1918,7 @@
             let canDrop = true;
             let currentX = canvas.width / 2;
             let animId;
+            let isDragging = false; // 드래그 조작 추적 플래그
 
             class Circle {
                 constructor(x, y, level, isFixed = false) {
@@ -1840,20 +1949,25 @@
                 }
                 update() {
                     if (this.isFixed) return;
-                    this.vy += 0.4; 
+                    this.vy += 0.45; // 자연스러운 물리를 위해 속도 보정
                     this.x += this.vx;
                     this.y += this.vy;
 
+                    // 바닥 경계선 충돌 및 미세 탄성 복원
                     if (this.y + this.radius > canvas.height) {
                         this.y = canvas.height - this.radius;
-                        this.vy = -this.vy * 0.2;
+                        this.vy = -this.vy * 0.15;
+                        this.vx *= 0.95; // 마찰력 작용
                     }
+                    // 좌벽 경계 충돌
                     if (this.x - this.radius < 0) {
                         this.x = this.radius;
-                        this.vx = -this.vx * 0.2;
-                    } else if (this.x + this.radius > canvas.width) {
+                        this.vx = -this.vx * 0.15;
+                    } 
+                    // 우벽 경계 충돌
+                    else if (this.x + this.radius > canvas.width) {
                         this.x = canvas.width - this.radius;
-                        this.vx = -this.vx * 0.2;
+                        this.vx = -this.vx * 0.15;
                     }
                 }
             }
@@ -1868,13 +1982,41 @@
                 if (currentX > canvas.width - r) currentX = canvas.width - r;
             }
 
-            canvas.addEventListener('mousemove', (e) => handleMove(e.clientX));
-            canvas.addEventListener('touchmove', (e) => {
-                if (e.touches.length > 0) handleMove(e.touches[0].clientX);
-            }, { passive: true });
+            // 모바일 300ms 터치 딜레이를 해소하고 완벽한 슬라이드 조절을 지원하는 Pointer-based 이벤트 리스너 통합 바인딩
+            canvas.onpointerdown = function(e) {
+                e.preventDefault();
+                try {
+                    canvas.setPointerCapture(e.pointerId); // 캔버스 영역 밖 드래그 유출 시에도 이벤트 소실 차단
+                } catch(err) {}
+                isDragging = true;
+                handleMove(e.clientX);
+            };
 
-            canvas.addEventListener('click', dropHanja);
-            canvas.addEventListener('touchend', dropHanja);
+            canvas.onpointermove = function(e) {
+                // PC 마우스 오버 시 또는 모바일 손가락 밀기 조작 중일 때 실시간 타겟 한자 위치 이동 적용
+                if (e.pointerType === 'mouse' || isDragging) {
+                    handleMove(e.clientX);
+                }
+            };
+
+            canvas.onpointerup = function(e) {
+                if (isDragging) {
+                    isDragging = false;
+                    try {
+                        canvas.releasePointerCapture(e.pointerId);
+                    } catch(err) {}
+                    dropHanja(); // 손가락을 떼거나 마우스를 뗄 때 하단으로 한자 투하
+                }
+            };
+
+            canvas.onpointercancel = function(e) {
+                if (isDragging) {
+                    isDragging = false;
+                    try {
+                        canvas.releasePointerCapture(e.pointerId);
+                    } catch(err) {}
+                }
+            };
 
             function dropHanja() {
                 if (!canDrop) return;
@@ -1883,54 +2025,73 @@
                 circles.push(c);
 
                 canDrop = false;
+                
+                // 낙하 후 새로운 대기 한자 즉시 생성 (랜덤 세팅)
                 currentLevel = Math.floor(Math.random() * 3);
 
-                setTimeout(() => { canDrop = true; }, 500);
+                setTimeout(() => { canDrop = true; }, 350);
             }
 
+            // 한 프레임에 다수의 한자가 부딪히고 순차 병합될 때 배열 조작 버그로 인해
+            // 한 박자 뚝뚝 끊기며 반응하던 충돌 연산 코드를 완전 루프형으로 재구성
             function handleHanjaCollisions() {
-                for (let i = 0; i < circles.length; i++) {
-                    for (let j = i + 1; j < circles.length; j++) {
-                        const c1 = circles[i];
-                        const c2 = circles[j];
-                        const dx = c2.x - c1.x;
-                        const dy = c2.y - c1.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        const min = c1.radius + c2.radius;
+                let keepChecking = true;
+                while (keepChecking) {
+                    keepChecking = false;
+                    for (let i = 0; i < circles.length; i++) {
+                        for (let j = i + 1; j < circles.length; j++) {
+                            const c1 = circles[i];
+                            const c2 = circles[j];
+                            const dx = c2.x - c1.x;
+                            const dy = c2.y - c1.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            const min = c1.radius + c2.radius;
 
-                        if (dist < min) {
-                            if (c1.level === c2.level) {
-                                const nextLvl = c1.level + 1;
-                                if (nextLvl < levels.length) {
-                                    playBeep('success');
-                                    score += levels[nextLvl].val;
-                                    const scoreUi = document.getElementById('hanja-score');
-                                    if (scoreUi) scoreUi.innerText = score;
+                            if (dist < min) {
+                                // 같은 단계의 한자 결합 융합 처리
+                                if (c1.level === c2.level) {
+                                    const nextLvl = c1.level + 1;
+                                    if (nextLvl < levels.length) {
+                                        playBeep('success');
+                                        score += levels[nextLvl].val;
+                                        const scoreUi = document.getElementById('hanja-score');
+                                        if (scoreUi) scoreUi.innerText = score;
 
-                                    const midX = (c1.x + c2.x) / 2;
-                                    const midY = (c1.y + c2.y) / 2;
-                                    circles.splice(j, 1);
-                                    circles.splice(i, 1);
-                                    circles.push(new Circle(midX, midY, nextLvl));
+                                        const midX = (c1.x + c2.x) / 2;
+                                        const midY = (c1.y + c2.y) / 2;
+                                        
+                                        // 병합 처리 (circles 인덱스 변경에 따른 안전한 데이터 삭제)
+                                        circles.splice(j, 1);
+                                        circles.splice(i, 1);
+                                        circles.push(new Circle(midX, midY, nextLvl));
 
-                                    if (nextLvl === levels.length - 1) {
-                                        cancelAnimationFrame(animId);
-                                        showCustomAlert('한자 병합 성공! 만(萬)을 완성하여 영광스러운 한문 스탬프를 찍었습니다.', "합체 완료", "萬", () => {
-                                            directClear();
-                                        });
-                                        return;
+                                        // 마지막 목표 萬(만) 완성 검증
+                                        if (nextLvl === levels.length - 1) {
+                                            cancelAnimationFrame(animId);
+                                            showCustomAlert('한자 병합 성공! 만(萬)을 완성하여 영광스러운 한문 스탬프를 찍었습니다.', "합체 완료", "萬", () => {
+                                                directClear();
+                                            });
+                                            return;
+                                        }
+                                        
+                                        keepChecking = true; // 배열 크기 및 인덱스가 변경되었으므로 연쇄 충돌 재스캔 전개
+                                        break;
                                     }
                                 }
-                                return;
+                                
+                                // 다른 이기종 한자의 부딪힘 밀어내기 반작용 연산
+                                const overlap = min - dist;
+                                const nx = dx / dist;
+                                const ny = dy / dist;
+                                
+                                // 미세하게 분산 밀어내어 프레임 드랍 및 떨림 방지
+                                c1.x -= nx * overlap * 0.5;
+                                c1.y -= ny * overlap * 0.5;
+                                c2.x += nx * overlap * 0.5;
+                                c2.y += ny * overlap * 0.5;
                             }
-                            const overlap = min - dist;
-                            const nx = dx / dist;
-                            const ny = dy / dist;
-                            c1.x -= nx * overlap * 0.5;
-                            c1.y -= ny * overlap * 0.5;
-                            c2.x += nx * overlap * 0.5;
-                            c2.y += ny * overlap * 0.5;
                         }
+                        if (keepChecking) break;
                     }
                 }
             }
@@ -1944,6 +2105,10 @@
                     ctx.lineTo(currentX, canvas.height);
                     ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
                     ctx.stroke();
+
+                    // 현재 대기 중인 한자 원반을 탑 포인터 위치에 실시간 표시 (드래그하는 동안 조준을 확인할 수 있음)
+                    const tempCircle = new Circle(currentX, 40, currentLevel, true);
+                    tempCircle.draw();
                 }
 
                 handleHanjaCollisions();
@@ -2175,46 +2340,52 @@
         }
 
         // ==========================================
-        //  개별 게임 12: 지구과학실 (탄소 순환 배관)
+        //  개별 게임 12: 지구과학실 (탄소 순환 배관) - 설명 유지, 초기화 제공, 가이드 상시 노출
         // ==========================================
         function setupCarbonCycleGame(container) {
+            // 설명과 타겟가이드를 담은 상단 강의 패널 상시 노출 처리
             container.innerHTML = `
-                <div class="w-full text-center space-y-4" id="carbon-intro-container">
-                    <div class="bg-indigo-50 border border-indigo-200 p-5 rounded-2xl text-left space-y-3 shadow-sm">
-                        <h4 class="font-black text-indigo-850 text-sm flex items-center gap-1.5"><i data-lucide="book-open"></i> 탄소 순환 핵심 이론 정리</h4>
-                        <p class="text-xs text-slate-600 leading-relaxed">
-                            대기 중 이산화탄소($CO_2$)는 각각의 수송 경로를 지나 알맞은 저장고에 보관됩니다.<br>
-                            이 게임을 통해 탄소를 올바른 저장 순환로로 수집해 주십시오!
-                        </p>
-                        <div class="space-y-1.5 text-xs text-slate-500">
-                            <div>🌊 <b>해양 저장고:</b> 대기 중 기체가 용해되어 이온 형태로 저장됩니다.</div>
-                            <div>🌲 <b>생물권 저장고:</b> 식물의 광합성을 거쳐 단단한 탄수화물 유기물질로 보존됩니다.</div>
-                            <div>🪨 <b>지권 저장고:</b> 오랜 세월 퇴적되어 지층 깊이 화석 연료 형태로 밀봉됩니다.</div>
+                <div class="w-full text-center space-y-4">
+                    <!-- 항시 유지되는 핵심 탄소이론 가이드 설명창 및 정답 배치도 조감도 예시 연동 -->
+                    <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-left text-xs text-slate-700 leading-relaxed shadow-sm space-y-2">
+                        <div class="font-extrabold text-indigo-800 flex items-center gap-1"><i data-lucide="book-open" class="w-4 h-4"></i> 탄소 순환 배관 가이드</div>
+                        <p>대기 중 기체 이산화탄소를 각각의 저장로로 수송하세요!</p>
+                        <div class="grid grid-cols-2 gap-2 mt-2 pt-1 border-t border-indigo-100">
+                            <div class="space-y-1">
+                                <div class="font-semibold text-sky-700">📌 순환로 연결 조건</div>
+                                <div>• <b>가로 배관 타일 (━, ━)</b>들이 수평 배치(기본 0도 또는 180도)되어 좌우 탄소 흐름을 차단하지 않도록 회전시켜 일치시키세요.</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="font-semibold text-amber-700 flex items-center gap-0.5">🔍 정답 가이드 조감도 예시</div>
+                                <div class="text-[10px] font-mono border border-amber-200 bg-amber-50/70 p-1.5 rounded flex flex-col justify-center">
+                                    <div>[대기] ➔ ┃ ➔ <span class="bg-amber-100 px-1 py-0.5 rounded font-black text-rose-600">━ (0도/180도)</span> ➔ ┗</div>
+                                    <div class="mt-1">... 하단 ┃ ➔ <span class="bg-amber-100 px-1 py-0.5 rounded font-black text-rose-600">━ (0도/180도)</span> ➔ [해양]</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <button id="start-carbon-puzzle-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow">
-                        수업 이수 완료! 미션 시작 ➔
-                    </button>
+
+                    <div class="text-xs text-slate-500 font-medium">배관 조각을 탭하여 회전시키면서 대기에서 해양까지 순환로를 완성하세요!</div>
+                    <div class="grid grid-cols-4 gap-2 bg-slate-100 p-3 rounded-xl border border-slate-200 max-w-sm mx-auto" id="carbon-grid-board"></div>
+                    
+                    <div class="flex gap-2 max-w-sm mx-auto">
+                        <!-- 초기화 버튼 탑재 -->
+                        <button id="reset-carbon-pipes-btn" class="flex-grow bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition-colors">
+                            배관 초기화 🔄
+                        </button>
+                        <button id="check-carbon-pipes-btn" class="flex-grow bg-indigo-650 hover:bg-indigo-750 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow">
+                            탄소 수송 시작 ➔
+                        </button>
+                    </div>
                 </div>
             `;
             lucide.createIcons();
 
-            document.getElementById('start-carbon-puzzle-btn').onclick = function() {
-                container.innerHTML = `
-                    <div class="w-full text-center space-y-4">
-                        <p class="text-xs text-slate-500">배관 조각을 탭하여 회전시킴으로써, 왼쪽의 <b>☁ 대기</b>에서 오른쪽의 <b>🌊 해양, 🌲 생물, 🪨 지권</b>까지 탄소 순환로를 완성하세요!</p>
-                        <div class="grid grid-cols-4 gap-2 bg-slate-100 p-3 rounded-xl border border-slate-200 max-w-sm mx-auto" id="carbon-grid-board"></div>
-                        <div class="text-xs text-slate-400">
-                            * 각 배관 타일을 클릭하여 방향을 일치시키세요.
-                        </div>
-                        <button id="check-carbon-pipes-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow">
-                            탄소 수송 시작
-                        </button>
-                    </div>
-                `;
+            let pipes = [];
 
-                // 초기 상태 회전 분산 적용
-                const pipes = [
+            // 배관 초기화 및 재생성
+            function initCarbonPipes() {
+                pipes = [
                     { id: 0, text: '☁ 대기', isStart: true },
                     { id: 1, text: '┃', angle: 90 },
                     { id: 2, text: '━', angle: 90 }, 
@@ -2234,6 +2405,9 @@
                 ];
 
                 const board = document.getElementById('carbon-grid-board');
+                if (!board) return;
+                board.innerHTML = '';
+                
                 pipes.forEach((p, idx) => {
                     const btn = document.createElement('button');
                     btn.className = `w-full aspect-square border-2 rounded-xl flex items-center justify-center font-bold text-xs transition-transform ${p.isStart ? 'bg-sky-100 border-sky-300' : (p.isEnd ? 'bg-indigo-100 border-indigo-300' : 'bg-white border-slate-200')}`;
@@ -2249,21 +2423,121 @@
                     }
                     board.appendChild(btn);
                 });
+            }
 
-                document.getElementById('check-carbon-pipes-btn').onclick = function() {
-                    const isCorrect = (pipes[2].angle === 0 || pipes[2].angle === 180) &&
-                                      (pipes[14].angle === 0 || pipes[14].angle === 180);
+            initCarbonPipes();
 
-                    if (isCorrect) {
-                        playBeep('success');
-                        showCustomAlert('순환 연결 성공! 탄소가 유실됨 없이 각 대기권과 해양 저장로 사이를 온전하게 왕복 순환합니다.', "수송 성공", "🌍", () => {
-                            window.directClear();
-                        });
-                    } else {
-                        playBeep('fail');
-                        showCustomAlert('배관 방향이 유실되거나 연결 회로가 완전하지 않습니다. 파이프를 클릭해 회전시키세요.', "경로 누출 발생", "⚠️");
-                    }
-                };
+            document.getElementById('reset-carbon-pipes-btn').onclick = function() {
+                playBeep('click');
+                initCarbonPipes();
+            };
+
+            document.getElementById('check-carbon-pipes-btn').onclick = function() {
+                const isCorrect = (pipes[2].angle === 0 || pipes[2].angle === 180) &&
+                                  (pipes[14].angle === 0 || pipes[14].angle === 180);
+
+                if (isCorrect) {
+                    playBeep('success');
+                    showCustomAlert('순환 연결 성공! 탄소가 유실됨 없이 각 대기권과 해양 저장로 사이를 온전하게 왕복 순환합니다.', "수송 성공", "🌍", () => {
+                        window.directClear();
+                    });
+                } else {
+                    playBeep('fail');
+                    showCustomAlert('배관 방향이 맞지 않거나 연결 회로가 완전하지 않습니다. 정답 예시 조감도를 참고하여 ━ 형태 파이프들을 회전시키세요.', "경로 누출 발생", "⚠️");
+                }
+            };
+        }
+
+        // ==========================================
+        //  개별 게임 13: 체육실 (5초 타이머 맞추기) - 가림 기능 제거
+        // ==========================================
+        function setupPeTimerGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4">
+                    <span class="inline-block bg-rose-100 text-rose-700 font-bold px-3 py-1 text-xs rounded-full border border-rose-200 mb-2">체육실 미션</span>
+                    <p class="text-xs text-slate-500">체육인의 정교한 페이스 조절 능력과 평정심이 필요합니다!<br>정확히 <b>5초</b>를 맞추세요! (통과 기준: <span class="text-rose-500 font-bold">±0.15초 오차</span> 범위인 <b>4.85초 ~ 5.15초</b>)</p>
+                    
+                    <div class="bg-slate-900 text-green-400 font-mono text-5xl py-6 px-8 rounded-2xl my-4 inline-block shadow-inner border-4 border-slate-700 tracking-wider">
+                        <span id="pe-timer-val">0.00</span>초
+                    </div>
+
+                    <div class="flex justify-center gap-4 max-w-xs mx-auto">
+                        <button id="pe-timer-start" onclick="startPeTimer()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">시작</button>
+                        <button id="pe-timer-stop" onclick="stopPeTimer()" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl transition-all shadow-md opacity-50 cursor-not-allowed" disabled>멈춤</button>
+                    </div>
+
+                    <p id="pe-timer-status" class="text-xs text-slate-400 font-semibold mt-2">시작 버튼을 누르면 시간이 실시간으로 표시됩니다. 알맞은 순간에 [멈춤]을 누르세요!</p>
+                </div>
+            `;
+
+            let timerInterval = null;
+            let startTime = 0;
+            let isRunning = false;
+
+            window.startPeTimer = function() {
+                if (isRunning) return;
+                playBeep('click');
+                isRunning = true;
+                startTime = Date.now();
+
+                const startBtn = document.getElementById('pe-timer-start');
+                const stopBtn = document.getElementById('pe-timer-stop');
+                const display = document.getElementById('pe-timer-val');
+                const status = document.getElementById('pe-timer-status');
+
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                stopBtn.disabled = false;
+                stopBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                status.innerText = "흘러가는 시간을 잘 보고 정확하게 5초가 되었을 때 [멈춤] 버튼을 누르세요!";
+                status.className = "text-xs text-indigo-500 font-bold mt-2";
+
+                timerInterval = setInterval(() => {
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    display.innerText = elapsed.toFixed(2); // ?.?? 변환 없이 계속 실시간 숫자 표출
+                }, 30);
+            };
+
+            window.stopPeTimer = function() {
+                if (!isRunning) return;
+                playBeep('click');
+                isRunning = false;
+                clearInterval(timerInterval);
+
+                const elapsed = (Date.now() - startTime) / 1000;
+                document.getElementById('pe-timer-val').innerText = elapsed.toFixed(2);
+
+                const startBtn = document.getElementById('pe-timer-start');
+                const stopBtn = document.getElementById('pe-timer-stop');
+                const status = document.getElementById('pe-timer-status');
+
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                stopBtn.disabled = true;
+                stopBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                // ±0.15초 판정 (4.85 ~ 5.15초)
+                if (elapsed >= 4.85 && elapsed <= 5.15) {
+                    playBeep('success');
+                    status.innerText = `성공! 측정 시간: ${elapsed.toFixed(2)}초`;
+                    status.className = "text-xs text-emerald-500 font-bold mt-2";
+                    setTimeout(() => {
+                        window.directClear();
+                    }, 1200);
+                } else {
+                    playBeep('fail');
+                    status.innerText = `실패! 측정 시간: ${elapsed.toFixed(2)}초 (기준 초과)`;
+                    status.className = "text-xs text-rose-500 font-bold mt-2";
+                    showCustomAlert(`아쉬워요! 측정된 시간은 ${elapsed.toFixed(2)}초입니다.<br>4.85초 ~ 5.15초 범위 내에서 정확하게 멈춰주세요!`, "기록 미달", "⏱️");
+                }
+            };
+
+            const origClose = window.closeModal;
+            window.closeModal = function() {
+                clearInterval(timerInterval);
+                origClose();
+                window.closeModal = origClose;
             };
         }
 
@@ -2271,9 +2545,6 @@
         //  보조 과제용 퀴즈 뱅크
         // ==========================================
         const quizBank = {
-            pe: [
-                { q: '축구에서 골키퍼 외 야외 선수가 고의로 팔이나 손에 공을 접촉시켰을 때 발생하는 반칙은?', a: ['오프사이드', '핸들링 반칙', '간접 프리킥'], right: 1 }
-            ],
             geography: [
                 { q: '세계에서 국경선 내 가장 광대하고 큰 영토 면적을 자랑하는 국가는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 }
             ],
@@ -2286,8 +2557,10 @@
             korean3: [
                 { q: '단어 형성 시 문법적으로 실제 사물의 성질이나 명칭의 실질적인 본바탕을 지닌 핵심 형태소는?', a: ['접사', '어근', '어간'], right: 1 }
             ],
+            // 제2외국어 일본어 전면 교체 적용
             lang: [
-                { q: '프랑스어로 아침이나 이른 주간 시간대에 따뜻하게 건네는 기본적인 전형 인사는?', a: ['봉주르 (Bonjour)', '그라시아스 (Gracias)', '차오 (Ciao)'], right: 0 }
+                { q: '처음 만났을 때 친근하게 나누는 일본어 첫인사 표현은?', a: ['はじめまして (하지메마시테)', 'こんにちは (곤니치와)', 'ありがとう (아리가토)'], right: 0 },
+                { q: '일본어에서 고마움을 다정하게 전하는 보편적인 감사의 말은?', a: ['すみません (스미마센)', 'ありがとうございます (아리가토고자이마스)', 'さようなら (사요나라)'], right: 1 }
             ],
             history: [
                 { q: '조선 왕조 제4대 군주로, 과학 농업을 집대성하고 백성들을 위해 훈민정음을 독창적으로 친히 반포한 현군은?', a: ['태조', '정조', '세종대왕'], right: 2 }
@@ -2345,14 +2618,27 @@
             renderQuiz();
         }
 
+        // ==========================================
+        //  4층 영어실 (한글 뜻 안내 탑재)
+        // ==========================================
         function setupEnglishTypingGame(container, roomId) {
-            const wordList = ['excellent', 'colleague', 'laboratory', 'university', 'geography', 'philosophy'];
+            // 단어와 의미 매핑 데이터 탑재
+            const wordList = [
+                { english: 'excellent', korean: '우수한, 훌륭한' },
+                { english: 'colleague', korean: '동료' },
+                { english: 'laboratory', korean: '연구소, 실험실' },
+                { english: 'university', korean: '대학교' },
+                { english: 'geography', korean: '지리학, 지리' },
+                { english: 'philosophy', korean: '철학' }
+            ];
             container.innerHTML = `
                 <div class="w-full text-center">
                     <p class="text-xs text-slate-500 mb-2">화면에 등장하는 단어를 속도감 있게 키보드로 입력란에 타이핑하세요!</p>
-                    <div class="bg-white border border-slate-200 p-6 rounded-xl mb-4 shadow-sm">
-                        <div class="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-1">Target Word</div>
+                    <div class="bg-white border border-slate-200 p-6 rounded-xl mb-4 shadow-sm space-y-1">
+                        <div class="text-[10px] text-slate-400 uppercase tracking-widest font-black">Target Word</div>
                         <div id="english-target-word" class="text-2xl font-black text-sky-600 tracking-wide">school</div>
+                        <!-- 단어 뜻 노출 공간 -->
+                        <div id="english-target-meaning" class="text-xs text-slate-500 font-semibold italic">학교</div>
                     </div>
                     <div class="max-w-xs mx-auto">
                         <input id="english-input" type="text" placeholder="영단어를 따라치세요" class="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-center font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm">
@@ -2364,25 +2650,26 @@
             `;
 
             let score = 0;
-            let currentWord = "";
+            let currentWordObj = {};
             let lastWord = "";
             const inputField = document.getElementById('english-input');
 
             function nextWord() {
                 let candidate = wordList[Math.floor(Math.random() * wordList.length)];
-                while(candidate === lastWord) {
+                while(candidate.english === lastWord) {
                     candidate = wordList[Math.floor(Math.random() * wordList.length)];
                 }
-                currentWord = candidate;
-                lastWord = candidate;
+                currentWordObj = candidate;
+                lastWord = candidate.english;
                 
-                document.getElementById('english-target-word').innerText = currentWord;
+                document.getElementById('english-target-word').innerText = currentWordObj.english;
+                document.getElementById('english-target-meaning').innerText = `뜻: ${currentWordObj.korean}`;
                 inputField.value = "";
                 inputField.focus();
             }
 
             inputField.oninput = () => {
-                if (inputField.value.trim().toLowerCase() === currentWord.toLowerCase()) {
+                if (inputField.value.trim().toLowerCase() === currentWordObj.english.toLowerCase()) {
                     playBeep('success');
                     score++;
                     document.getElementById('eng-score').innerText = score;
