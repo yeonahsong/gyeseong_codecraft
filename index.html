@@ -601,13 +601,13 @@
         // --- 복도 및 교실 데이터 ---
         const schoolMap = {
             1: {
-                left: [{ id: "1_music", name: "음악실", desc: "도레미~ 타이밍에 맞춰 노트를 연주하세요!", icon: "🎵", gameType: "rhythm" }],
+                left: [{ id: "1_music", name: "음악실", desc: "도레미~ 건반의 올바른 계이름을 맞히세요!", icon: "🎵", gameType: "rhythm" }],
                 center: [{ id: "1_lobby", name: "중앙 로비", desc: "쾌적한 계성고등학교의 로비입니다.", icon: "🚪", gameType: "none" }],
                 right: [{ id: "1_study", name: "자습실", desc: "집중력을 채워 자습 한도를 100%로 올리세요!", icon: "📖", gameType: "study" }]
             },
             2: {
                 left: [
-                    { id: "2_infirmary", name: "보건실", desc: "아픈 학우들의 상태에 알맞은 치료 처방을 신속히 매치하세요!", icon: "🏥", gameType: "nurse" },
+                    { id: "2_infirmary", name: "보건실", desc: "실생활에 유용한 응급처치 OX 퀴즈를 해결하세요!", icon: "🏥", gameType: "nurse" },
                     { id: "2_art", name: "미술실", desc: "R, G, B 삼원색 슬라이더를 일치시키세요!", icon: "🎨", gameType: "absolute_color" }
                 ],
                 center: [{ id: "2_philosophy", name: "철학실", desc: "타당한 삼단논법 조판을 설계하세요!", icon: "🧠", gameType: "philosophy_syllogism" }],
@@ -889,11 +889,11 @@
         function getRoomRules(gameType) {
             switch(gameType) {
                 case 'rhythm':
-                    return "음악실 미션:\n• 위에서 내려오는 음표가 노란색 점선 판정선과 만날 때 정확히 아래의 [A], [S], [D] 버튼을 터치하거나 키보드로 누르세요.\n• 판정이 많이 보완되어 리듬을 타고 누르면 쉽게 8점을 달성하여 스탬프를 얻을 수 있습니다!";
+                    return "음악실 미션:\n• 가상 피아노 건반 중 노랗게 불이 들어온 건반을 보고 알맞은 계이름(도, 레, 미, 파, 솔, 라, 시)을 버튼에서 선택하세요.\n• 5회 연속으로 올바르게 정답을 매칭하면 음악 스탬프를 획득합니다!";
                 case 'study':
                     return "자습실 미션:\n• 공부하기 버튼을 연속으로 클릭하여 우측 자습 집중도 지수를 100%까지 채우세요!\n• 시간이 지날수록 집중력이 감소하므로 번개 같은 순발력 터치가 필요합니다!";
                 case 'nurse':
-                    return "보건실 미션:\n• 머리가 아프거나, 상처가 나거나, 가려워하는 3명의 환자 학생의 증상에 알맞은 정답 처방 버튼을 짝지어 매칭하세요!";
+                    return "보건실 미션:\n• 일상생활에서 꼭 알아야 하는 기초 보건 및 응급처치 OX 퀴즈가 펼쳐집니다.\n• 3문제를 연속으로 올바르게 맞추면 스탬프를 획득할 수 있습니다!";
                 case 'absolute_color':
                     return "미술실 미션:\n• 제시된 'Target' 색상 블록과 나의 색상 블록이 똑같아지도록 하단 [R / G / B] 삼원색 슬라이더를 정교하게 조절하세요!\n• 90% 이상 일치하면 합격입니다!";
                 case 'philosophy_syllogism':
@@ -1127,112 +1127,107 @@
         window.directClear = directClear;
 
         // ==========================================
-        //  개별 게임 1: 음악실 (리듬) - 판정 범위 보완
+        //  개별 게임 1: 음악실 (피아노 계이름 맞히기)
         // ==========================================
         function setupMusicGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-2">위에서 내려오는 음표가 점선에 닿을 때 알맞은 아래 버튼을 탭하세요! (A/S/D 키 사용 가능)</p>
-                    <div class="flex justify-around items-center bg-slate-900 border border-slate-200 h-60 relative rounded-xl overflow-hidden mb-4 shadow-inner">
-                        <div class="w-1/3 h-full border-r border-slate-800 relative" id="rhythm-line-1">
-                            <div class="absolute bottom-6 w-full border-b-2 border-dashed border-amber-400"></div>
-                        </div>
-                        <div class="w-1/3 h-full border-r border-slate-800 relative" id="rhythm-line-2">
-                            <div class="absolute bottom-6 w-full border-b-2 border-dashed border-amber-400"></div>
-                        </div>
-                        <div class="w-1/3 h-full relative" id="rhythm-line-3">
-                            <div class="absolute bottom-6 w-full border-b-2 border-dashed border-amber-400"></div>
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500">가상 피아노 건반 중 노랗게 불이 들어온 건반을 보고 올바른 계이름을 터치하세요!</p>
+                    
+                    <!-- 피아노 조감도 디자인 -->
+                    <div class="flex justify-center bg-slate-900 p-4 rounded-xl max-w-sm mx-auto shadow-inner relative">
+                        <div class="flex relative border-t-4 border-slate-950 w-full justify-between" style="height: 140px;">
+                            <div id="piano-key-0" onclick="playPianoKeySound(0)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                            <div id="piano-key-1" onclick="playPianoKeySound(1)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                            <div id="piano-key-2" onclick="playPianoKeySound(2)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                            <div id="piano-key-3" onclick="playPianoKeySound(3)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                            <div id="piano-key-4" onclick="playPianoKeySound(4)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                            <div id="piano-key-5" onclick="playPianoKeySound(5)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                            <div id="piano-key-6" onclick="playPianoKeySound(6)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                            <div id="piano-key-7" onclick="playPianoKeySound(7)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
+                        
+                            <!-- 흑건 (비주얼 장식 효과) -->
+                            <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 9%;"></div>
+                            <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 21%;"></div>
+                            <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 47%;"></div>
+                            <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 60%;"></div>
+                            <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 73%;"></div>
                         </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="triggerHit(0)" class="flex-1 bg-white border border-slate-300 py-2.5 rounded-lg active:bg-indigo-500 active:text-white font-bold text-xs shadow-sm text-slate-700">A (왼쪽)</button>
-                        <button onclick="triggerHit(1)" class="flex-1 bg-white border border-slate-300 py-2.5 rounded-lg active:bg-indigo-500 active:text-white font-bold text-xs shadow-sm text-slate-700">S (가운데)</button>
-                        <button onclick="triggerHit(2)" class="flex-1 bg-white border border-slate-300 py-2.5 rounded-lg active:bg-indigo-500 active:text-white font-bold text-xs shadow-sm text-slate-700">D (오른쪽)</button>
+
+                    <!-- 계이름 선택 버튼 리스트 -->
+                    <div class="grid grid-cols-4 gap-2 max-w-sm mx-auto">
+                        <button onclick="guessPianoSyllable('도')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">도</button>
+                        <button onclick="guessPianoSyllable('레')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">레</button>
+                        <button onclick="guessPianoSyllable('미')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">미</button>
+                        <button onclick="guessPianoSyllable('파')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">파</button>
+                        <button onclick="guessPianoSyllable('솔')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">솔</button>
+                        <button onclick="guessPianoSyllable('라')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">라</button>
+                        <button onclick="guessPianoSyllable('시')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">시</button>
                     </div>
-                    <div class="mt-3 flex justify-between items-center text-xs font-bold text-slate-600">
-                        <span>성공: <strong id="r-score" class="text-indigo-650 text-base">0</strong> / 8회</span>
-                        <span id="r-feedback" class="text-indigo-500">대기 중...</span>
+
+                    <div class="text-xs font-bold text-slate-500">
+                        연속 매칭: <span id="piano-combo" class="text-indigo-650 text-sm">0</span> / 5회 성공 타겟
                     </div>
                 </div>
             `;
 
-            let score = 0;
-            const targetScore = 8;
-            let gameInterval;
-            let activeNotes = [];
+            const syllables = ["도", "레", "미", "파", "솔", "라", "시", "도"];
+            const noteFrequencies = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]; // C4~C5 주파수
+            let targetIdx = 0;
+            let combo = 0;
 
-            const keyHandler = (e) => {
-                if(e.key.toLowerCase() === 'a') triggerHit(0);
-                if(e.key.toLowerCase() === 's') triggerHit(1);
-                if(e.key.toLowerCase() === 'd') triggerHit(2);
-            };
-            window.addEventListener('keydown', keyHandler);
-
-            const cleanMusicGame = () => {
-                clearInterval(gameInterval);
-                window.removeEventListener('keydown', keyHandler);
-            };
-
-            gameInterval = setInterval(() => {
-                const lineIndex = Math.floor(Math.random() * 3);
-                const lineDiv = document.getElementById(`rhythm-line-${lineIndex + 1}`);
-                if (!lineDiv) return;
-
-                const note = document.createElement('div');
-                note.className = 'absolute w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-400 to-sky-500 flex items-center justify-center text-white text-xs font-bold transition-all duration-[1500ms] ease-linear';
-                note.style.top = '0px';
-                note.style.left = 'calc(50% - 16px)';
-                note.innerText = '🎵';
-                lineDiv.appendChild(note);
-
-                setTimeout(() => { note.style.top = '200px'; }, 50);
-
-                const noteData = { element: note, line: lineIndex, spawnTime: Date.now() };
-                activeNotes.push(noteData);
-
-                setTimeout(() => {
-                    if (note.parentNode) { note.parentNode.removeChild(note); }
-                    activeNotes = activeNotes.filter(n => n !== noteData);
-                }, 1600);
-            }, 1000);
-
-            // 판정 범위를 1200ms~1650ms로 더 넓혀 리듬 판정을 쉽게 만듦
-            window.triggerHit = function(line) {
-                const notesOnLine = activeNotes.filter(n => n.line === line);
-                if (notesOnLine.length > 0) {
-                    const candidate = notesOnLine[0];
-                    const elapsed = Date.now() - candidate.spawnTime;
-                    
-                    if (elapsed >= 1200 && elapsed <= 1650) {
-                        score++;
-                        playBeep('success');
-                        document.getElementById('r-score').innerText = score;
-                        document.getElementById('r-feedback').innerText = "✨ PERFECT! ✨";
-                        document.getElementById('r-feedback').className = "text-emerald-500 font-bold";
-                        
-                        if (candidate.element.parentNode) { candidate.element.parentNode.removeChild(candidate.element); }
-                        activeNotes = activeNotes.filter(n => n !== candidate);
-
-                        if(score >= targetScore) {
-                            cleanMusicGame();
-                            directClear();
-                        }
-                    } else { triggerFailFeedback(); }
-                } else { triggerFailFeedback(); }
+            window.playPianoKeySound = function(idx) {
+                try {
+                    if (!audioCtx) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(noteFrequencies[idx], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } catch(e) {}
             };
 
-            function triggerFailFeedback() {
-                playBeep('fail');
-                document.getElementById('r-feedback').innerText = "⚠️ MISS!";
-                document.getElementById('r-feedback').className = "text-rose-500 font-bold";
+            function nextPianoQuestion() {
+                // 이전 강조 비활성화
+                document.querySelectorAll('.piano-white-key').forEach(el => {
+                    el.className = "piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-all";
+                });
+
+                // 새로운 건반 출제
+                targetIdx = Math.floor(Math.random() * syllables.length);
+                const targetEl = document.getElementById(`piano-key-${targetIdx}`);
+                if (targetEl) {
+                    targetEl.className = "piano-white-key bg-amber-400 border border-amber-500 flex-1 rounded-b-md relative cursor-pointer active:bg-amber-500 shadow-inner scale-95 transition-all";
+                }
             }
 
-            const origClose = window.closeModal;
-            window.closeModal = function() {
-                cleanMusicGame();
-                origClose();
-                window.closeModal = origClose;
+            window.guessPianoSyllable = function(guess) {
+                if (guess === syllables[targetIdx]) {
+                    playPianoKeySound(targetIdx);
+                    combo++;
+                    document.getElementById('piano-combo').innerText = combo;
+                    if (combo >= 5) {
+                        directClear();
+                    } else {
+                        nextPianoQuestion();
+                    }
+                } else {
+                    playBeep('fail');
+                    showCustomAlert(`틀렸습니다! 정답은 [ ${syllables[targetIdx]} ] 입니다.<br>처음부터 다시 연주해 보세요!`, "오답 판정", "🎹");
+                    combo = 0;
+                    document.getElementById('piano-combo').innerText = combo;
+                    nextPianoQuestion();
+                }
             };
+
+            nextPianoQuestion();
         }
 
         // ==========================================
@@ -1296,63 +1291,70 @@
         }
 
         // ==========================================
-        //  개별 게임 3: 보건실 (치료 매칭)
+        //  개별 게임 3: 보건실 (기초 안전/응급처치 상식 OX 퀴즈)
         // ==========================================
         function setupNurseGame(container) {
             container.innerHTML = `
-                <div class="w-full text-center">
-                    <p class="text-xs text-slate-500 mb-2">보건실에 내방한 아픈 학생들의 부위에 가장 알맞은 치료 처방을 짝지어 주세요.</p>
-                    <div class="flex justify-center items-center gap-6 bg-white border border-slate-200 p-4 rounded-xl mb-4 relative min-h-[130px] shadow-sm">
-                        <div class="text-center">
-                            <span class="text-5xl animate-bounce inline-block" id="patient-icon">🤒</span>
-                            <div class="text-xs text-slate-600 mt-2 font-black" id="patient-status">증상: 머리가 욱신욱신 아파요</div>
-                        </div>
-                        <div class="h-10 w-[1px] bg-slate-200"></div>
-                        <div class="text-left">
-                            <div class="text-xs text-slate-400 font-bold">치료 성공 학생</div>
-                            <div class="text-2xl font-black text-indigo-500"><span id="heal-count">0</span> / 3</div>
-                        </div>
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500">실생활에 꼭 유용한 보건 및 안전 응급 대처 OX 퀴즈를 해결하세요!</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-sm min-h-[100px] flex items-center justify-center text-sm font-bold text-slate-800" id="nurse-quiz-question">
+                        질문이 로딩 중입니다...
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="applyCure('pill')" class="bg-white border border-slate-300 hover:bg-slate-50 p-2.5 rounded-lg text-xs font-bold text-slate-700 shadow-sm">💊 타이레놀 투약</button>
-                        <button onclick="applyCure('band')" class="bg-white border border-slate-300 hover:bg-slate-50 p-2.5 rounded-lg text-xs font-bold text-slate-700 shadow-sm">🩹 상처 밴드 처치</button>
-                        <button onclick="applyCure('spray')" class="bg-white border border-slate-300 hover:bg-slate-50 p-2.5 rounded-lg text-xs font-bold text-slate-700 shadow-sm">💨 소독 스프레이</button>
+                    <div class="flex justify-center gap-4 max-w-xs mx-auto">
+                        <button onclick="guessNurseOX(true)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 text-lg transition-all">O</button>
+                        <button onclick="guessNurseOX(false)" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-black py-4 rounded-xl shadow-lg shadow-rose-500/20 active:scale-95 text-lg transition-all">X</button>
+                    </div>
+                    <div class="text-xs font-bold text-slate-500">
+                        연속 정답 수: <span id="nurse-combo" class="text-indigo-650 text-sm">0</span> / 3회 성공 타겟
                     </div>
                 </div>
             `;
 
-            let healed = 0;
-            const patientTypes = [
-                { icon: '🤒', symptom: '머리가 욱신욱신 아파요', cure: 'pill' },
-                { icon: '🤕', symptom: '넘어져서 손이 까졌어요', cure: 'band' },
-                { icon: '🦟', symptom: '벌레에 물려서 가려워요', cure: 'spray' }
+            const quizzes = [
+                { q: "코피가 날 때는 지혈을 돕기 위해 머리를 뒤로 젖히는 것이 올바른 대처 방법이다.", a: false, exp: "머리를 뒤로 젖히면 피가 기도나 위로 넘어가 구토를 유발할 수 있으므로, 고개를 앞으로 약간 숙인 채 지혈해야 합니다." },
+                { q: "뜨거운 물에 가벼운 열화상을 입었을 때는 부어오르기 전에 즉시 얼음을 직접 피부에 비벼주어야 한다.", a: false, exp: "화상 부위에 직접 얼음을 대면 혈관이 수축해 상처가 악화되거나 동상이 생길 수 있으므로 흐르는 찬물로 충분히 식혀야 합니다." },
+                { q: "눈에 모래나 먼지 같은 이물질이 들어갔을 때는 손으로 절대 비비지 말고 흐르는 물이나 생리식염수로 씻어내야 한다.", a: true, exp: "비비면 모래 입자가 각막에 미세한 상처를 줄 수 있어 즉시 물로 자연스럽게 흘려보내야 합니다." },
+                { q: "발목을 삐었을 때(염좌) 초기에는 혈액 순환 촉진을 위해 온찜질을 최우선으로 시행해야 한다.", a: false, exp: "초기(24~48시간)에는 냉찜질을 하여 염증과 붓기, 내부 출혈을 최소화해야 합니다." }
             ];
-            let currentPatientIdx = 0;
 
-            window.applyCure = function(cureType) {
-                const target = patientTypes[currentPatientIdx];
-                if (cureType === target.cure) {
+            let combo = 0;
+            let currentIdx = 0;
+            let usedQuizzes = [];
+
+            function nextNurseQuiz() {
+                if (usedQuizzes.length >= quizzes.length) {
+                    usedQuizzes = [];
+                }
+                currentIdx = Math.floor(Math.random() * quizzes.length);
+                while (usedQuizzes.includes(currentIdx)) {
+                    currentIdx = Math.floor(Math.random() * quizzes.length);
+                }
+                usedQuizzes.push(currentIdx);
+                document.getElementById('nurse-quiz-question').innerText = quizzes[currentIdx].q;
+            }
+
+            window.guessNurseOX = function(guess) {
+                const target = quizzes[currentIdx];
+                if (guess === target.a) {
                     playBeep('success');
-                    healed++;
-                    document.getElementById('heal-count').innerText = healed;
-                    
-                    if (healed >= 3) {
+                    combo++;
+                    document.getElementById('nurse-combo').innerText = combo;
+                    if (combo >= 3) {
                         directClear();
                     } else {
-                        currentPatientIdx = (currentPatientIdx + 1) % patientTypes.length;
-                        document.getElementById('patient-icon').innerText = '😄';
-                        document.getElementById('patient-status').innerText = '감사합니다! 다 나았어요!';
-                        setTimeout(() => {
-                            const next = patientTypes[currentPatientIdx];
-                            document.getElementById('patient-icon').innerText = next.icon;
-                            document.getElementById('patient-status').innerText = `증상: ${next.symptom}`;
-                        }, 800);
+                        nextNurseQuiz();
                     }
                 } else {
                     playBeep('fail');
-                    document.getElementById('patient-status').innerText = `⚠️ 올바르지 않은 처치입니다! (${target.symptom})`;
+                    showCustomAlert(`틀렸습니다!<br><br>💡 **설명**: ${target.exp}<br><br>다시 처음부터 도전해 보세요!`, "오답 처치", "🏥");
+                    combo = 0;
+                    usedQuizzes = [];
+                    document.getElementById('nurse-combo').innerText = combo;
+                    nextNurseQuiz();
                 }
             };
+
+            nextNurseQuiz();
         }
 
         // ==========================================
@@ -2562,8 +2564,12 @@
             history: [
                 { q: '조선 왕조 제4대 군주로, 과학 농업을 집대성하고 백성들을 위해 훈민정음을 독창적으로 친히 반포한 현군은?', a: ['태조', '정조', '세종대왕'], right: 2 }
             ],
+            // 고1 통합과학 물리 핵심 개념 퀴즈로 완전 개편
             physics: [
-                { q: '뉴턴 역학 제2법칙에 의거하여 물체에 가해진 힘(F)은 질량(m)에 무엇을 곱한 값과 일치합니까?', a: ['속도 (v)', '시간 (t)', '가속도 (a)'], right: 2 }
+                { q: '공기 저항이 없을 때, 같은 높이에서 자유 낙하하는 쇠구슬과 수평 방향으로 던진 식구슬이 바닥에 도달하는 시간에 대한 설명으로 옳은 것은?', a: ['연직 방향으로 둘 다 중력 가속도를 받으므로 동시에 바닥에 도달한다.', '자유 낙하하는 물체가 수평으로 던진 물체보다 항상 늦게 도달한다.', '쇠구슬의 질량이 식구슬보다 크므로 쇠구슬이 무조건 먼저 도달한다.'], right: 0 },
+                { q: '발전기 내부에서 자석이나 코일을 회전시킬 때, 유도 전류가 코일을 통과하는 자기장의 변화를 방해하는 방향으로 흐른다는 전자기학의 핵심 법칙은?', a: ['렌츠의 법칙', '쿨롱의 법칙', '옴의 법칙'], right: 0 },
+                { q: '자동차가 충돌할 때 승객을 보호하는 에어백의 물리적 원리로 가장 알맞은 설명은?', a: ['에어백이 팽창하면서 사람이 충격을 받는 충돌 시간을 길어지게 하여 받는 충격력을 감소시킨다.', '에어백이 몸에 가해지는 속도를 완전히 0으로 소멸시켜 운동량을 증가시킨다.', '승객의 질량을 미세하게 일시적으로 낮추어 충격량 자체를 0으로 소멸시킨다.'], right: 0 },
+                { q: '마찰력과 공기 저항이 존재하지 않는 이상적인 물리적 환경에서, 높이가 내려갈 때 감소하는 역학적 시스템의 위치에너지는 무엇으로 전환 보존됩니까?', a: ['운동에너지', '열에너지', '전기에너지'], right: 0 }
             ]
         };
 
@@ -2571,8 +2577,20 @@
             const list = quizBank[subject] || quizBank['geography'];
             let currentIdx = 0;
             let successStreak = 0;
+            let usedIndexes = []; // 중복 방지를 위한 출제 이력 보존 배열
 
             function renderQuiz() {
+                if (usedIndexes.length >= list.length) {
+                    usedIndexes = [];
+                }
+
+                let randomIdx = Math.floor(Math.random() * list.length);
+                while (usedIndexes.includes(randomIdx)) {
+                    randomIdx = Math.floor(Math.random() * list.length);
+                }
+                usedIndexes.push(randomIdx);
+                currentIdx = randomIdx;
+
                 const quiz = list[currentIdx];
                 container.innerHTML = `
                     <div class="w-full text-center">
@@ -2597,14 +2615,13 @@
                             if (successStreak >= list.length) {
                                 window.directClear();
                             } else {
-                                currentIdx++;
                                 renderQuiz();
                             }
                         } else {
                             playBeep('fail');
                             showCustomAlert('선택지가 타당하지 않습니다. 지식을 돌이켜 다시 도전해 보세요.', "오답 판정", "👀");
                             successStreak = 0;
-                            currentIdx = 0;
+                            usedIndexes = [];
                             renderQuiz();
                         }
                     };
