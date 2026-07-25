@@ -9,7 +9,7 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Firebase SDK Compat 라이브러리 (표준 호환 모드 로드) -->
+    <!-- Firebase SDK Compat 라이브러리 -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -26,10 +26,7 @@
             font-family: 'Jua', sans-serif;
         }
         
-        /* 계성고 실제 U자형 건물 구조 맞춤형 그리드
-           - Row 1: [ 예의동 ] [ 야외 광장 ] [ 실력동 ]
-           - Row 2: [ 봉사동이 아래쪽 전체를 좌에서 우로 웅장하게 관통하며 연결 ]
-        */
+        /* 계성고 실제 U자형 건물 구조 맞춤형 그리드 */
         .u-building-grid {
             display: grid;
             grid-template-columns: 200px 1fr 200px;
@@ -51,34 +48,30 @@
             }
         }
         
-        /* 예의동: 왼쪽 세로상단 */
         .left-wing {
             grid-column: 1;
-            grid-row: 1;
+            grid-row: 1 / span 2;
             border: 3px solid #818cf8;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
         
-        /* 실력동: 오른쪽 세로상단 */
         .right-wing {
             grid-column: 3;
-            grid-row: 1;
+            grid-row: 1 / span 2;
             border: 3px solid #818cf8;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
         
-        /* 봉사동: 하단 전체 가로를 관통하며 예의동과 실력동을 연결 */
         .bottom-connector {
-            grid-column: 1 / span 3;
+            grid-column: 2;
             grid-row: 2;
-            border: 3px solid #4f46e5;
+            border: 3px solid #818cf8;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
         
-        /* 중정 야외 광장: 가운데 위 */
         .empty-courtyard {
             grid-column: 2;
             grid-row: 1;
@@ -88,7 +81,6 @@
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* 프리미엄 카드 애니메이션 */
         .room-card {
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -97,7 +89,6 @@
             box-shadow: 0 10px 15px -6px rgba(99, 102, 241, 0.3);
         }
 
-        /* 공통 커스텀 스크롤바 */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -111,7 +102,6 @@
             border-radius: 8px;
         }
 
-        /* 미술실 조절 슬라이더 */
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -124,7 +114,6 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        /* 영어 매칭 카드 */
         .flip-card {
             perspective: 800px;
         }
@@ -140,6 +129,101 @@
         }
         .flip-card-back {
             transform: rotateY(180deg);
+        }
+
+        /* 4층 지리실 레이더 애니메이션 CSS */
+        .radar-wrapper {
+            position: relative; width: 100px; height: 100px; border-radius: 50%;
+            border: 2px solid #38bdf8; background: #0f172a; overflow: hidden;
+            box-shadow: 0 0 15px rgba(56,189,248,0.4); margin: 0 auto 10px;
+        }
+        .radar-sweep {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 70%, rgba(56,189,248,0.8) 100%);
+            animation: sweep 2s linear infinite;
+        }
+        .radar-grid {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background-image: radial-gradient(circle, transparent 20px, #38bdf8 21px, transparent 22px), radial-gradient(circle, transparent 40px, #38bdf8 41px, transparent 42px);
+            background-position: center; background-size: 100px 100px;
+        }
+        .radar-line-h { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(56,189,248,0.5); }
+        .radar-line-v { position: absolute; top: 0; left: 50%; width: 1px; height: 100%; background: rgba(56,189,248,0.5); }
+        @keyframes sweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 4층 국어실 두더지 애니메이션 CSS */
+        .mole-hole {
+            height: 70px;
+            background: #1e293b;
+            border-radius: 12px;
+            border-bottom: 4px solid #0f172a;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 8px 10px rgba(0,0,0,0.5);
+        }
+        .mole-card-elem {
+            width: 90%;
+            height: 55px;
+            background: linear-gradient(145deg, #475569, #334155);
+            color: #FFF;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 8px;
+            position: absolute;
+            left: 5%;
+            bottom: -100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #64748b;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: bottom 0.2s ease-out;
+        }
+        .mole-card-elem.up { bottom: 6px; }
+        .mole-card-elem.shatter {
+            animation: shatterAnim 0.3s forwards ease-out;
+            pointer-events: none;
+            border-color: #10b981;
+            background: #10b981;
+        }
+        @keyframes shatterAnim {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); }
+            50% { opacity: 0.8; transform: scale(1.1) rotate(10deg); filter: blur(1px); }
+            100% { opacity: 0; transform: scale(0.5) rotate(-20deg); filter: blur(4px); display: none;}
+        }
+
+        /* 4층 역사실 연대기 블록 CSS */
+        .history-block {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            color: #334155;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 12px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 4px 0 #94a3b8, 0 6px 10px rgba(0,0,0,0.1);
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+            line-height: 1.3;
+            white-space: pre-line;
+        }
+        .history-block:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #94a3b8, 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .history-cleared {
+            background: #d1fae5 !important;
+            color: #059669 !important;
+            border-color: #10b981 !important;
+            pointer-events: none;
+            transform: scale(0.98) translateY(4px);
+            box-shadow: 0 0px 0 #10b981 !important;
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -197,11 +281,11 @@
                     <div class="col-span-1">
                         <label class="block text-xs text-slate-500 font-bold mb-1">학번 입력</label>
                         <!-- 선생님 정보 지정을 위해MaxLength를 10으로 조정 -->
-                        <input id="input-student-id" type="text" maxlength="10" placeholder="예: 10101" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-center text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white">
+                        <input id="input-student-id" type="text" maxlength="10" placeholder="예: 10101" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-center text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400">
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs text-slate-500 font-bold mb-1">이름을 입력하세요</label>
-                        <input id="input-username" type="text" placeholder="예: 홍길동" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white">
+                        <input id="input-username" type="text" placeholder="예: 홍길동" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-400">
                     </div>
                 </div>
                 
@@ -236,7 +320,6 @@
         <!-- [2] 학교 메인 맵 (층 선택 및 U자형 교실 배치) -->
         <section id="screen-map" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 my-4">
             
-            <!-- 층 네비게이션 복도 계단 -->
             <div class="lg:col-span-3 bg-white/80 backdrop-blur border border-indigo-100 p-5 rounded-2xl flex flex-col justify-between shadow-sm">
                 <div>
                     <h3 class="font-bold text-lg fancy-font text-slate-700 mb-4 flex items-center gap-2">
@@ -253,7 +336,6 @@
                 </div>
             </div>
 
-            <!-- U자형 디지털 탐험 복도 판넬 -->
             <div class="lg:col-span-9 bg-white/90 backdrop-blur border border-indigo-100 p-6 rounded-2xl relative shadow-sm">
                 <div class="flex justify-between items-center mb-6">
                     <div>
@@ -266,50 +348,27 @@
                     </div>
                 </div>
 
-                <!-- 
-                  계성고 독창적 U자형 건물 그리드
-                  - 예의동: 왼쪽 1열 상단
-                  - 실력동: 오른쪽 3열 상단
-                  - 봉사동: 하단 전체 가로폭 통관 점유
-                -->
+                <!-- 계성고 독창적 U자형 건물 그리드 -->
                 <div class="u-building-grid relative border border-indigo-300 p-5 rounded-3xl bg-indigo-50/40 shadow-xl overflow-x-auto custom-scrollbar">
                     
-                    <!-- 예의동 -->
                     <div id="wrapper-left-wing" class="left-wing bg-white/95 rounded-2xl p-3 flex flex-col justify-start gap-2.5 relative overflow-visible">
-                        <div class="text-xs text-indigo-650 font-bold border-b border-slate-100 pb-1 text-center">
-                            예의동
-                        </div>
-                        <div id="wing-left-rooms" class="flex-grow flex flex-col justify-center gap-2.5">
-                            <!-- 예의동 방 배치 -->
-                        </div>
+                        <div class="text-xs text-indigo-650 font-bold border-b border-slate-100 pb-1 text-center">예의동</div>
+                        <div id="wing-left-rooms" class="flex-grow flex flex-col justify-center gap-2.5"></div>
                     </div>
 
-                    <!-- 중앙 정원/중정 -->
                     <div class="empty-courtyard rounded-2xl flex flex-col items-center justify-center p-3 text-center">
-                        <div class="w-12 h-14 mb-1.5 rounded-full shadow-inner bg-indigo-100 border border-indigo-300 flex items-center justify-center text-3xl">
-                            🌳
-                        </div>
+                        <div class="w-12 h-14 mb-1.5 rounded-full shadow-inner bg-indigo-100 border border-indigo-300 flex items-center justify-center text-3xl">🌳</div>
                         <span class="text-xs font-extrabold text-indigo-700 fancy-font">계성 야외 광장</span>
                     </div>
 
-                    <!-- 실력동 -->
                     <div id="wrapper-right-wing" class="right-wing bg-white/95 rounded-2xl p-3 flex flex-col justify-start gap-2.5 relative overflow-visible">
-                        <div class="text-xs text-indigo-650 font-bold border-b border-slate-100 pb-1 text-center">
-                            실력동
-                        </div>
-                        <div id="wing-right-rooms" class="flex-grow flex flex-col justify-center gap-2.5">
-                            <!-- 실력동 교실 배치 -->
-                        </div>
+                        <div class="text-xs text-indigo-650 font-bold border-b border-slate-100 pb-1 text-center">실력동</div>
+                        <div id="wing-right-rooms" class="flex-grow flex flex-col justify-center gap-2.5"></div>
                     </div>
 
-                    <!-- 봉사동 -->
                     <div id="wrapper-bottom-connector" class="bottom-connector bg-white/95 rounded-2xl p-3 flex flex-col justify-start gap-2.5 relative overflow-visible">
-                        <div class="text-xs text-indigo-650 font-bold border-b border-slate-100 pb-1 text-center">
-                            봉사동
-                        </div>
-                        <div id="wing-center-rooms" class="flex-grow flex flex-row flex-wrap justify-around items-center gap-2.5 py-1">
-                            <!-- 봉사동 교실 배치 -->
-                        </div>
+                        <div class="text-xs text-indigo-650 font-bold border-b border-slate-100 pb-1 text-center">봉사동</div>
+                        <div id="wing-center-rooms" class="flex-grow flex flex-row flex-wrap justify-around items-center gap-2.5 py-1"></div>
                     </div>
 
                 </div>
@@ -326,7 +385,6 @@
     <div id="game-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-md hidden items-center justify-center z-50 p-4">
         <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col text-slate-800">
             
-            <!-- 헤더 -->
             <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <span id="modal-room-icon" class="text-3xl">🔬</span>
@@ -340,10 +398,8 @@
                 </button>
             </div>
 
-            <!-- 게임 플레이 및 인트로 대기 영역 -->
             <div id="game-playzone" class="p-6 flex-grow flex flex-col items-center justify-center min-h-[380px] max-h-[80vh] overflow-y-auto custom-scrollbar relative bg-slate-50"></div>
 
-            <!-- 푸터 -->
             <div class="bg-slate-100 p-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
                 <span class="font-bold text-indigo-600 flex items-center gap-1"><i data-lucide="sparkles" class="w-4 h-4"></i> 미션을 정복하고 도장을 획득하세요!</span>
                 <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded-lg font-bold text-slate-700 transition-colors">
@@ -404,7 +460,7 @@
         </div>
     </div>
 
-    <!-- [6] 범용 커스텀 안내 모달 -->
+    <!-- [6] 커스텀 알림 모달 -->
     <div id="custom-alert-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4">
         <div class="bg-white border-2 border-indigo-400 rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
             <span id="custom-alert-icon" class="text-4xl">💡</span>
@@ -414,133 +470,115 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="bg-white py-4 text-center text-xs text-slate-400 border-t border-indigo-100">
         <p>© 2026 계성고등학교 코드 크래프트 동아리. All rights reserved.</p>
     </footer>
 
-    <!-- 게임 컨트롤 시스템 스크립트 -->
+    <!-- 게임 컨트롤 스크립트 -->
     <script>
-        // --- Firebase 초기화 & 룰 1 및 3 완전 준수 ---
         const defaultAppId = "kyesung-star-tour-2026";
         const appId = typeof __app_id !== 'undefined' ? __app_id : defaultAppId;
         
         let db = null;
         let auth = null;
         let firebaseReady = false;
+        window.currentGameInterval = null; 
+        window.currentGameTimeout = null;
+
+        // 통합 퀴즈 데이터 뱅크 
+        const quizBank = {
+            geography: [
+                { q: '세계에서 가장 넓은 영토 면적을 자랑하는 국가는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 },
+                { q: '아프리카 대륙에서 가장 큰 사막으로 이집트를 포함해 넓게 펼쳐진 사막은?', a: ['사하라 사막', '고비 사막', '칼라하리 사막'], right: 0 },
+                { q: '에펠탑, 루브르 박물관이 있으며 수도가 파리인 유럽의 국가는?', a: ['프랑스', '독일', '이탈리아'], right: 0 }
+            ],
+            korean3: [
+                { q: '단어 형성 시 문법적으로 실제 사물의 성질이나 명칭의 실질적인 본바탕을 지닌 핵심 형태소는?', a: ['접사', '어근', '어간'], right: 1 },
+                { q: '용언이 활용할 때 형태가 변하지 않는 부분은?', a: ['어미', '어간', '접두사'], right: 1 },
+                { q: '다음 중 뜻을 더해주지만 홀로 쓰일 수 없는 형태소는?', a: ['자립 형태소', '어근', '접사'], right: 2 }
+            ],
+            lang: [
+                { q: '처음 만났을 때 친근하게 나누는 일본어 첫인사 표현은?', a: ['はじめまして (하지메마시테)', 'こんにちは (곤니치와)', 'ありがとう (아리가토)'], right: 0 },
+                { q: '일본어에서 고마움을 다정하게 전하는 보편적인 감사의 말은?', a: ['すみません (스미마센)', 'ありがとうございます (아리가토고자이마스)', 'さようなら (사요나라)'], right: 1 },
+                { q: '아침에 만났을 때 하는 일본어 인사는?', a: ['おはようございます (오하요고자이마스)', 'こんばんは (콘반와)', 'おやすみなさい (오야스미나사이)'], right: 0 }
+            ],
+            physics: [
+                { q: '공기 저항이 없을 때, 같은 높이에서 자유 낙하하는 쇠구슬과 수평 방향으로 던진 쇠구슬이 바닥에 도달하는 시간에 대한 설명으로 옳은 것은?', a: ['연직 방향으로 둘 다 중력 가속도를 받으므로 동시에 바닥에 도달한다.', '자유 낙하하는 물체가 수평으로 던진 물체보다 항상 늦게 도달한다.', '쇠구슬의 질량이 식구슬보다 크므로 쇠구슬이 무조건 먼저 도달한다.'], right: 0 },
+                { q: '발전기 내부에서 자석이나 코일을 회전시킬 때, 유도 전류가 코일을 통과하는 자기장의 변화를 방해하는 방향으로 흐른다는 전자기학의 핵심 법칙은?', a: ['렌츠의 법칙', '쿨롱의 법칙', '옴의 법칙'], right: 0 },
+                { q: '자동차가 충돌할 때 승객을 보호하는 에어백의 물리적 원리로 가장 알맞은 설명은?', a: ['에어백이 팽창하면서 사람이 충격을 받는 충돌 시간을 길어지게 하여 받는 충격력을 감소시킨다.', '에어백이 몸에 가해지는 속도를 완전히 0으로 소멸시켜 운동량을 증가시킨다.', '승객의 질량을 미세하게 일시적으로 낮추어 충격량 자체를 0으로 소멸시킨다.'], right: 0 },
+                { q: '마찰력과 공기 저항이 존재하지 않는 이상적인 물리적 환경에서, 높이가 내려갈 때 감소하는 역학적 시스템의 위치에너지는 무엇으로 전환 보존됩니까?', a: ['운동에너지', '열에너지', '전기에너지'], right: 0 }
+            ]
+        };
 
         const initFirebase = async () => {
             try {
                 if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                     const firebaseConfig = JSON.parse(__firebase_config);
-                    // Compat SDK를 이용한 안전한 초기화
                     const app = firebase.initializeApp(firebaseConfig);
                     auth = firebase.auth();
                     db = firebase.firestore();
 
-                    // Rule 3: Auth Before Queries
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await auth.signInWithCustomToken(__initial_auth_token);
                     } else {
                         await auth.signInAnonymously();
                     }
                     firebaseReady = true;
-                    console.log("Firebase Compat SDK Ready");
                 }
             } catch (e) {
-                console.error("Firebase Initialization Fail, falling back to local-only", e);
+                console.error("Firebase Fallback", e);
             }
         };
 
-        // 로드 시 즉시 시작
         initFirebase();
 
-        // --- 진행 상황 복구 시스템 (클라우드 + 로컬스토리지 백업 하이브리드) ---
         async function loadStudentProgress(studentId, realName) {
             const docId = `${studentId}_${realName}`.replace(/[^a-zA-Z0-9가-힣_]/g, ""); 
-            
-            // 1단계: LocalStorage에서 안전 백업 먼저 확인
             let localData = null;
             try {
                 const stored = localStorage.getItem(`progress_${docId}`);
-                if (stored) {
-                    localData = JSON.parse(stored);
-                }
-            } catch (e) {
-                console.error("로컬 저장소 조회 실패", e);
-            }
+                if (stored) localData = JSON.parse(stored);
+            } catch (e) {}
 
-            // 2단계: Firebase 연동 상태일 경우 클라우드 동기화 수행
             if (firebaseReady && db) {
                 try {
-                    // Rule 1: 엄격한 컬렉션 경로 지정 준수
                     const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('student_progress').doc(docId);
                     const docSnap = await docRef.get();
                     if (docSnap.exists) {
                         const cloudData = docSnap.data();
-                        
-                        // 더 진행도가 높거나 최신인 데이터를 채택하여 복구
                         if (!localData || (cloudData.completedRooms && cloudData.completedRooms.length >= localData.completedRooms.length)) {
                             localStorage.setItem(`progress_${docId}`, JSON.stringify(cloudData));
                             return cloudData;
                         }
                     }
-                } catch (e) {
-                    console.error("클라우드 진행 상황 로드 에러", e);
-                }
+                } catch (e) {}
             }
             return localData;
         }
 
         async function saveStudentProgress(studentId, realName, completedRooms, avatar) {
             const docId = `${studentId}_${realName}`.replace(/[^a-zA-Z0-9가-힣_]/g, "");
-            const progressData = {
-                studentId,
-                realName,
-                completedRooms,
-                avatar,
-                updatedAt: new Date().toISOString()
-            };
+            const progressData = { studentId, realName, completedRooms, avatar, updatedAt: new Date().toISOString() };
 
-            // 1단계: 로컬 저장소에 즉시 안전 저장
             try {
                 localStorage.setItem(`progress_${docId}`, JSON.stringify(progressData));
-            } catch (e) {
-                console.error("로컬 스탬프 백업 에러", e);
-            }
+            } catch (e) {}
 
-            // 2단계: 클라우드가 사용 가능할 시 클라우드 동기화 병행
             if (firebaseReady && db) {
                 try {
-                    // Rule 1: 엄격한 컬렉션 경로 지정 준수
                     const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('student_progress').doc(docId);
                     await docRef.set(progressData, { merge: true });
-                } catch (e) {
-                    console.error("클라우드 진행 상황 동기화 에러", e);
-                }
+                } catch (e) {}
             }
         }
 
-        // --- 플레이어 기본 변수 ---
-        window.player = {
-            studentId: "",
-            realName: "",
-            name: "학생",
-            avatar: "🎒",
-            currentFloor: 1,
-            completedRooms: [] 
-        };
+        window.player = { studentId: "", realName: "", name: "학생", avatar: "🎒", currentFloor: 1, completedRooms: [] };
 
-        // --- 사운드 효과 ---
         let audioCtx = null;
         function playBeep(type) {
             try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
 
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
@@ -569,19 +607,15 @@
                     osc.start();
                     osc.stop(audioCtx.currentTime + 0.3);
                 }
-            } catch(e) {
-                console.log("Audio play error", e);
-            }
+            } catch(e) {}
         }
 
-        // --- 커스텀 모달 알리미 ---
         let alertCallback = null;
         function showCustomAlert(message, title = "안내", icon = "💡", callback = null) {
             document.getElementById('custom-alert-icon').innerText = icon;
             document.getElementById('custom-alert-title').innerText = title;
             document.getElementById('custom-alert-message').innerHTML = message;
             alertCallback = callback;
-            
             const modal = document.getElementById('custom-alert-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -591,65 +625,60 @@
             const modal = document.getElementById('custom-alert-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            if (alertCallback) {
-                alertCallback();
-                alertCallback = null;
-            }
+            if (alertCallback) { alertCallback(); alertCallback = null; }
         }
-
-        // --- 전역 함수 명시적 바인딩 ---
         window.closeCustomAlert = closeCustomAlert;
 
-        // --- 복도 및 교실 데이터 ---
+        /* 층별 교실 데이터 구조 */
         const schoolMap = {
             1: {
-                left: [{ id: "1_music", name: "음악실", desc: "도레미~ 건반의 올바른 계이름을 맞히세요!", icon: "🎵", gameType: "rhythm" }],
+                left: [{ id: "1_music", name: "음악실", desc: "건반의 올바른 계이름을 맞히세요!", icon: "🎵", gameType: "rhythm" }],
                 center: [{ id: "1_lobby", name: "중앙 로비", desc: "쾌적한 계성고등학교의 로비입니다.", icon: "🚪", gameType: "none" }],
                 right: [{ id: "1_study", name: "자습실", desc: "집중력을 채워 자습 한도를 100%로 올리세요!", icon: "📖", gameType: "study" }]
             },
             2: {
                 left: [
-                    { id: "2_infirmary", name: "보건실", desc: "실생활에 유용한 응급처치 OX 퀴즈를 해결하세요!", icon: "🏥", gameType: "nurse" },
+                    { id: "2_infirmary", name: "보건실", desc: "응급처치 OX 퀴즈를 해결하세요!", icon: "🏥", gameType: "nurse" },
                     { id: "2_art", name: "미술실", desc: "R, G, B 삼원색 슬라이더를 일치시키세요!", icon: "🎨", gameType: "absolute_color" }
                 ],
                 center: [{ id: "2_philosophy", name: "철학실", desc: "타당한 삼단논법 조판을 설계하세요!", icon: "🧠", gameType: "philosophy_syllogism" }],
-                right: [{ id: "2_pe", name: "체육실", desc: "정밀한 시간 조절 감각에 도전하여 스탬프를 획득하세요!", icon: "⚽", gameType: "pe_timer" }]
+                right: [{ id: "2_pe", name: "체육실", desc: "5초 맞추기 타이머 미션에 도전하세요!", icon: "⚽", gameType: "pe_timer" }]
             },
             3: {
                 left: [
                     { id: "3_english", name: "영어실", desc: "영어 단어와 한글 뜻 짝을 매칭하세요!", icon: "🔤", gameType: "english_memory" },
-                    { id: "3_geography", name: "지리실", desc: "세계 여러 지리 지형 필수 상식 퀴즈!", icon: "🗺️", gameType: "quiz", subject: "geography" }
+                    { id: "3_geography", name: "지리실", desc: "세계 여러 나라 지리 상식 퀴즈!", icon: "🗺️", gameType: "quiz", subject: "geography" }
                 ],
                 center: [
-                    { id: "3_korean", name: "국어실", desc: "단어의 품사를 속전속결 매치하세요!", icon: "✍️", gameType: "korean_parts_of_speech" },
-                    { id: "3_computer", name: "컴퓨터실", desc: "컴퓨터 바이러스 오류 버그를 빠르게 박멸하세요!", icon: "💻", gameType: "bug" },
-                    { id: "3_lang", name: "제2외국어실", desc: "다정한 일본어 첫인사 표현들을 골라 짝지으세요!", icon: "🌍", gameType: "quiz", subject: "lang" }
+                    { id: "3_korean", name: "국어실", desc: "단어의 품사를 매치하세요!", icon: "✍️", gameType: "korean_parts_of_speech" },
+                    { id: "3_computer", name: "컴퓨터실", desc: "오류 버그를 빠르게 박멸하세요!", icon: "💻", gameType: "bug" },
+                    { id: "3_lang", name: "제2외국어실", desc: "일본어 첫인사 표현들을 짝지으세요!", icon: "🌍", gameType: "quiz", subject: "lang" }
                 ],
                 right: [
                     { id: "3_math", name: "수학실", desc: "숫자 야구 미션에 도전하세요!", icon: "➕", gameType: "number_baseball" },
-                    { id: "3_hanmun", name: "한문실", desc: "같은 한자를 융합해 가며 최종 '萬(만)'을 조립하세요!", icon: "🈴", gameType: "hanja_drop" }
+                    { id: "3_hanmun", name: "한문실", desc: "같은 한자를 융합해 가며 '萬'을 조립하세요!", icon: "🈴", gameType: "hanja_drop" }
                 ]
             },
             4: {
                 left: [
-                    { id: "4_english", name: "영어실", desc: "단어 타이핑 순발력!", icon: "🗣️", gameType: "english" },
-                    { id: "4_korean", name: "국어실", desc: "고전 문학과 시조에 담긴 아름다운 시어 퀴즈!", icon: "📜", gameType: "quiz", subject: "korean2" },
-                    { id: "4_geography", name: "지리실", desc: "기후와 지형, 인문학적 환경 탐구!", icon: "🌋", gameType: "quiz", subject: "geography2" }
+                    { id: "4_english", name: "영어실", desc: "영단어 타이핑 순발력 도전!", icon: "🗣️", gameType: "english" },
+                    { id: "4_korean", name: "국어실", desc: "생활 속 올바른 맞춤법 두더지 격파!", icon: "📜", gameType: "korean_mole" },
+                    { id: "4_geography", name: "지리실", desc: "세계 여러 나라 위치를 찾아내는 레이더 게임!", icon: "🌋", gameType: "geography_radar" }
                 ],
                 center: [
-                    { id: "4_history", name: "역사실", desc: "핵심 한국사 문제에 도전하세요!", icon: "🏺", gameType: "quiz", subject: "history" },
+                    { id: "4_history", name: "역사실", desc: "역사적 사건의 순서를 맞추세요!", icon: "🏺", gameType: "history_timeline" },
                     { id: "4_biology", name: "생물실", desc: "mRNA 염기 사다리를 조립하세요!", icon: "🔬", gameType: "dna_transcription" },
-                    { id: "4_chemistry", name: "화학실", desc: "이온들을 결합시켜 안정된 결합을 유도하세요!", icon: "🧪", gameType: "ion_bond" }
+                    { id: "4_chemistry", name: "화학실", desc: "이온 결합으로 전하량을 0으로 만드세요!", icon: "🧪", gameType: "ion_bond" }
                 ],
                 right: [
                     { id: "4_math", name: "수학실", desc: "수열과 사칙연산 수식을 계산하세요!", icon: "📐", gameType: "math", level: "hard" },
-                    { id: "4_korean_2", name: "국어실", desc: "헷갈리기 쉬운 국어의 문법 퀴즈!", icon: "📝", gameType: "quiz", subject: "korean3" }
+                    { id: "4_korean_2", name: "국어실", desc: "국어 문법 규범 퀴즈!", icon: "📝", gameType: "quiz", subject: "korean3" }
                 ]
             },
             5: {
                 left: [],
                 center: [
-                    { id: "5_physics", name: "물리실", desc: "역학 법칙과 에너지 공식 퀴즈!", icon: "⚙️", gameType: "quiz", subject: "physics" },
+                    { id: "5_physics", name: "물리실", desc: "고1 물리 개념 퀴즈!", icon: "⚙️", gameType: "quiz", subject: "physics" },
                     { id: "5_earth", name: "지구과학실", desc: "탄소 순환 배관 망을 연결하세요!", icon: "🪐", gameType: "carbon_cycle" }
                 ],
                 right: []
@@ -668,53 +697,38 @@
             return list;
         })();
 
-        // 스탬프 총 개수 동적 업데이트 함수
         function updateStampHUD() {
             const currentCount = window.player.completedRooms.length;
             const stampCountEl = document.getElementById('stamp-count');
             if (stampCountEl) stampCountEl.innerText = currentCount;
-            
             const totalCountEl = document.getElementById('total-rooms-count');
             if (totalCountEl) totalCountEl.innerText = totalStampRooms.length;
         }
 
-        function selectAvatar(emoji, element) {
+        window.selectAvatar = function(emoji, element) {
             playBeep('click');
             window.player.avatar = emoji;
-            
             document.querySelectorAll('.avatar-option').forEach(btn => {
                 btn.className = "avatar-option group relative p-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 hover:scale-105 transition-all flex flex-col items-center gap-1 shadow-sm";
             });
-            
             element.className = "avatar-option group relative p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-100 scale-110 flex flex-col items-center gap-1 shadow-md ring-4 ring-indigo-500 font-bold";
-        }
-        window.selectAvatar = selectAvatar;
+        };
 
-        async function startGame() {
+        window.startGame = async function() {
             let nameInput = document.getElementById('input-username').value.trim();
             let idInput = document.getElementById('input-student-id').value.trim();
             
-            if(!idInput) {
-                showCustomAlert('계성고등학교 학생님의 학번 또는 교사 구분을 적어주세요!', '학번 누락', '🔢');
-                return;
-            }
-            if(!nameInput) {
-                showCustomAlert('성함을 적어주세요!', '이름 누락', '✏️');
-                return;
-            }
+            if(!idInput) { showCustomAlert('계성고등학교 학생님의 학번 또는 교사 구분을 적어주세요!', '학번 누락', '🔢'); return; }
+            if(!nameInput) { showCustomAlert('성함을 적어주세요!', '이름 누락', '✏️'); return; }
 
             window.player.studentId = idInput;
             window.player.realName = nameInput;
 
-            // --- 교사 여부 동적 판단 로직 구성 ---
             const isTeacher = idInput.includes("선생님") || idInput === "교사" || nameInput.includes("선생님");
             if (isTeacher) {
                 let displayName = nameInput;
-                if (!displayName.includes("선생님")) {
-                    displayName += " 선생님";
-                }
+                if (!displayName.includes("선생님")) displayName += " 선생님";
                 window.player.name = displayName;
-                // HUD 라벨 "참가 학생" ➔ "참가 교사"로 변경
                 const hudAvatarLabel = document.getElementById('hud-role-label');
                 if (hudAvatarLabel) hudAvatarLabel.innerText = "참가 교사";
             } else {
@@ -723,7 +737,6 @@
                 if (hudAvatarLabel) hudAvatarLabel.innerText = "참가 학생";
             }
             
-            // --- 클라우드 동기화 기록 확인 ---
             let hasSavedProgress = false;
             const savedData = await loadStudentProgress(idInput, nameInput);
             if (savedData) {
@@ -746,19 +759,11 @@
             updateStampHUD();
 
             if (hasSavedProgress) {
-                if (isTeacher) {
-                    showCustomAlert(`반가워요, ${window.player.name}!<br>이전에 완료했던 투어 기록(${window.player.completedRooms.length}개의 스탬프)를 안전하게 복구했습니다!`, "도장 기록 자동 복구", "📂");
-                } else {
-                    showCustomAlert(`반가워요, ${nameInput} 학생!<br>이전에 완료했던 데이터(${window.player.completedRooms.length}개의 스탬프)를 안전하게 불러와 도장첩을 복구했습니다!`, "도장 기록 자동 복구", "📂");
-                }
-            } else {
-                if (isTeacher) {
-                    // 중요: '선생님님' 중복 방지 - window.player.name이 이미 'OOO 선생님'이므로 뒤에 '님'을 겹쳐 붙이지 않습니다.
-                    showCustomAlert(`${window.player.name} 안녕하세요!<br>계성고 샛별 학교 투어에 참여해 주셔서 대단히 감사합니다. 자유롭게 교내를 둘러보세요!`, "선생님 환영합니다", "👩‍🏫");
-                }
+                showCustomAlert(`반가워요, ${window.player.name}!<br>이전에 완료했던 데이터(${window.player.completedRooms.length}개의 스탬프)를 복구했습니다!`, "도장 기록 복구", "📂");
+            } else if (isTeacher) {
+                showCustomAlert(`${window.player.name} 안녕하세요!<br>계성고 샛별 학교 투어에 참여해 주셔서 감사합니다. 자유롭게 둘러보세요!`, "선생님 환영합니다", "👩‍🏫");
             }
-        }
-        window.startGame = startGame;
+        };
 
         function buildFloorButtons() {
             const container = document.getElementById('floor-buttons-container');
@@ -770,10 +775,7 @@
                     ? 'bg-indigo-600 text-white border-indigo-400 shadow-md scale-[1.02]' 
                     : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`;
-                btn.onclick = () => {
-                    playBeep('click');
-                    renderFloor(f);
-                };
+                btn.onclick = () => { playBeep('click'); renderFloor(f); };
 
                 const label = document.createElement('span');
                 label.className = 'fancy-font text-base flex items-center gap-2';
@@ -805,7 +807,6 @@
 
         function renderFloor(floor) {
             window.player.currentFloor = floor;
-            
             document.getElementById('current-floor-title').innerText = `${floor}층 복도 : ${getFloorName(floor)}`;
             buildFloorButtons();
 
@@ -819,18 +820,13 @@
         function renderWing(containerId, rooms, isCenter = false, wrapperId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-
             const parentWing = document.getElementById(wrapperId);
 
             if (rooms.length === 0) {
-                if (parentWing) {
-                    parentWing.classList.remove('invisible', 'h-0', 'py-0');
-                }
+                if (parentWing) parentWing.classList.remove('invisible', 'h-0', 'py-0');
                 return;
             } else {
-                if (parentWing) {
-                    parentWing.classList.remove('invisible', 'h-0', 'py-0');
-                }
+                if (parentWing) parentWing.classList.remove('invisible', 'h-0', 'py-0');
             }
 
             rooms.forEach(room => {
@@ -839,24 +835,16 @@
                 const isLobby = room.gameType === 'none';
 
                 let cardClasses = `room-card p-3 rounded-xl border text-center transition-all cursor-pointer relative flex flex-col justify-center items-center ${
-                    isLobby 
-                    ? 'bg-slate-100 border-slate-200 cursor-default text-slate-400'
-                    : isCleared 
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm' 
+                    isLobby ? 'bg-slate-100 border-slate-200 cursor-default text-slate-400'
+                    : isCleared ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm' 
                     : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-400 hover:bg-indigo-50/10 hover:-translate-y-0.5 shadow-sm'
                 }`;
 
-                if (isCenter) {
-                    cardClasses += " flex-1 min-h-[90px] min-w-[100px]";
-                } else {
-                    cardClasses += " min-h-[65px] w-full";
-                }
+                if (isCenter) cardClasses += " flex-1 min-h-[90px] min-w-[100px]";
+                else cardClasses += " min-h-[65px] w-full";
 
                 card.className = cardClasses;
-                
-                if (!isLobby) {
-                    card.onclick = () => openGameModal(room);
-                }
+                if (!isLobby) card.onclick = () => window.openGameModal(room);
 
                 let stampBadge = '';
                 if (!isLobby) {
@@ -865,36 +853,26 @@
                     : `<span class="absolute top-1 right-1 text-slate-300"><i data-lucide="circle" class="w-3.5 h-3.5"></i></span>`;
                 }
 
-                card.innerHTML = `
-                    ${stampBadge}
-                    <span class="text-2xl mb-1">${room.icon}</span>
-                    <span class="font-bold text-xs md:text-sm whitespace-nowrap">${room.name}</span>
-                `;
-                
+                card.innerHTML = `${stampBadge}<span class="text-2xl mb-1">${room.icon}</span><span class="font-bold text-xs md:text-sm whitespace-nowrap">${room.name}</span>`;
                 container.appendChild(card);
             });
         }
 
-        function openGameModal(room) {
+        window.openGameModal = function(room) {
             playBeep('click');
             currentRoomInPlay = room;
-            
             document.getElementById('modal-room-icon').innerText = room.icon;
             document.getElementById('modal-room-title').innerText = room.name;
             document.getElementById('modal-room-desc').innerText = room.desc;
 
             const playzone = document.getElementById('game-playzone');
             playzone.innerHTML = ''; 
-
-            // 시작 전 설명 팝업을 먼저 노출하여 유저가 게임 규칙을 쉽게 확인하도록 유도
             showGameIntroPopup(room, playzone);
 
             document.getElementById('game-modal').classList.remove('hidden');
             document.getElementById('game-modal').classList.add('flex');
-            
             lucide.createIcons();
-        }
-        window.openGameModal = openGameModal;
+        };
 
         function showGameIntroPopup(room, playzone) {
             let introHtml = `
@@ -904,7 +882,6 @@
                     <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-left text-xs text-slate-600 leading-relaxed whitespace-pre-line">
                         ${getRoomRules(room.gameType)}
                     </div>
-                    <!-- 중요: 미션 연동 중복 해결을 위해 퀴즈과목(subject) 인자를 세 번째 파라미터로 명시 전달 전개 -->
                     <button onclick="startGameAction('${room.gameType}', '${room.id}', '${room.subject || ''}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition-transform active:scale-95 text-xs">
                         챌린지 시작하기 🎮
                     </button>
@@ -915,6 +892,12 @@
 
         function getRoomRules(gameType) {
             switch(gameType) {
+                case 'geography_radar':
+                    return "4층 지리실 미션:\n• 세계 여러 나라의 대표적인 특징 단서를 보고 아래 레이더망에서 올바른 국가를 클릭하세요!\n• 3개의 국가를 연속으로 찾아내면 지리 스탬프를 받습니다.";
+                case 'korean_mole':
+                    return "4층 국어실 미션:\n• 두더지 구멍에서 올라오는 단어 카드 중 헷갈리는 '틀린 맞춤법' 단어만 터치해 격파하세요!\n• 올바른 단어를 때리면 감점됩니다. 4개를 정확히 찾아 격파하면 성공입니다.";
+                case 'history_timeline':
+                    return "4층 역사실 미션:\n• 역사적 사건들이 적힌 블록을 '가장 먼저 일어난 순서'대로 클릭하여 해결하세요!\n• 올바른 블록은 파괴되지 않고 초록색 체크표시가 남습니다. 총 2개의 스테이지를 순서대로 완벽하게 맞추면 스탬프를 획득합니다.";
                 case 'rhythm':
                     return "음악실 미션:\n• 가상 피아노 건반 중 노랗게 불이 들어온 건반을 보고 알맞은 계이름(도, 레, 미, 파, 솔, 라, 시)을 버튼에서 선택하세요.\n• 5회 연속으로 올바르게 정답을 매칭하면 음악 스탬프를 획득합니다!";
                 case 'study':
@@ -930,7 +913,7 @@
                 case 'korean_parts_of_speech':
                     return "국어실 미션:\n• 문장에서 밑줄 쳐진 한국어 단어의 올바른 9품사를 찾으세요!\n• 중복 없이 순차적으로 진행되는 문장 퀴즈 4개를 완벽하게 맞추면 스탬프를 받습니다.";
                 case 'number_baseball':
-                    return "수학실 미션:\n• 0부터 9까지의 수로 이루어진 서로 다른 3자리 숫자를 맞추는 야구 게임입니다.\n• 수와 자릿수가 모두 일치하면 Strike, 수만 일치하면 Ball 판정을 보고 숨은 정답을 추리하세요!";
+                    return "수학실 미션:\n• 컴퓨터가 숨겨둔 0~9 사이의 중복 없는 3자리 숫자를 추리하세요!\n• 숫자와 위치가 모두 맞으면 Strike, 숫자만 맞으면 Ball입니다.";
                 case 'hanja_drop':
                     return "한문실 미션:\n• 화면을 누른 채 드래그하여 떨어뜨릴 자리를 정하고, 손을 떼어 한자를 투하하세요.\n• 동일한 한자끼리 충돌하면 더 높은 단계의 한자로 융합됩니다.\n• 萬(만)까지 합성하면 스탬프를 획득합니다!";
                 case 'dna_transcription':
@@ -941,6 +924,14 @@
                     return "지구과학실 미션:\n• 이산화탄소가 대기에서 각 목적지까지 누수 없이 통과되도록 배관 타일들을 올바르게 회전시키세요!\n• 연결된 배관은 실시간으로 초록빛(Glowing Green)으로 밝아지며, 설명과 예시 조감도를 참고하여 쉽게 극복할 수 있습니다.";
                 case 'pe_timer':
                     return "체육실 미션:\n• 평정심을 유지하며 정확한 '5초' 타이머 감각에 도전하세요!\n• 흘러가는 시간 숫자를 보고 정확히 4.85초 ~ 5.15초 (오차범위 0.15초) 내에 멈추면 성공입니다.";
+                case 'quiz':
+                    return "교양 퀴즈 미션:\n• 제시된 퀴즈의 정답을 골라주세요!\n• 연속으로 문제를 통과하면 스탬프를 획득합니다.";
+                case 'english':
+                    return "영어실 미션:\n• 화면에 등장하는 단어를 속도감 있게 키보드로 입력란에 타이핑하세요!\n• 4문제를 맞추면 영어 스탬프를 획득합니다.";
+                case 'bug':
+                    return "컴퓨터실 미션:\n• 서버 격자에서 무작위 분열하는 시스템 오류 버그 바이러스를 빠르게 클릭해 삭제하세요!\n• 8마리를 격리하면 성공입니다.";
+                case 'math':
+                    return "수학실 미션:\n• 화면에 제시되는 임의의 사칙연산 수식을 보고 신속하게 정답을 고르세요!\n• 4문제를 연속으로 맞추면 수학 스탬프를 획득합니다.";
                 default:
                     return "제시되는 교과 도전을 멋지게 돌파하고 스탬프를 얻으세요!";
             }
@@ -949,21 +940,22 @@
         window.startGameAction = function(gameType, roomId, subject) {
             const playzone = document.getElementById('game-playzone');
             playzone.innerHTML = '';
-            
             const dummyRoom = { gameType: gameType, id: roomId, subject: subject };
             loadMiniGame(gameType, dummyRoom);
         };
 
-        function closeModal() {
+        window.closeModal = function() {
             playBeep('click');
+            if (window.currentGameInterval) clearInterval(window.currentGameInterval);
+            if (window.currentGameTimeout) clearTimeout(window.currentGameTimeout);
+            
             document.getElementById('game-modal').classList.add('hidden');
             document.getElementById('game-modal').classList.remove('flex');
             currentRoomInPlay = null;
             renderFloor(window.player.currentFloor);
-        }
-        window.closeModal = closeModal;
+        };
 
-        function openStampBook() {
+        window.openStampBook = function() {
             playBeep('click');
             const grid = document.getElementById('stamp-grid');
             grid.innerHTML = '';
@@ -972,9 +964,7 @@
                 const isCleared = window.player.completedRooms.includes(room.id);
                 const stampBox = document.createElement('div');
                 stampBox.className = `p-3 rounded-lg border text-center flex flex-col items-center justify-center ${
-                    isCleared 
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800' 
-                    : 'bg-slate-50 border-slate-200 opacity-60 text-slate-400'
+                    isCleared ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-slate-50 border-slate-200 opacity-60 text-slate-400'
                 }`;
 
                 stampBox.innerHTML = `
@@ -986,24 +976,13 @@
 
             document.getElementById('stamp-modal').classList.remove('hidden');
             document.getElementById('stamp-modal').classList.add('flex');
-        }
-        window.openStampBook = openStampBook;
+        };
 
-        function closeStampBook() {
+        window.closeStampBook = function() {
             playBeep('click');
             document.getElementById('stamp-modal').classList.add('hidden');
             document.getElementById('stamp-modal').classList.remove('flex');
-        }
-        window.closeStampBook = closeStampBook;
-
-        function updateStampHUD() {
-            const currentCount = window.player.completedRooms.length;
-            const stampCountEl = document.getElementById('stamp-count');
-            if (stampCountEl) stampCountEl.innerText = currentCount;
-            
-            const totalCountEl = document.getElementById('total-rooms-count');
-            if (totalCountEl) totalCountEl.innerText = totalStampRooms.length;
-        }
+        };
 
         async function clearCurrentRoom() {
             if (currentRoomInPlay && !window.player.completedRooms.includes(currentRoomInPlay.id)) {
@@ -1011,7 +990,6 @@
                 updateStampHUD();
                 playBeep('success');
 
-                // 클라우드 및 로컬 백업 동시 기록 저장
                 await saveStudentProgress(
                     window.player.studentId,
                     window.player.realName,
@@ -1021,7 +999,7 @@
             }
         }
 
-        function checkGraduation() {
+        window.checkGraduation = function() {
             playBeep('click');
             if (window.player.completedRooms.length >= totalStampRooms.length) {
                 closeStampBook();
@@ -1031,53 +1009,57 @@
             } else {
                 showCustomAlert(`아직 모든 배움의 과정이 끝나지 않았어요!<br>현재 스탬프: ${window.player.completedRooms.length} / ${totalStampRooms.length}<br>모든 교실의 챌린지를 극복해 주세요!`, "학업 미수료", "🎓");
             }
-        }
-        window.checkGraduation = checkGraduation;
+        };
 
-        function closeGrad() {
+        window.closeGrad = function() {
             playBeep('click');
             document.getElementById('grad-modal').classList.add('hidden');
             document.getElementById('grad-modal').classList.remove('flex');
-        }
-        window.closeGrad = closeGrad;
+        };
 
-        function resetGame() {
+        window.resetGame = function() {
             playBeep('click');
-            
-            window.player = {
-                studentId: "",
-                realName: "",
-                name: "학생",
-                avatar: "🎒",
-                currentFloor: 1,
-                completedRooms: [] 
-            };
-            
+            window.player = { studentId: "", realName: "", name: "학생", avatar: "🎒", currentFloor: 1, completedRooms: [] };
             document.getElementById('input-student-id').value = "";
             document.getElementById('input-username').value = "";
-            
             const firstAvatarBtn = document.querySelectorAll('.avatar-option')[0];
-            if (firstAvatarBtn) {
-                selectAvatar('🧑‍🎓', firstAvatarBtn);
-            }
-            
+            if (firstAvatarBtn) selectAvatar('🧑‍🎓', firstAvatarBtn);
             updateStampHUD();
-            
             document.getElementById('player-hud').classList.add('hidden');
             document.getElementById('screen-map').classList.add('hidden');
             document.getElementById('screen-login').classList.remove('hidden');
-            
             closeGrad();
-        }
-        window.resetGame = resetGame;
+        };
 
-        // ==========================================
-        //  미니게임 로더
-        // ==========================================
+        window.directClear = async function() {
+            if (window.currentGameInterval) clearInterval(window.currentGameInterval);
+            if (window.currentGameTimeout) clearTimeout(window.currentGameTimeout);
+            
+            await clearCurrentRoom();
+            const playzone = document.getElementById('game-playzone');
+            playzone.innerHTML = `
+                <div class="text-center py-8">
+                    <span class="text-5xl text-emerald-500 animate-pulse">✨</span>
+                    <h4 class="text-2xl font-black mt-2 text-emerald-600 fancy-font">미션 클리어!</h4>
+                    <p class="text-xs text-slate-500 mt-1">스탬프 도장이 쾅 찍혔습니다. 다음 교실로 전진하세요!</p>
+                </div>
+            `;
+        };
+
+        /* 미니게임 로더 로직 */
         function loadMiniGame(type, room) {
             const playzone = document.getElementById('game-playzone');
             
             switch(type) {
+                case 'geography_radar':
+                    setupGeographyRadarGame(playzone);
+                    break;
+                case 'korean_mole':
+                    setupKoreanMoleGame(playzone);
+                    break;
+                case 'history_timeline':
+                    setupHistoryTimelineGame(playzone);
+                    break;
                 case 'rhythm': 
                     setupMusicGame(playzone);
                     break;
@@ -1134,34 +1116,361 @@
                         <div class="text-center py-8">
                             <span class="text-4xl">🛠️</span>
                             <p class="mt-2 text-slate-655 font-bold">도전 과제 준비 완료!</p>
-                            <button onclick="directClear()" class="mt-4 bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md">스탬프 받기</button>
+                            <button onclick="window.directClear()" class="mt-4 bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md">스탬프 받기</button>
                         </div>
                     `;
             }
         }
 
-        async function directClear() {
-            await clearCurrentRoom();
-            const playzone = document.getElementById('game-playzone');
-            playzone.innerHTML = `
-                <div class="text-center py-8">
-                    <span class="text-5xl text-emerald-500 animate-pulse">✨</span>
-                    <h4 class="text-2xl font-black mt-2 text-emerald-600 fancy-font">미션 클리어!</h4>
-                    <p class="text-xs text-slate-500 mt-1">스탬프 도장이 쾅 찍혔습니다. 다음 교실로 전진하세요!</p>
+        // ==========================================
+        //  미니게임 구현부
+        // ==========================================
+        function setupQuizGame(container, subject) {
+            const list = quizBank[subject] || quizBank['physics']; // fallback
+            let currentIdx = 0;
+            let successStreak = 0;
+            let usedIndexes = []; 
+
+            function renderQuiz() {
+                if (usedIndexes.length >= list.length) {
+                    usedIndexes = [];
+                }
+
+                let randomIdx = Math.floor(Math.random() * list.length);
+                while (usedIndexes.includes(randomIdx)) {
+                    randomIdx = Math.floor(Math.random() * list.length);
+                }
+                usedIndexes.push(randomIdx);
+                currentIdx = randomIdx;
+
+                const quiz = list[currentIdx];
+                container.innerHTML = `
+                    <div class="w-full text-center">
+                        <span class="inline-block bg-sky-100 text-sky-700 font-bold px-3 py-1 text-xs rounded-full border border-sky-200 mb-3">전공 퀴즈 챌린지</span>
+                        <h4 class="text-sm font-black mb-6 text-slate-800 leading-relaxed">${quiz.q}</h4>
+                        <div class="flex flex-col gap-3 max-w-md mx-auto" id="quiz-options"></div>
+                        <div class="mt-6 text-xs text-slate-500 font-bold">
+                            연속 통과 수: <span class="font-bold text-sky-600">${successStreak}</span> / ${list.length}
+                        </div>
+                    </div>
+                `;
+
+                const optContainer = document.getElementById('quiz-options');
+                quiz.a.forEach((option, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full bg-white hover:bg-slate-50 border border-slate-200 text-left px-5 py-3 rounded-xl text-xs font-bold shadow-sm text-slate-700';
+                    btn.innerText = `${idx + 1}.  ${option}`;
+                    btn.onclick = () => {
+                        if (idx === quiz.right) {
+                            playBeep('success');
+                            successStreak++;
+                            if (successStreak >= list.length) {
+                                window.directClear();
+                            } else {
+                                renderQuiz();
+                            }
+                        } else {
+                            playBeep('fail');
+                            showCustomAlert('선택지가 타당하지 않습니다. 지식을 돌이켜 다시 도전해 보세요.', "오답 판정", "👀");
+                            successStreak = 0;
+                            usedIndexes = [];
+                            renderQuiz();
+                        }
+                    };
+                    optContainer.appendChild(btn);
+                });
+            }
+            renderQuiz();
+        }
+
+        function setupGeographyRadarGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4 w-full bg-slate-900 rounded-2xl p-4 text-white shadow-inner transition-all duration-300" id="geo-game-container">
+                    <div class="radar-wrapper">
+                        <div class="radar-grid"></div>
+                        <div class="radar-line-h"></div>
+                        <div class="radar-line-v"></div>
+                        <div class="radar-sweep"></div>
+                    </div>
+                    
+                    <div class="bg-slate-800 border border-sky-400/50 p-3 rounded-xl shadow-md mb-4 max-w-xs mx-auto">
+                        <div class="text-[10px] text-amber-400 font-bold mb-1 uppercase tracking-widest">Target Clue</div>
+                        <div id="geo-clue" class="text-sm font-bold text-white break-keep">단서를 로딩 중입니다...</div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto mb-4" id="geo-grid">
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('미국')">미국</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('프랑스')">프랑스</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('이집트')">이집트</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('호주')">호주</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('캐나다')">캐나다</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('중국')">중국</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('영국')">영국</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('일본')">일본</button>
+                        <button class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white py-2 rounded-lg text-xs font-bold transition-all active:scale-95" onclick="guessCountry('브라질')">브라질</button>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-400 px-2">
+                        <span>목표 탐사: <strong id="geo-progress" class="text-sky-400 text-sm">0 / 3</strong></span>
+                        <span class="text-rose-400">틀리면 초기화</span>
+                    </div>
                 </div>
             `;
-        }
-        window.directClear = directClear;
 
-        // ==========================================
-        //  개별 게임 1: 음악실 (피아노 계이름 맞히기)
-        // ==========================================
+            const geoQuestions = [
+                { clue: "자유의 여신상과 그랜드 캐니언이 있는 국가는?", answer: "미국" },
+                { clue: "에펠탑과 달팽이 요리가 유명한 유럽 국가는?", answer: "프랑스" },
+                { clue: "피라미드와 스핑크스, 나일강이 흐르는 국가는?", answer: "이집트" },
+                { clue: "오페라 하우스와 캥거루가 서식하는 국가는?", answer: "호주" },
+                { clue: "메이플 시럽과 나이아가라 폭포가 있는 국가는?", answer: "캐나다" },
+                { clue: "만리장성과 자금성, 판다가 서식하는 국가는?", answer: "중국" },
+                { clue: "빅벤과 템스강의 본고장인 유럽의 섬나라는?", answer: "영국" },
+                { clue: "아마존 열대우림과 삼바, 거대 예수상이 있는 남미 국가는?", answer: "브라질" },
+                { clue: "후지산과 벚꽃, 초밥이 유명한 동아시아의 섬나라는?", answer: "일본" }
+            ];
+
+            let currentHits = 0;
+            const targetHits = 3;
+            let currentQuestion = null;
+            let availableQuestions = [...geoQuestions].sort(() => Math.random() - 0.5);
+
+            function nextQuestion() {
+                if (availableQuestions.length === 0) {
+                    availableQuestions = [...geoQuestions].sort(() => Math.random() - 0.5);
+                }
+                currentQuestion = availableQuestions.pop();
+                document.getElementById('geo-clue').innerText = currentQuestion.clue;
+            }
+
+            window.guessCountry = function(selectedRegion) {
+                const container = document.getElementById('geo-game-container');
+                
+                if (selectedRegion === currentQuestion.answer) {
+                    playBeep('success');
+                    currentHits++;
+                    document.getElementById('geo-progress').innerText = `${currentHits} / ${targetHits}`;
+
+                    container.style.boxShadow = "0 0 20px rgba(56, 189, 248, 0.6)";
+                    setTimeout(() => container.style.boxShadow = "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)", 300);
+
+                    if (currentHits >= targetHits) {
+                        setTimeout(() => window.directClear(), 400);
+                    } else {
+                        nextQuestion();
+                    }
+                } else {
+                    playBeep('fail');
+                    currentHits = 0;
+                    document.getElementById('geo-progress').innerText = `${currentHits} / ${targetHits}`;
+                    showCustomAlert(`잘못된 탐사 위치입니다. 다시 처음부터 도전하세요!`, "탐사 실패", "❌");
+                    
+                    container.style.border = "2px solid #ef4444";
+                    setTimeout(() => container.style.border = "none", 300);
+                    nextQuestion();
+                }
+            };
+
+            nextQuestion();
+        }
+
+        function setupKoreanMoleGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4">
+                    <p class="text-xs text-slate-500 font-bold">천천히 올라오는 카드 중 <b class="text-rose-500">틀린 맞춤법</b> 표기만 타격해 부수세요!</p>
+                    <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto" id="mole-grid-container" style="transition: transform 0.1s;">
+                        <div class="mole-hole"><div class="mole-card-elem" onclick="hitMole(this)"></div></div>
+                        <div class="mole-hole"><div class="mole-card-elem" onclick="hitMole(this)"></div></div>
+                        <div class="mole-hole"><div class="mole-card-elem" onclick="hitMole(this)"></div></div>
+                        <div class="mole-hole"><div class="mole-card-elem" onclick="hitMole(this)"></div></div>
+                        <div class="mole-hole"><div class="mole-card-elem" onclick="hitMole(this)"></div></div>
+                        <div class="mole-hole"><div class="mole-card-elem" onclick="hitMole(this)"></div></div>
+                    </div>
+                    <div class="text-xs font-bold text-slate-500 flex justify-between px-2 max-w-xs mx-auto">
+                        <span>목표 격파: <strong id="mole-progress" class="text-indigo-650 text-sm">0 / 4</strong></span>
+                        <span class="text-rose-500">올바른 표현 타격 시 감점!</span>
+                    </div>
+                </div>
+            `;
+
+            const words = [
+                { text: "어의가 없네", isWrong: true },
+                { text: "어이가 없네", isWrong: false },
+                { text: "설래임", isWrong: true },
+                { text: "설렘", isWrong: false },
+                { text: "몇일 동안", isWrong: true },
+                { text: "며칠 동안", isWrong: false },
+                { text: "오랫만에", isWrong: true },
+                { text: "오랜만에", isWrong: false },
+                { text: "금새 다 먹음", isWrong: true },
+                { text: "금세 다 먹음", isWrong: false },
+                { text: "희안한 일", isWrong: true },
+                { text: "희한한 일", isWrong: false }
+            ];
+
+            let hits = 0;
+            const targetHits = 4;
+            const moles = document.querySelectorAll('.mole-card-elem');
+
+            function popRandomMole() {
+                const availableMoles = Array.from(moles).filter(m => !m.classList.contains('up'));
+                if (availableMoles.length === 0) return;
+
+                const randomMole = availableMoles[Math.floor(Math.random() * availableMoles.length)];
+                const randomWord = words[Math.floor(Math.random() * words.length)];
+
+                randomMole.innerText = randomWord.text;
+                randomMole.dataset.isWrong = randomWord.isWrong;
+                randomMole.classList.remove('shatter');
+                randomMole.classList.add('up');
+
+                setTimeout(() => {
+                    if (randomMole.classList.contains('up')) {
+                        randomMole.classList.remove('up');
+                    }
+                }, 1200);
+            }
+
+            window.currentGameInterval = setInterval(() => {
+                popRandomMole();
+            }, 1200);
+
+            window.hitMole = function(element) {
+                if (!element.classList.contains('up') || element.classList.contains('shatter')) return;
+
+                const isWrong = element.dataset.isWrong === "true";
+
+                if (isWrong) {
+                    playBeep('success');
+                    element.classList.add('shatter');
+                    hits++;
+                    document.getElementById('mole-progress').innerText = `${hits} / ${targetHits}`;
+
+                    if (hits >= targetHits) {
+                        clearInterval(window.currentGameInterval);
+                        setTimeout(() => window.directClear(), 400);
+                    }
+                } else {
+                    playBeep('fail');
+                    hits = Math.max(0, hits - 1);
+                    document.getElementById('mole-progress').innerText = `${hits} / ${targetHits}`;
+                    element.classList.remove('up');
+                    
+                    const container = document.getElementById('mole-grid-container');
+                    container.style.transform = "translateX(5px)";
+                    setTimeout(() => container.style.transform = "translateX(-5px)", 50);
+                    setTimeout(() => container.style.transform = "translateX(0)", 100);
+                }
+            };
+        }
+
+        function setupHistoryTimelineGame(container) {
+            container.innerHTML = `
+                <div class="w-full text-center space-y-4">
+                    <div class="inline-block bg-slate-800 text-amber-400 font-bold px-4 py-1.5 rounded-lg border border-amber-500/50 mb-1 shadow-inner text-xs" id="history-stage-title">
+                        STAGE 1 / 2
+                    </div>
+                    <p class="text-xs text-slate-500">💡 <b>가장 먼저 일어난 역사적 사건</b>부터 순서대로 맞히세요!</p>
+
+                    <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto" id="history-grid-blocks">
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500 px-2 max-w-sm mx-auto">
+                        <span>진행률: <strong id="history-progress" class="text-sky-500 text-sm">0 / 4</strong></span>
+                        <span class="text-rose-400">틀리면 감점!</span>
+                    </div>
+                </div>
+            `;
+
+            const stages = [
+                {
+                    title: "STAGE 1 : 고대 ~ 고려시대",
+                    events: [
+                        { name: "살수대첩\n(을지문덕)", order: 1 },
+                        { name: "신라의\n삼국 통일", order: 2 },
+                        { name: "발해 건국\n(대조영)", order: 3 },
+                        { name: "귀주대첩\n(강감찬)", order: 4 }
+                    ]
+                },
+                {
+                    title: "STAGE 2 : 조선시대",
+                    events: [
+                        { name: "조선 건국\n(이성계)", order: 1 },
+                        { name: "훈민정음 창제\n(세종대왕)", order: 2 },
+                        { name: "임진왜란\n발생", order: 3 },
+                        { name: "수원 화성 완공\n(정조)", order: 4 }
+                    ]
+                }
+            ];
+
+            let currentStage = 0;
+            let expectedOrder = 1;
+
+            function loadStage(stageIdx) {
+                expectedOrder = 1;
+                const stageData = stages[stageIdx];
+                document.getElementById('history-stage-title').innerText = `${stageData.title}`;
+                document.getElementById('history-progress').innerText = `0 / ${stageData.events.length}`;
+
+                const shuffled = [...stageData.events].sort(() => Math.random() - 0.5);
+                const grid = document.getElementById('history-grid-blocks');
+                grid.innerHTML = '';
+
+                shuffled.forEach(item => {
+                    const btn = document.createElement('div');
+                    btn.className = 'history-block';
+                    btn.style.whiteSpace = "pre-line";
+                    btn.innerText = item.name;
+                    btn.onclick = () => window.clickHistoryEvent(btn, item.order, stageData.events.length);
+                    grid.appendChild(btn);
+                });
+            }
+
+            window.clickHistoryEvent = function(element, order, totalEvents) {
+                if (element.classList.contains('history-cleared')) return;
+
+                if (order === expectedOrder) {
+                    playBeep('click');
+                    
+                    element.classList.add('history-cleared');
+                    element.innerHTML += ' <br><span class="text-emerald-600 text-[10px] mt-1">✔️ 확인됨</span>';
+                    
+                    document.getElementById('history-progress').innerText = `${expectedOrder} / ${totalEvents}`;
+                    expectedOrder++;
+
+                    if (expectedOrder > totalEvents) {
+                        setTimeout(() => {
+                            currentStage++;
+                            if (currentStage < stages.length) {
+                                playBeep('success');
+                                loadStage(currentStage);
+                            } else {
+                                playBeep('success');
+                                window.directClear();
+                            }
+                        }, 500); 
+                    }
+                } else {
+                    playBeep('fail');
+                    element.style.borderColor = '#ef4444';
+                    element.style.color = '#ef4444';
+                    element.style.transform = 'translateX(5px)';
+                    setTimeout(() => element.style.transform = 'translateX(-5px)', 50);
+                    setTimeout(() => {
+                        element.style.transform = 'translateX(0)';
+                        element.style.borderColor = '#cbd5e1';
+                        element.style.color = '#334155';
+                    }, 200);
+                }
+            };
+
+            loadStage(currentStage);
+        }
+
         function setupMusicGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
                     <p class="text-xs text-slate-500">가상 피아노 건반 중 노랗게 불이 들어온 건반을 보고 올바른 계이름을 터치하세요!</p>
                     
-                    <!-- 피아노 조감도 디자인 -->
                     <div class="flex justify-center bg-slate-900 p-4 rounded-xl max-w-sm mx-auto shadow-inner relative">
                         <div class="flex relative border-t-4 border-slate-950 w-full justify-between" style="height: 140px;">
                             <div id="piano-key-0" onclick="playPianoKeySound(0)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
@@ -1173,7 +1482,6 @@
                             <div id="piano-key-6" onclick="playPianoKeySound(6)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
                             <div id="piano-key-7" onclick="playPianoKeySound(7)" class="piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-colors"></div>
                         
-                            <!-- 흑건 (비주얼 장식 효과) -->
                             <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 9%;"></div>
                             <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 21%;"></div>
                             <div class="absolute bg-slate-950 w-4 h-20 rounded-b" style="left: 47%;"></div>
@@ -1182,7 +1490,6 @@
                         </div>
                     </div>
 
-                    <!-- 계이름 선택 버튼 리스트 -->
                     <div class="grid grid-cols-4 gap-2 max-w-sm mx-auto">
                         <button onclick="guessPianoSyllable('도')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">도</button>
                         <button onclick="guessPianoSyllable('레')" class="bg-white border border-slate-200 hover:bg-slate-50 py-2.5 rounded-lg text-xs font-bold text-slate-700">레</button>
@@ -1200,15 +1507,13 @@
             `;
 
             const syllables = ["도", "레", "미", "파", "솔", "라", "시", "도"];
-            const noteFrequencies = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]; // C4~C5 주파수
+            const noteFrequencies = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
             let targetIdx = 0;
             let combo = 0;
 
             window.playPianoKeySound = function(idx) {
                 try {
-                    if (!audioCtx) {
-                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    }
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.connect(gain);
@@ -1222,12 +1527,9 @@
             };
 
             function nextPianoQuestion() {
-                // 이전 강조 비활성화
                 document.querySelectorAll('.piano-white-key').forEach(el => {
                     el.className = "piano-white-key bg-white border border-slate-300 flex-1 rounded-b-md relative cursor-pointer active:bg-slate-200 transition-all";
                 });
-
-                // 새로운 건반 출제
                 targetIdx = Math.floor(Math.random() * syllables.length);
                 const targetEl = document.getElementById(`piano-key-${targetIdx}`);
                 if (targetEl) {
@@ -1241,7 +1543,7 @@
                     combo++;
                     document.getElementById('piano-combo').innerText = combo;
                     if (combo >= 5) {
-                        directClear();
+                        window.directClear();
                     } else {
                         nextPianoQuestion();
                     }
@@ -1257,9 +1559,6 @@
             nextPianoQuestion();
         }
 
-        // ==========================================
-        //  개별 게임 2: 자습실 (클릭커)
-        // ==========================================
         function setupStudyGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center">
@@ -1278,9 +1577,7 @@
             `;
 
             let progress = 0;
-            let decayInterval;
-
-            decayInterval = setInterval(() => {
+            window.currentGameInterval = setInterval(() => {
                 if (progress > 0) {
                     progress = Math.max(0, progress - 3);
                     updateUI();
@@ -1293,8 +1590,8 @@
                 if (progress >= 100) {
                     progress = 100;
                     updateUI();
-                    clearInterval(decayInterval);
-                    directClear();
+                    clearInterval(window.currentGameInterval);
+                    window.directClear();
                 } else {
                     updateUI();
                 }
@@ -1308,18 +1605,8 @@
                     label.innerText = `자습 지수: ${progress}%`;
                 }
             }
-
-            const origClose = window.closeModal;
-            window.closeModal = function() {
-                clearInterval(decayInterval);
-                origClose();
-                window.closeModal = origClose;
-            };
         }
 
-        // ==========================================
-        //  개별 게임 3: 보건실 (기초 안전/응급처치 상식 OX 퀴즈)
-        // ==========================================
         function setupNurseGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
@@ -1349,13 +1636,9 @@
             let usedQuizzes = [];
 
             function nextNurseQuiz() {
-                if (usedQuizzes.length >= quizzes.length) {
-                    usedQuizzes = [];
-                }
+                if (usedQuizzes.length >= quizzes.length) usedQuizzes = [];
                 currentIdx = Math.floor(Math.random() * quizzes.length);
-                while (usedQuizzes.includes(currentIdx)) {
-                    currentIdx = Math.floor(Math.random() * quizzes.length);
-                }
+                while (usedQuizzes.includes(currentIdx)) currentIdx = Math.floor(Math.random() * quizzes.length);
                 usedQuizzes.push(currentIdx);
                 document.getElementById('nurse-quiz-question').innerText = quizzes[currentIdx].q;
             }
@@ -1366,11 +1649,8 @@
                     playBeep('success');
                     combo++;
                     document.getElementById('nurse-combo').innerText = combo;
-                    if (combo >= 3) {
-                        directClear();
-                    } else {
-                        nextNurseQuiz();
-                    }
+                    if (combo >= 3) window.directClear();
+                    else nextNurseQuiz();
                 } else {
                     playBeep('fail');
                     showCustomAlert(`틀렸습니다!<br><br>💡 **설명**: ${target.exp}<br><br>다시 처음부터 도전해 보세요!`, "오답 처치", "🏥");
@@ -1384,9 +1664,6 @@
             nextNurseQuiz();
         }
 
-        // ==========================================
-        //  개별 게임 4: 미술실 (절대 색감)
-        // ==========================================
         function setupAbsoluteColorGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
@@ -1428,68 +1705,42 @@
                 </div>
             `;
 
-            const tgtColor = {
-                r: Math.floor(Math.random() * 256),
-                g: Math.floor(Math.random() * 256),
-                b: Math.floor(Math.random() * 256)
-            };
+            const tgtColor = { r: Math.floor(Math.random() * 256), g: Math.floor(Math.random() * 256), b: Math.floor(Math.random() * 256) };
             const userColor = { r: 127, g: 127, b: 127 };
 
             document.getElementById('target-color-preview').style.backgroundColor = `rgb(${tgtColor.r}, ${tgtColor.g}, ${tgtColor.b})`;
             
-            const rSlider = document.getElementById('slider-r');
-            const gSlider = document.getElementById('slider-g');
-            const bSlider = document.getElementById('slider-b');
-            const rLabel = document.getElementById('label-r');
-            const gLabel = document.getElementById('label-g');
-            const bLabel = document.getElementById('label-b');
-            const uPreview = document.getElementById('user-color-preview');
-
+            const rSlider = document.getElementById('slider-r'), gSlider = document.getElementById('slider-g'), bSlider = document.getElementById('slider-b');
+            
             function updateColor() {
-                userColor.r = parseInt(rSlider.value);
-                userColor.g = parseInt(gSlider.value);
-                userColor.b = parseInt(bSlider.value);
-                rLabel.innerText = userColor.r;
-                gLabel.innerText = userColor.g;
-                bLabel.innerText = userColor.b;
-                uPreview.style.backgroundColor = `rgb(${userColor.r}, ${userColor.g}, ${userColor.b})`;
+                userColor.r = parseInt(rSlider.value); userColor.g = parseInt(gSlider.value); userColor.b = parseInt(bSlider.value);
+                document.getElementById('label-r').innerText = userColor.r; document.getElementById('label-g').innerText = userColor.g; document.getElementById('label-b').innerText = userColor.b;
+                document.getElementById('user-color-preview').style.backgroundColor = `rgb(${userColor.r}, ${userColor.g}, ${userColor.b})`;
             }
 
-            [rSlider, gSlider, bSlider].forEach(slider => {
-                slider.addEventListener('input', () => { updateColor(); });
-            });
-
+            [rSlider, gSlider, bSlider].forEach(slider => slider.addEventListener('input', updateColor));
             updateColor();
 
             window.compareColors = function() {
-                const distance = Math.sqrt(
-                    Math.pow(tgtColor.r - userColor.r, 2) +
-                    Math.pow(tgtColor.g - userColor.g, 2) +
-                    Math.pow(tgtColor.b - userColor.b, 2)
-                );
-                const maxDistance = Math.sqrt(3 * Math.pow(255, 2));
-                const similarity = Math.round((1 - (distance / maxDistance)) * 100);
+                const distance = Math.sqrt(Math.pow(tgtColor.r - userColor.r, 2) + Math.pow(tgtColor.g - userColor.g, 2) + Math.pow(tgtColor.b - userColor.b, 2));
+                const similarity = Math.round((1 - (distance / Math.sqrt(3 * Math.pow(255, 2)))) * 100);
 
                 if (similarity >= 90) {
                     playBeep('success');
                     showCustomAlert(`완벽합니다! 일치도: ${similarity}%\n정답: RGB(${tgtColor.r}, ${tgtColor.g}, ${tgtColor.b})\n내가 만든 색상: RGB(${userColor.r}, ${userColor.g}, ${userColor.b})`, "판정 통과", "🎨", () => {
-                        directClear();
+                        window.directClear();
                     });
                 } else {
                     playBeep('fail');
                     showCustomAlert(`색감의 일치도를 더 높여보세요! 현재 일치도: ${similarity}%\n(90% 이상 일치 시 통과됩니다.)`, "색상 불일치", "🧐");
                 }
             };
-            lucide.createIcons();
         }
 
-        // ==========================================
-        //  철학실 (논증 조판소) - 다리 있는 뱀 버그 수정
-        // ==========================================
         function setupSyllogismGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <p class="text-xs text-slate-500">제시된 세 가지 전제와 결론 카드를 알맞게 조립하여 타당한 삼단논법을 세우세요.</p>
+                    <p class="text-xs text-slate-500">제시된 세 가지 전제와 결론 카드를 알맞게 조립하여 논리적 삼단논법을 세우세요.</p>
                     <div class="space-y-2 text-left">
                         <div class="border-2 border-dashed border-slate-300 p-2.5 rounded-lg min-h-[50px] bg-white cursor-pointer hover:border-sky-400 flex items-center justify-between" onclick="selectSlot(0)">
                             <span class="text-xs text-slate-400 font-bold">전제 1</span>
@@ -1521,7 +1772,7 @@
                 { id: 0, type: 'premise', text: '모든 파충류는 온혈동물이 아니다.' },
                 { id: 1, type: 'premise', text: '모든 뱀은 파충류다.' },
                 { id: 2, type: 'conclusion', text: '그러므로 어떤 뱀도 온혈동물이 아니다.' },
-                { id: 3, type: 'dummy', text: '모든 뱀은 다리를 가지고 있다.' } // [다리 있는 뱀 오류 명백한 더미로 수정 완료]
+                { id: 3, type: 'dummy', text: '모든 뱀은 날 수 있는 생물이다.' } 
             ];
 
             let selectedCard = null;
@@ -1571,7 +1822,7 @@
 
             window.verifySyllogism = function() {
                 if (placed[0] === null || placed[1] === null || placed[2] === null) {
-                    showCustomAlert('세 칸을 카드들로 모두 조립해야 검증할 수 있습니다!', '슬롯 미완성', '⚠️');
+                    showCustomAlert('세 칸을 카드로 채워야만 검증할 수 있습니다!', '슬롯 부족', '⚠️');
                     return;
                 }
                 
@@ -1581,28 +1832,25 @@
 
                 if (hasP1 && hasP2 && hasC) {
                     playBeep('success');
-                    showCustomAlert('정답입니다! 뱀(파충류)의 올바른 생물학적 사실을 기반으로 타당한 삼단논법을 완성했습니다.', '논증 통과', '🧠', () => {
-                        directClear();
+                    showCustomAlert('정답입니다! 뱀(파충류)의 올바른 생물적 지식에 부합하는 철학적 논증을 완성하셨습니다.', '논증 통과', '🧠', () => {
+                        window.directClear();
                     });
                 } else {
                     playBeep('fail');
-                    showCustomAlert('아쉽게도 오류가 있는 삼단논법입니다. 파충류, 뱀, 온혈동물 개념의 주연 규칙에 유의해 조합하세요.', '논증 기각', '❌');
+                    showCustomAlert('오류가 있는 삼단논법입니다. 전제들과 결론의 순서와 관계를 다시 잘 정렬해 보세요.', '논증 반려', '❌');
                 }
             };
 
             renderCards();
         }
 
-        // ==========================================
-        //  영어실 (영어단어 <-> 한글뜻 매치) - 최초 2초 카드 엿보기 혜택 제공
-        // ==========================================
         function setupEnglishMemoryGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <p class="text-xs text-slate-500">2초 뒤집기 찬스 제공! <b>영어 단어</b>와 올바른 <b>한글 뜻</b> 짝을 맞춰 뒤집으세요!</p>
+                    <p class="text-xs text-slate-500">기회 제공! <b>2초 뒤집기 찬스</b> 후, 카드 뒤집기 짝 맞추기가 진행됩니다!</p>
                     <div class="grid grid-cols-4 gap-2.5 max-w-sm mx-auto" id="english-card-board"></div>
                     <div class="flex justify-between items-center text-xs font-bold text-slate-500">
-                        <span>성공한 짝: <strong id="mem-score" class="text-indigo-650 text-sm">0</strong> / 6쌍</span>
+                        <span>매치 완료: <strong id="mem-score" class="text-indigo-650 text-sm">0</strong> / 6쌍</span>
                         <span id="mem-status" class="text-rose-500 font-bold">암기 찬스 진행 중...</span>
                     </div>
                 </div>
@@ -1633,7 +1881,7 @@
 
             cardsData.forEach((c, idx) => {
                 const cardOuter = document.createElement('div');
-                cardOuter.className = 'flip-card w-full aspect-[3/4] cursor-pointer flipped'; // 초반 뒤집힌 상태로 시작
+                cardOuter.className = 'flip-card w-full aspect-[3/4] cursor-pointer flipped'; 
                 cardOuter.dataset.index = idx;
                 
                 cardOuter.innerHTML = `
@@ -1675,7 +1923,7 @@
                         lock = false;
 
                         if (successCount >= 6) {
-                            setTimeout(() => { directClear(); }, 600);
+                            setTimeout(() => { window.directClear(); }, 600);
                         }
                     } else {
                         playBeep('fail');
@@ -1692,8 +1940,7 @@
                 board.appendChild(cardOuter);
             });
 
-            // 2.2초 후에 모든 카드 감춘 후 게임 시작
-            setTimeout(() => {
+            window.currentGameTimeout = setTimeout(() => {
                 document.querySelectorAll('.flip-card').forEach(el => {
                     el.classList.remove('flipped');
                 });
@@ -1706,9 +1953,6 @@
             }, 2200);
         }
 
-        // ==========================================
-        //  개별 이식 게임 7: 3층 국어실 (품사 분류 - 문제 중복 차단 완벽 적용)
-        // ==========================================
         function setupPartsOfSpeechGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
@@ -1717,32 +1961,30 @@
                         철수는 어제 <span class="text-rose-500 font-black underline underline-offset-4">공원</span>에서 축구를 했다.
                     </div>
                     <div class="grid grid-cols-3 gap-2" id="korean-choices">
-                        <!-- 동적 품사 선택 단추 -->
                     </div>
                     <div class="text-xs font-bold text-slate-500">
-                        연속 매칭: <span id="kor-combo" class="text-indigo-650 text-sm">0</span> / 4회 성공 타겟
+                        연속 매칭 스택: <span id="kor-combo" class="text-indigo-650 text-sm">0</span> / 4회 성공 타겟
                     </div>
                 </div>
             `;
 
             const sentences = [
                 { text: '철수는 어제 <span class="text-rose-500 font-bold underline">공원</span>에서 축구를 했다.', answer: '명사' },
-                { text: '<span class="text-rose-500 font-bold underline">저것</span>은 내가 가장 소중히 하는 책이다.', answer: '대명사' },
+                { text: '<span class="text-rose-500 font-bold underline">저것</span>은 내가 소중히 아끼는 필기구이다.', answer: '대명사' },
                 { text: '귤 <span class="text-rose-500 font-bold underline">하나</span>를 까먹었다.', answer: '수사' },
-                { text: '아이가 마당에서 신나게 <span class="text-rose-500 font-bold underline">뛰었다</span>.', answer: '동사' },
-                { text: '오늘따라 아침 하늘이 매우 <span class="text-rose-500 font-bold underline">푸르다</span>.', answer: '형용사' },
-                { text: '그는 <span class="text-rose-500 font-bold underline">새</span> 가방을 메고 복도를 돌았다.', answer: '관형사' },
-                { text: '바람이 불어 낙엽이 <span class="text-rose-500 font-bold underline">천천히</span> 떨어진다.', answer: '부사' },
-                { text: '영희<span class="text-rose-500 font-bold underline">가</span> 지우개를 빌려주었다.', answer: '조사' },
-                { text: '<span class="text-rose-500 font-bold underline">아이고</span>, 깜짝이야!', answer: '감탄사' }
+                { text: '아이가 마당에서 신나게 <span class="text-rose-500 font-bold underline">달린다</span>.', answer: '동사' },
+                { text: '가을 하늘이 유난히 맑고 <span class="text-rose-500 font-bold underline">푸르다</span>.', answer: '형용사' },
+                { text: '엄마가 <span class="text-rose-500 font-bold underline">헌</span> 옷들을 정리하셨다.', answer: '관형사' },
+                { text: '빗방울이 마당으로 <span class="text-rose-500 font-bold underline">주룩주룩</span> 쏟아졌다.', answer: '부사' },
+                { text: '영희<span class="text-rose-500 font-bold underline">야</span>, 이리 와서 밥 먹으렴.', answer: '조사' },
+                { text: '<span class="text-rose-500 font-bold underline">어머나</span>, 장미꽃이 정말 아름답네요!', answer: '감탄사' }
             ];
 
             const allParts = ['명사', '대명사', '수사', '동사', '형용사', '관형사', '부사', '조사', '감탄사'];
             let combo = 0;
-            let usedIndexes = []; // 이번 스테이지 도전에 출제되었던 문제 배열 인덱스 보존하여 중복 차단
+            let usedIndexes = []; 
 
             function nextChallenge() {
-                // 더이상 출제할 새로운 질문이 없으면 인덱스 목록 초기화
                 if (usedIndexes.length >= sentences.length) {
                     usedIndexes = [];
                 }
@@ -1778,15 +2020,15 @@
                             combo++;
                             document.getElementById('kor-combo').innerText = combo;
                             if (combo >= 4) {
-                                directClear();
+                                window.directClear();
                             } else {
                                 nextChallenge();
                             }
                         } else {
                             playBeep('fail');
-                            showCustomAlert('틀렸습니다! 품사의 성격을 다시 떠올려보세요.', "오답 안내", "👀");
+                            showCustomAlert('틀렸습니다! 품사 문법 체계를 다시 검토해 보세요.', "오답 안내", "👀");
                             combo = 0;
-                            usedIndexes = []; // 틀리면 처음부터 출제풀 초기화
+                            usedIndexes = []; 
                             document.getElementById('kor-combo').innerText = combo;
                             nextChallenge();
                         }
@@ -1798,9 +2040,6 @@
             nextChallenge();
         }
 
-        // ==========================================
-        //  개별 이식 게임 8: 3층 수학실 (숫자 야구)
-        // ==========================================
         function setupNumberBaseballGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
@@ -1812,7 +2051,6 @@
                         <div class="w-12 h-14 border-2 border-slate-300 rounded-lg flex items-center justify-center font-black text-2xl text-slate-800 bg-white" id="b-guess-2">-</div>
                     </div>
 
-                    <!-- 숫자 버튼 패드 -->
                     <div class="grid grid-cols-5 gap-1.5 max-w-xs mx-auto">
                         <button onclick="pressNum(1)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">1</button>
                         <button onclick="pressNum(2)" class="py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-xs font-bold text-slate-700">2</button>
@@ -1898,7 +2136,7 @@
                 if (strike === 3) {
                     playBeep('success');
                     showCustomAlert(`정답입니다! 수학적 비밀수 ${guess.join('')}을 올바르게 추리하셨습니다!`, "추리 성공", "👑", () => {
-                        directClear();
+                        window.directClear();
                     });
                 } else {
                     playBeep('fail');
@@ -1908,9 +2146,6 @@
             };
         }
 
-        // ==========================================
-        //  개별 이식 게임 9: 3층 한문실 (한문 수박 게임) - 드래그 앤 릴리즈 조작 메커니즘 완벽 패치
-        // ==========================================
         function setupHanjaDropGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
@@ -1919,7 +2154,6 @@
                         <span>현재 점수: <strong id="hanja-score" class="text-indigo-650 text-sm">0</strong></span>
                     </div>
                     <div class="w-full overflow-hidden flex justify-center">
-                        <!-- 터치 동작 시 웹 화면이 스크롤되거나 원치 않게 팅기는 것을 막기 위해 touch-action: none 지정 -->
                         <canvas id="hanja-canvas" width="400" height="420" class="max-w-full h-auto border border-slate-300 rounded-xl bg-slate-50 block cursor-crosshair shadow-inner" style="touch-action: none;"></canvas>
                     </div>
                 </div>
@@ -1944,7 +2178,7 @@
             let canDrop = true;
             let currentX = canvas.width / 2;
             let animId;
-            let isDragging = false; // 드래그 조작 추적 플래그
+            let isDragging = false; 
 
             class Circle {
                 constructor(x, y, level, isFixed = false) {
@@ -1975,22 +2209,19 @@
                 }
                 update() {
                     if (this.isFixed) return;
-                    this.vy += 0.45; // 자연스러운 물리를 위해 속도 보정
+                    this.vy += 0.45; 
                     this.x += this.vx;
                     this.y += this.vy;
 
-                    // 바닥 경계선 충돌 및 미세 탄성 복원
                     if (this.y + this.radius > canvas.height) {
                         this.y = canvas.height - this.radius;
                         this.vy = -this.vy * 0.15;
-                        this.vx *= 0.95; // 마찰력 작용
+                        this.vx *= 0.95; 
                     }
-                    // 좌벽 경계 충돌
                     if (this.x - this.radius < 0) {
                         this.x = this.radius;
                         this.vx = -this.vx * 0.15;
                     } 
-                    // 우벽 경계 충돌
                     else if (this.x + this.radius > canvas.width) {
                         this.x = canvas.width - this.radius;
                         this.vx = -this.vx * 0.15;
@@ -2008,18 +2239,14 @@
                 if (currentX > canvas.width - r) currentX = canvas.width - r;
             }
 
-            // 모바일 300ms 터치 딜레이를 해소하고 완벽한 슬라이드 조절을 지원하는 Pointer-based 이벤트 리스너 통합 바인딩
             canvas.onpointerdown = function(e) {
                 e.preventDefault();
-                try {
-                    canvas.setPointerCapture(e.pointerId); // 캔버스 영역 밖 드래그 유출 시에도 이벤트 소실 차단
-                } catch(err) {}
+                try { canvas.setPointerCapture(e.pointerId); } catch(err) {}
                 isDragging = true;
                 handleMove(e.clientX);
             };
 
             canvas.onpointermove = function(e) {
-                // PC 마우스 오버 시 또는 모바일 손가락 밀기 조작 중일 때 실시간 타겟 한자 위치 이동 적용
                 if (e.pointerType === 'mouse' || isDragging) {
                     handleMove(e.clientX);
                 }
@@ -2028,19 +2255,15 @@
             canvas.onpointerup = function(e) {
                 if (isDragging) {
                     isDragging = false;
-                    try {
-                        canvas.releasePointerCapture(e.pointerId);
-                    } catch(err) {}
-                    dropHanja(); // 손가락을 떼거나 마우스를 뗄 때 하단으로 한자 투하
+                    try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+                    dropHanja(); 
                 }
             };
 
             canvas.onpointercancel = function(e) {
                 if (isDragging) {
                     isDragging = false;
-                    try {
-                        canvas.releasePointerCapture(e.pointerId);
-                    } catch(err) {}
+                    try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
                 }
             };
 
@@ -2051,15 +2274,11 @@
                 circles.push(c);
 
                 canDrop = false;
-                
-                // 낙하 후 새로운 대기 한자 즉시 생성 (랜덤 세팅)
                 currentLevel = Math.floor(Math.random() * 3);
 
                 setTimeout(() => { canDrop = true; }, 350);
             }
 
-            // 한 프레임에 다수의 한자가 부딪히고 순차 병합될 때 배열 조작 버그로 인해
-            // 한 박자 뚝뚝 끊기며 반응하던 충돌 연산 코드를 완전 루프형으로 재구성
             function handleHanjaCollisions() {
                 let keepChecking = true;
                 while (keepChecking) {
@@ -2074,7 +2293,6 @@
                             const min = c1.radius + c2.radius;
 
                             if (dist < min) {
-                                // 같은 단계의 한자 결합 융합 처리
                                 if (c1.level === c2.level) {
                                     const nextLvl = c1.level + 1;
                                     if (nextLvl < levels.length) {
@@ -2086,31 +2304,25 @@
                                         const midX = (c1.x + c2.x) / 2;
                                         const midY = (c1.y + c2.y) / 2;
                                         
-                                        // 병합 처리 (circles 인덱스 변경에 따른 안전한 데이터 삭제)
                                         circles.splice(j, 1);
                                         circles.splice(i, 1);
                                         circles.push(new Circle(midX, midY, nextLvl));
 
-                                        // 마지막 목표 萬(만) 완성 검증
                                         if (nextLvl === levels.length - 1) {
                                             cancelAnimationFrame(animId);
                                             showCustomAlert('한자 병합 성공! 만(萬)을 완성하여 영광스러운 한문 스탬프를 찍었습니다.', "합체 완료", "萬", () => {
-                                                directClear();
+                                                window.directClear();
                                             });
                                             return;
                                         }
-                                        
-                                        keepChecking = true; // 배열 크기 및 인덱스가 변경되었으므로 연쇄 충돌 재스캔 전개
+                                        keepChecking = true; 
                                         break;
                                     }
                                 }
-                                
-                                // 다른 이기종 한자의 부딪힘 밀어내기 반작용 연산
                                 const overlap = min - dist;
                                 const nx = dx / dist;
                                 const ny = dy / dist;
                                 
-                                // 미세하게 분산 밀어내어 프레임 드랍 및 떨림 방지
                                 c1.x -= nx * overlap * 0.5;
                                 c1.y -= ny * overlap * 0.5;
                                 c2.x += nx * overlap * 0.5;
@@ -2132,7 +2344,6 @@
                     ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
                     ctx.stroke();
 
-                    // 현재 대기 중인 한자 원반을 탑 포인터 위치에 실시간 표시 (드래그하는 동안 조준을 확인할 수 있음)
                     const tempCircle = new Circle(currentX, 40, currentLevel, true);
                     tempCircle.draw();
                 }
@@ -2157,20 +2368,17 @@
             };
         }
 
-        // ==========================================
-        //  생물실 (DNA 전사 타임어택) - 틀리면 오답 상보결합 쌍 전송 가이드 추가
-        // ==========================================
         function setupDnaTranscriptionGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <p class="text-xs text-slate-500">DNA 주형 가닥을 바탕으로, 전사 상보결합하는 알맞은 mRNA 가닥 염기(A, U, G, C)를 조립해 가세요!</p>
+                    <p class="text-xs text-slate-500">DNA 주형 사다리를 참고해 상보결합하는 올바른 mRNA 염기 가닥(A, U, G, C)을 순서대로 완성하세요!</p>
                     <div class="bg-indigo-950 text-white border-2 border-indigo-455 p-6 rounded-2xl max-w-xs mx-auto shadow-md">
-                        <span class="text-[10px] text-indigo-300 block mb-1 font-bold">DNA 주형 가닥</span>
+                        <span class="text-[10px] text-indigo-300 block mb-1 font-bold">DNA 주형 염기</span>
                         <div id="dna-target-base" class="text-5xl font-black tracking-widest text-sky-400">A</div>
                     </div>
                     <div class="grid grid-cols-4 gap-2" id="transcription-buttons"></div>
                     <div class="text-xs font-bold text-slate-600">
-                        전사 완료 염기쌍: <span id="trans-score" class="text-indigo-650 text-sm">0</span> / 6쌍 성공 타겟
+                        완료된 염기 전사쌍: <span id="trans-score" class="text-indigo-650 text-sm">0</span> / 6쌍 완성 타겟
                     </div>
                 </div>
             `;
@@ -2199,7 +2407,7 @@
                             score++;
                             document.getElementById('trans-score').innerText = score;
                             if (score >= 6) {
-                                directClear();
+                                window.directClear();
                             } else {
                                 nextBase();
                             }
@@ -2222,9 +2430,6 @@
             nextBase();
         }
 
-        // ==========================================
-        //  화학실 (원소 이온결합 전하합 0) - 30초 스피드 타임어택 밸런스 조정
-        // ==========================================
         function setupIonBondGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
@@ -2262,13 +2467,12 @@
             let selected = [];
             let score = 0;
             let chemistryTimeLeft = 30.0;
-            let chemInterval = null;
 
-            chemInterval = setInterval(() => {
+            window.currentGameInterval = setInterval(() => {
                 chemistryTimeLeft -= 0.1;
                 if (chemistryTimeLeft <= 0) {
                     chemistryTimeLeft = 0;
-                    clearInterval(chemInterval);
+                    clearInterval(window.currentGameInterval);
                     playBeep('fail');
                     showCustomAlert("타임아웃! 30초의 제한 시간이 끝났습니다. 다시 보드를 리뉴얼합니다.", "시간 초과", "⏳", () => {
                         setupIonBondGame(container);
@@ -2339,8 +2543,8 @@
                     score++;
                     document.getElementById('ion-score').innerText = score;
                     if (score >= 3) {
-                        clearInterval(chemInterval);
-                        directClear();
+                        clearInterval(window.currentGameInterval);
+                        window.directClear();
                     } else {
                         showCustomAlert('성공! 전하량이 0으로 안정적인 중성이온 결합이 완료되었습니다!', '결합 수립', '🧪', () => {
                             initBoard();
@@ -2356,22 +2560,11 @@
             };
 
             initBoard();
-
-            const origClose = window.closeModal;
-            window.closeModal = function() {
-                clearInterval(chemInterval);
-                origClose();
-                window.closeModal = origClose;
-            };
         }
 
-        // ==========================================
-        //  지구과학실 (탄소순환 퍼즐) - 실시간 흐름 흐름 시각화 및 무조건 정답 가능 구조
-        // ==========================================
         function setupCarbonCycleGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
-                    <!-- 항시 유지되는 핵심 탄소이론 가이드 설명창 및 정답 배치도 조감도 예시 연동 -->
                     <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-left text-xs text-slate-700 leading-relaxed shadow-sm space-y-2">
                         <div class="font-extrabold text-indigo-800 flex items-center gap-1"><i data-lucide="book-open" class="w-4 h-4"></i> 탄소 순환 배관 가이드</div>
                         <p>대기의 이산화탄소($CO_2$)를 해양으로 이송하기 위한 안전한 통로를 설계하세요!</p>
@@ -2397,7 +2590,7 @@
                     <div class="grid grid-cols-4 gap-2 bg-slate-100 p-3 rounded-xl border border-slate-200 max-w-sm mx-auto" id="carbon-grid-board"></div>
                     
                     <div class="flex gap-2 max-w-sm mx-auto">
-                        <button id="reset-carbon-pipes-btn" onclick="resetCarbonPipes()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition-colors">
+                        <button onclick="resetCarbonPipes()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition-colors shadow">
                             배관 초기화 🔄
                         </button>
                     </div>
@@ -2407,8 +2600,6 @@
 
             let pipes = [];
 
-            // 배관 정보 정의: Straight (━), Corner (┗)
-            // 0: top, 1: right, 2: bottom, 3: left
             window.resetCarbonPipes = function() {
                 playBeep('click');
                 pipes = [
@@ -2423,7 +2614,7 @@
                     { id: 7, r: 1, c: 3, type: 'straight', text: '━', angle: 0 }, 
                     
                     { id: 8, r: 2, c: 0, type: 'corner', text: '┗', angle: 270 },
-                    { id: 9, r: 2, c: 1, type: 'corner', text: '┗', angle: 180 }, // [지구과학실 100% 성공 보장용] 타입 corner, 텍스트 ┗, 각도 180으로 완벽 교정
+                    { id: 9, r: 2, c: 1, type: 'corner', text: '┗', angle: 180 }, 
                     { id: 10, r: 2, c: 2, type: 'straight', text: '━', angle: 90 },
                     { id: 11, r: 2, c: 3, type: 'corner', text: '┗', angle: 180 }, 
                     
@@ -2436,15 +2627,13 @@
             };
 
             function getPorts(pipe) {
-                if (pipe.type === 'start') return [1]; // 대기는 오른쪽(1)만 개방
-                if (pipe.type === 'end') return [3];   // 해양은 왼쪽(3)만 개방
+                if (pipe.type === 'start') return [1]; 
+                if (pipe.type === 'end') return [3];   
                 
                 if (pipe.type === 'straight') {
-                    // 0, 180: 좌우 (━) / 90, 270: 상하 (┃)
                     return (pipe.angle === 0 || pipe.angle === 180) ? [1, 3] : [0, 2];
                 }
                 if (pipe.type === 'corner') {
-                    // 0: ┗ (상, 우) / 90: ┏ (우, 하) / 180: ┓ (하, 좌) / 270: ┛ (좌, 상)
                     if (pipe.angle === 0) return [0, 1];
                     if (pipe.angle === 90) return [1, 2];
                     if (pipe.angle === 180) return [2, 3];
@@ -2456,9 +2645,7 @@
             function getPipeChar(pipe) {
                 if (pipe.type === 'start') return '☁ 대기';
                 if (pipe.type === 'end') return '🌊 해양';
-                if (pipe.type === 'straight') {
-                    return (pipe.angle === 0 || pipe.angle === 180) ? '━' : '┃';
-                }
+                if (pipe.type === 'straight') return (pipe.angle === 0 || pipe.angle === 180) ? '━' : '┃';
                 if (pipe.type === 'corner') {
                     if (pipe.angle === 0) return '┗';
                     if (pipe.angle === 90) return '┏';
@@ -2468,7 +2655,6 @@
                 return '';
             }
 
-            // 실시간 가스 연통 탐색 알고리즘 (BFS)
             function calculateFlow() {
                 let connected = new Set();
                 let queue = [0];
@@ -2479,12 +2665,11 @@
                     let currPipe = pipes[currIdx];
                     let currPorts = getPorts(currPipe);
 
-                    // 4방향 이웃 탐색
                     let neighbors = [
-                        { dir: 0, r: currPipe.r - 1, c: currPipe.c, opp: 2 }, // 상
-                        { dir: 1, r: currPipe.r, c: currPipe.c + 1, opp: 3 }, // 우
-                        { dir: 2, r: currPipe.r + 1, c: currPipe.c, opp: 0 }, // 하
-                        { dir: 3, r: currPipe.r, c: currPipe.c - 1, opp: 1 }  // 좌
+                        { dir: 0, r: currPipe.r - 1, c: currPipe.c, opp: 2 },
+                        { dir: 1, r: currPipe.r, c: currPipe.c + 1, opp: 3 },
+                        { dir: 2, r: currPipe.r + 1, c: currPipe.c, opp: 0 },
+                        { dir: 3, r: currPipe.r, c: currPipe.c - 1, opp: 1 } 
                     ];
 
                     for (let n of neighbors) {
@@ -2494,7 +2679,6 @@
                                 let neighborPipe = pipes[neighborIdx];
                                 let neighborPorts = getPorts(neighborPipe);
 
-                                // 두 타일의 입출구가 상호 일치하는 경우 흐름 확장
                                 if (currPorts.includes(n.dir) && neighborPorts.includes(n.opp)) {
                                     connected.add(neighborIdx);
                                     queue.push(neighborIdx);
@@ -2511,19 +2695,17 @@
                 if (!board) return;
                 board.innerHTML = '';
 
-                // 현재 활성화된 가스 수송 경로 계산
                 const activeSet = calculateFlow();
 
                 pipes.forEach((p, idx) => {
                     const btn = document.createElement('button');
                     const isActive = activeSet.has(idx);
 
-                    // 기본 비주얼 세팅 & 활성화된 경로의 경우 빛나는 아름다운 초록색 불빛 테마 적용
-                    let baseClass = "w-full aspect-square border-2 rounded-xl flex items-center justify-center font-bold text-xs transition-all duration-200 ";
+                    let baseClass = "w-full aspect-square border-2 rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-200 ";
                     if (isActive) {
-                        baseClass += "bg-emerald-100 text-emerald-600 border-emerald-400 font-extrabold shadow-md shadow-emerald-200/50 scale-[1.02] ";
+                        baseClass += "bg-emerald-100 text-emerald-600 border-emerald-400 font-extrabold shadow-[0_0_12px_rgba(52,211,153,0.5)] scale-[1.03] z-10 ";
                     } else {
-                        baseClass += p.isStart ? 'bg-sky-100 border-sky-300 text-sky-700 ' : (p.isEnd ? 'bg-indigo-100 border-indigo-300 text-indigo-700 ' : 'bg-white border-slate-200 text-slate-700 ');
+                        baseClass += p.isStart ? 'bg-sky-100 border-sky-300 text-sky-700 text-sm ' : (p.isEnd ? 'bg-indigo-100 border-indigo-300 text-indigo-700 text-sm ' : 'bg-white border-slate-200 text-slate-700 ');
                     }
 
                     btn.className = baseClass;
@@ -2539,25 +2721,17 @@
                     board.appendChild(btn);
                 });
 
-                // 목적지 [해양(15)] 타일까지 도달한 경우 자동으로 미션 완수 처리 진행
                 if (activeSet.has(15)) {
-                    setTimeout(() => {
+                    window.currentGameTimeout = setTimeout(() => {
                         playBeep('success');
-                        showCustomAlert('대성공! 대기의 탄소가 막힘 없이 해양 순환 저장고로 안전하게 수송 완료되었습니다!', "탄소 수송 성공", "🌍", () => {
-                            directClear();
-                        });
-                    }, 400);
+                        window.directClear();
+                    }, 500);
                 }
             }
 
-            // 최초 수립 진행
-            window.resetCarbonPipes = resetCarbonPipes;
-            resetCarbonPipes();
+            window.resetCarbonPipes();
         }
 
-        // ==========================================
-        //  개별 게임 13: 체육실 (5초 타이머 맞추기) - 가림 기능 제거
-        // ==========================================
         function setupPeTimerGame(container) {
             container.innerHTML = `
                 <div class="w-full text-center space-y-4">
@@ -2577,7 +2751,6 @@
                 </div>
             `;
 
-            let timerInterval = null;
             let startTime = 0;
             let isRunning = false;
 
@@ -2600,9 +2773,9 @@
                 status.innerText = "흘러가는 시간을 잘 보고 정확하게 5초가 되었을 때 [멈춤] 버튼을 누르세요!";
                 status.className = "text-xs text-indigo-500 font-bold mt-2";
 
-                timerInterval = setInterval(() => {
+                window.currentGameInterval = setInterval(() => {
                     const elapsed = (Date.now() - startTime) / 1000;
-                    display.innerText = elapsed.toFixed(2); // ?.?? 변환 없이 계속 실시간 숫자 표출
+                    display.innerText = elapsed.toFixed(2);
                 }, 30);
             };
 
@@ -2610,7 +2783,7 @@
                 if (!isRunning) return;
                 playBeep('click');
                 isRunning = false;
-                clearInterval(timerInterval);
+                clearInterval(window.currentGameInterval);
 
                 const elapsed = (Date.now() - startTime) / 1000;
                 document.getElementById('pe-timer-val').innerText = elapsed.toFixed(2);
@@ -2624,7 +2797,6 @@
                 stopBtn.disabled = true;
                 stopBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
-                // ±0.15초 판정 (4.85 ~ 5.15초)
                 if (elapsed >= 4.85 && elapsed <= 5.15) {
                     playBeep('success');
                     status.innerText = `성공! 측정 시간: ${elapsed.toFixed(2)}초`;
@@ -2639,112 +2811,9 @@
                     showCustomAlert(`아쉬워요! 측정된 시간은 ${elapsed.toFixed(2)}초입니다.<br>4.85초 ~ 5.15초 범위 내에서 정확하게 멈춰주세요!`, "기록 미달", "⏱️");
                 }
             };
-
-            const origClose = window.closeModal;
-            window.closeModal = function() {
-                clearInterval(timerInterval);
-                origClose();
-                window.closeModal = origClose;
-            };
         }
 
-        // ==========================================
-        //  보조 과제용 퀴즈 뱅크
-        // ==========================================
-        const quizBank = {
-            geography: [
-                { q: '세계에서 국경선 내 가장 광대하고 큰 영토 면적을 자랑하는 국가는 어디일까요?', a: ['미국', '러시아', '캐나다'], right: 1 }
-            ],
-            geography2: [
-                { q: '적도 인근 열대 지방에서 일 년 내내 수증기가 풍부하고 비가 일정하게 많이 쏟아지는 기후 유형은?', a: ['열대 우림 기후', '사막 기후', '지중해성 기후'], right: 0 }
-            ],
-            korean2: [
-                { q: '조선 전기 문과에 급제하고 강호가도 가사 문학의 대표작인 \"사미인곡\"을 저술한 인물은?', a: ['정철', '이황', '윤선도'], right: 0 }
-            ],
-            korean3: [
-                { q: '단어 형성 시 문법적으로 실제 사물의 성질이나 명칭의 실질적인 본바탕을 지닌 핵심 형태소는?', a: ['접사', '어근', '어간'], right: 1 }
-            ],
-            // 제2외국어 일본어 전면 교체 적용
-            lang: [
-                { q: '처음 만났을 때 친근하게 나누는 일본어 첫인사 표현은?', a: ['はじめまして (하지메마시테)', 'こんにちは (곤니치와)', 'ありがとう (아리가토)'], right: 0 },
-                { q: '일본어에서 고마움을 다정하게 전하는 보편적인 감사의 말은?', a: ['すみません (스미마센)', 'ありがとうございます (아리가토고자이마스)', 'さような라 (사요나라)'], right: 1 }
-            ],
-            history: [
-                { q: '조선 왕조 제4대 군주로, 과학 농업을 집대성하고 백성들을 위해 훈민정음을 독창적으로 친히 반포한 현군은?', a: ['태조', '정조', '세종대왕'], right: 2 }
-            ],
-            // 고1 통합과학 물리 핵심 개념 퀴즈로 완전 개편
-            physics: [
-                { q: '공기 저항이 없을 때, 같은 높이에서 자유 낙하하는 쇠구슬과 수평 방향으로 던진 식구슬이 바닥에 도달하는 시간에 대한 설명으로 옳은 것은?', a: ['연직 방향으로 둘 다 중력 가속도를 받으므로 동시에 바닥에 도달한다.', '자유 낙하하는 물체가 수평으로 던진 물체보다 항상 늦게 도달한다.', '쇠구슬의 질량이 식구슬보다 크므로 쇠구슬이 무조건 먼저 도달한다.'], right: 0 },
-                { q: '발전기 내부에서 자석이나 코일을 회전시킬 때, 유도 전류가 코일을 통과하는 자기장의 변화를 방해하는 방향으로 흐른다는 전자기학의 핵심 법칙은?', a: ['렌츠의 법칙', '쿨롱의 법칙', '옴의 법칙'], right: 0 },
-                { q: '자동차가 충돌할 때 승객을 보호하는 에어백의 물리적 원리로 가장 알맞은 설명은?', a: ['에어백이 팽창하면서 사람이 충격을 받는 충돌 시간을 길어지게 하여 받는 충격력을 감소시킨다.', '에어백이 몸에 가해지는 속도를 완전히 0으로 소멸시켜 운동량을 증가시킨다.', '승객의 질량을 미세하게 일시적으로 낮추어 충격량 자체를 0으로 소멸시킨다.'], right: 0 },
-                { q: '마찰력과 공기 저항이 존재하지 않는 이상적인 물리적 환경에서, 높이가 내려갈 때 감소하는 역학적 시스템의 위치에너지는 무엇으로 전환 보존됩니까?', a: ['운동에너지', '열에너지', '전기에너지'], right: 0 }
-            ]
-        };
-
-        function setupQuizGame(container, subject) {
-            const list = quizBank[subject] || quizBank['geography'];
-            let currentIdx = 0;
-            let successStreak = 0;
-            let usedIndexes = []; // 중복 방지를 위한 출제 이력 보존 배열
-
-            function renderQuiz() {
-                if (usedIndexes.length >= list.length) {
-                    usedIndexes = [];
-                }
-
-                let randomIdx = Math.floor(Math.random() * list.length);
-                while (usedIndexes.includes(randomIdx)) {
-                    randomIdx = Math.floor(Math.random() * list.length);
-                }
-                usedIndexes.push(randomIdx);
-                currentIdx = randomIdx;
-
-                const quiz = list[currentIdx];
-                container.innerHTML = `
-                    <div class="w-full text-center">
-                        <span class="inline-block bg-sky-100 text-sky-700 font-bold px-3 py-1 text-xs rounded-full border border-sky-200 mb-3">전공 퀴즈 챌린지</span>
-                        <h4 class="text-sm font-black mb-6 text-slate-800 leading-relaxed">${quiz.q}</h4>
-                        <div class="flex flex-col gap-3 max-w-md mx-auto" id="quiz-options"></div>
-                        <div class="mt-6 text-xs text-slate-500 font-bold">
-                            연속 통과 수: <span class="font-bold text-sky-600">${successStreak}</span> / ${list.length}
-                        </div>
-                    </div>
-                `;
-
-                const optContainer = document.getElementById('quiz-options');
-                quiz.a.forEach((option, idx) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'w-full bg-white hover:bg-slate-50 border border-slate-200 text-left px-5 py-3 rounded-xl text-xs font-bold shadow-sm text-slate-700';
-                    btn.innerText = `${idx + 1}.  ${option}`;
-                    btn.onclick = () => {
-                        if (idx === quiz.right) {
-                            playBeep('success');
-                            successStreak++;
-                            if (successStreak >= list.length) {
-                                window.directClear();
-                            } else {
-                                renderQuiz();
-                            }
-                        } else {
-                            playBeep('fail');
-                            showCustomAlert('선택지가 타당하지 않습니다. 지식을 돌이켜 다시 도전해 보세요.', "오답 판정", "👀");
-                            successStreak = 0;
-                            usedIndexes = [];
-                            renderQuiz();
-                        }
-                    };
-                    optContainer.appendChild(btn);
-                });
-            }
-
-            renderQuiz();
-        }
-
-        // ==========================================
-        //  4층 영어실 (한글 뜻 안내 탑재) - 중복 단어 출제 완전 방지
-        // ==========================================
         function setupEnglishTypingGame(container, roomId) {
-            // 단어와 의미 매핑 데이터 탑재
             const wordList = [
                 { english: 'excellent', korean: '우수한, 훌륭한' },
                 { english: 'colleague', korean: '동료' },
@@ -2759,7 +2828,6 @@
                     <div class="bg-white border border-slate-200 p-6 rounded-xl mb-4 shadow-sm space-y-1">
                         <div class="text-[10px] text-slate-400 uppercase tracking-widest font-black">Target Word</div>
                         <div id="english-target-word" class="text-2xl font-black text-sky-600 tracking-wide">school</div>
-                        <!-- 단어 뜻 노출 공간 -->
                         <div id="english-target-meaning" class="text-xs text-slate-500 font-semibold italic">학교</div>
                     </div>
                     <div class="max-w-xs mx-auto">
@@ -2773,8 +2841,6 @@
 
             let score = 0;
             let currentWordObj = {};
-            
-            // 1회성 게임 세션 동안 중복을 완전히 방지하기 위해 단어 목록을 랜덤으로 사전 셔플
             let shuffledWords = [...wordList].sort(() => Math.random() - 0.5);
             let currentWordIndex = 0;
             
@@ -2785,9 +2851,7 @@
                     shuffledWords = [...wordList].sort(() => Math.random() - 0.5);
                     currentWordIndex = 0;
                 }
-                
                 currentWordObj = shuffledWords[currentWordIndex++];
-                
                 document.getElementById('english-target-word').innerText = currentWordObj.english;
                 document.getElementById('english-target-meaning').innerText = `뜻: ${currentWordObj.korean}`;
                 inputField.value = "";
@@ -2824,7 +2888,6 @@
             let score = 0;
             const targetScore = 8;
             const field = document.getElementById('bug-field');
-            let bugInterval;
 
             function spawnBug() {
                 if (!field) return;
@@ -2845,7 +2908,7 @@
                     bg.remove();
 
                     if (score >= targetScore) {
-                        clearInterval(bugInterval);
+                        clearInterval(window.currentGameInterval);
                         window.directClear();
                     }
                 };
@@ -2857,14 +2920,7 @@
                 }, 1500);
             }
 
-            bugInterval = setInterval(spawnBug, 800);
-
-            const origClose = window.closeModal;
-            window.closeModal = function() {
-                clearInterval(bugInterval);
-                origClose();
-                window.closeModal = origClose;
-            };
+            window.currentGameInterval = setInterval(spawnBug, 800);
         }
 
         function setupMathGame(container, level) {
@@ -2945,7 +3001,6 @@
             nextMath();
         }
 
-        // 실행 마운트 시 Lucide 아이콘 및 분모 세팅 초기화 렌더링
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             const totalCountEl = document.getElementById('total-rooms-count');
