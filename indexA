@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계성고등학교 소통광장</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+  <!-- 커스텀 알림 모달 -->
+  <div id="custom-alert" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center animate-in fade-in duration-200">
+      <span class="text-3xl text-blue-500 block mb-2" id="alert-icon">📢</span>
+      <h3 class="text-base font-bold text-slate-800" id="alert-title">알림</h3>
+      <p class="text-xs text-slate-500 mt-2 whitespace-pre-wrap" id="alert-message">내용</p>
+      <button onclick="closeAlert()" class="mt-5 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-md">
+        확인
+      </button>
+    </div>
+  </div>
+
+  <!-- 비로그인 화면 (로그인 / 회원가입) -->
+  <div id="auth-container" class="flex-1 flex flex-col justify-center items-center p-4">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+      <div class="text-center mb-8">
+        <span class="text-4xl">🏫</span>
+        <h1 class="text-2xl font-black text-slate-800 mt-3">계성고등학교 소통광장</h1>
+        <p class="text-sm text-slate-500 mt-1">학생 모두가 함께 공부하고 질문하는 공간</p>
+      </div>
+
+      <div id="auth-alert-box" class="mb-4 p-3 rounded-lg text-sm font-semibold hidden"></div>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">아이디</label>
+          <input type="text" id="login-id" placeholder="아이디를 입력하세요" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">비밀번호</label>
+          <input type="password" id="login-pw" placeholder="비밀번호를 입력하세요" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm">
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-all text-sm mt-2">로그인</button>
+        <div class="flex justify-between items-center text-xs text-slate-500 pt-2 border-t border-slate-100">
+          <button type="button" onclick="openFindPwModal(true)" class="hover:text-blue-600 transition-colors">비밀번호 찾기</button>
+          <button type="button" onclick="toggleAuthMode(true)" class="text-blue-600 font-bold hover:underline">새 계정 만들기</button>
+        </div>
+      </form>
+
+      <form id="register-form" class="space-y-4 hidden">
+        <div class="p-3 bg-blue-50 rounded-lg text-xs text-blue-800 leading-relaxed">
+          💡 <strong>계성고 학번-이메일 매칭 안내:</strong> <br />
+          현재 학번을 올바르게 적어주시면 시스템이 입학연도 대조 연산을 자동으로 수행합니다.
+        </div>
+        <input type="text" id="reg-name" placeholder="이름" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm">
+        <input type="text" id="reg-student-id" placeholder="현재 학번 (예: 20517)" required maxlength="5" class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm">
+        <input type="email" id="reg-email" placeholder="학교 이메일" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm">
+        <input type="text" id="reg-id" placeholder="사용할 아이디" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm">
+        <input type="password" id="reg-pw" placeholder="비밀번호 (6자 이상)" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm">
+        <button type="submit" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-md transition-all text-sm mt-2">회원가입 완료하기</button>
+        <div class="text-center pt-2 border-t border-slate-100">
+          <button type="button" onclick="toggleAuthMode(false)" class="text-xs text-slate-500 hover:text-blue-600 font-semibold">이미 계정이 있으신가요? 로그인하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 메인 대시보드 화면 -->
+  <div id="main-container" class="hidden flex-1 flex flex-col">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🏫</span>
+          <div>
+            <h1 class="text-lg font-black text-slate-800">계성고등학교 소통광장</h1>
+            <p class="text-xs text-slate-500 font-medium">전교생이 실시간으로 소통하는 커뮤니티</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div id="header-avatar-container" class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center"></div>
+          <div class="text-right">
+            <p class="text-sm font-bold text-slate-700">
+              <span id="user-display-name">학생</span> <span class="text-xs font-normal text-slate-500" id="user-display-id">(아이디)</span>
+            </p>
+            <p class="text-xs text-emerald-600 font-semibold">
+              누적 공부: <span id="user-display-studytime">00:00:00</span>
+            </p>
+          </div>
+          <button id="btn-logout" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-bold transition-all border border-slate-200 shadow-sm">
+            로그아웃
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="bg-white border-b border-slate-200 shadow-sm z-30">
+      <div class="max-w-6xl mx-auto px-4 flex gap-6 overflow-x-auto">
+        <button id="tab-home" onclick="switchTab('home')" class="py-3 px-1 border-b-2 font-bold text-sm transition-all border-blue-600 text-blue-600 flex items-center gap-1">🏠 홈</button>
+        <button id="tab-board" onclick="switchTab('board')" class="py-3 px-1 border-b-2 font-bold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">❓ 익명 질문 마당</button>
+        <button id="tab-timer" onclick="switchTab('timer')" class="py-3 px-1 border-b-2 font-bold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">⏱️ 공부 스톱워치</button>
+        <button id="tab-ranking" onclick="switchTab('ranking')" class="py-3 px-1 border-b-2 font-bold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">🏆 열공 랭킹보드</button>
+        <button id="tab-game" onclick="switchTab('game')" class="py-3 px-1 border-b-2 font-bold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">🎮 미니게임</button>
+        <button id="tab-mypage" onclick="switchTab('mypage')" class="py-3 px-1 border-b-2 font-bold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1">👤 마이페이지</button>
+      </div>
+    </nav>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">
+      
+      <!-- 홈 화면 탭 -->
+      <section id="content-home" class="space-y-6">
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm">
+          <h2 class="text-xl font-bold">계성고 소통광장에 오신 것을 환영합니다!</h2>
+          <p class="text-xs text-blue-100 mt-1">친구들과 공부 시간을 겨루고, 모르는 문제를 편안하게 익명으로 교환해 보세요.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div onclick="switchTab('mypage')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-400 transition-all group">
+            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-1">👤 마이 캐릭터 <span class="text-xs text-blue-500 group-hover:underline">선택 ➔</span></h3>
+            <div id="home-avatar-display" class="w-44 h-44 rounded-full overflow-hidden bg-slate-50 flex items-center justify-center mb-4 transition-transform group-hover:scale-105 border-4 border-slate-100"></div>
+            <p class="font-bold text-slate-800 text-base" id="home-avatar-user-name">계성고 학생</p>
+            <p class="text-xs text-slate-400 mt-1" id="home-avatar-user-id">학번 정보가 표시됩니다</p>
+          </div>
+
+          <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div onclick="switchTab('board')" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group hover:border-blue-300">
+              <div class="flex justify-between items-start">
+                <span class="text-3xl transition-transform group-hover:scale-110">📝</span>
+                <span class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded">질문마당</span>
+              </div>
+              <div class="mt-4">
+                <h4 class="font-bold text-slate-800 text-base group-hover:text-blue-600 transition-colors">익명 질문마당</h4>
+                <p class="text-xs text-slate-400 mt-1">과목별 궁금증을 익명으로 묻고 답해보세요.</p>
+              </div>
+            </div>
+
+            <div onclick="switchTab('timer')" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group hover:border-emerald-300">
+              <div class="flex justify-between items-start">
+                <span class="text-3xl transition-transform group-hover:scale-110">⏱️</span>
+                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded">스톱워치</span>
+              </div>
+              <div class="mt-4">
+                <h4 class="font-bold text-slate-800 text-base group-hover:text-emerald-600 transition-colors">열풍타 측정기</h4>
+                <p class="text-xs text-slate-400 mt-1">집중 공부 모드를 활성화하고 실력을 높이세요.</p>
+              </div>
+            </div>
+
+            <div onclick="switchTab('ranking')" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group hover:border-amber-300">
+              <div class="flex justify-between items-start">
+                <span class="text-3xl transition-transform group-hover:scale-110">🏆</span>
+                <span class="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded">랭킹보드</span>
+              </div>
+              <div class="mt-4">
+                <h4 class="font-bold text-slate-800 text-base group-hover:text-amber-600 transition-colors">실시간 열공 랭킹</h4>
+                <p class="text-xs text-slate-400 mt-1">명예의 전당! 오늘 가장 집중한 친구를 확인하세요.</p>
+              </div>
+            </div>
+
+            <div onclick="switchTab('game')" class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group hover:border-purple-300 relative overflow-hidden">
+              <span class="absolute -right-4 -bottom-4 text-7xl opacity-5 group-hover:opacity-10 transition-opacity">🎮</span>
+              <div class="flex justify-between items-start relative z-10">
+                <span class="text-3xl transition-transform group-hover:scale-110">🕹️</span>
+                <span class="text-[10px] text-purple-600 font-bold bg-purple-50 px-2 py-1 rounded">휴식시간</span>
+              </div>
+              <div class="mt-4 relative z-10">
+                <h4 class="font-bold text-slate-800 text-base group-hover:text-purple-600 transition-colors">미니 게임 & 액티비티</h4>
+                <p class="text-xs text-slate-400 mt-1">계성고 가상 투어와 재밌는 슈팅 게임을 즐겨보세요!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 미니 게임 탭 (내부 게임 실행 및 새창 열기 지원) -->
+      <section id="content-game" class="space-y-6 hidden">
+        <!-- 게임 선택 메뉴 -->
+        <div id="game-menu" class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center max-w-4xl mx-auto">
+          <h2 class="text-2xl font-black text-slate-800 mb-2">🎮 미니 게임 & 활동</h2>
+          <p class="text-xs text-slate-500 mb-8 text-center bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium">
+            원하는 게임을 클릭하여 바로 실행하세요!<br class="sm:hidden">
+            (화면이 잘리거나 키보드 조작이 안 되면 새 창 열기를 추천합니다)
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+            <div onclick="openGame('https://yeonahsong.github.io/gyeseong_codecraft/')" class="bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-400 transition-all cursor-pointer rounded-2xl p-8 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
+              <div class="absolute top-4 right-4 text-blue-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>클릭하여 시작</span>
+              </div>
+              <span class="text-6xl mb-5 group-hover:scale-110 transition-transform">🗺️</span>
+              <h3 class="text-lg font-black text-slate-800 mb-2 group-hover:text-blue-700 transition-colors">계성고등학교 가상 투어<br>& 스탬프 챌린지</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">가상으로 구현된 학교를 돌아다니며 숨겨진 스탬프를 찾고 전교생 랭킹을 올려보세요!</p>
+            </div>
+
+            <div onclick="openGame('https://youknow-1043.github.io/2d-education-shooting-game-final-/')" class="bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-400 transition-all cursor-pointer rounded-2xl p-8 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
+              <div class="absolute top-4 right-4 text-purple-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>클릭하여 시작</span>
+              </div>
+              <span class="text-6xl mb-5 group-hover:scale-110 transition-transform">🚀</span>
+              <h3 class="text-lg font-black text-slate-800 mb-2 group-hover:text-purple-700 transition-colors">수학 사칙연산<br>2D 슈팅게임</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">다가오는 사칙연산 문제의 정답을 맞추며 우주선을 지키는 짜릿한 두뇌 풀가동 슈팅 게임입니다!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 실제 게임 실행 화면 (iframe) -->
+        <div id="game-canvas-area" class="hidden bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col min-h-[600px] h-[80vh] max-w-5xl mx-auto">
+          <!-- 상단 조작 버튼 영역 -->
+          <div class="w-full flex flex-wrap gap-2 justify-between mb-4 shrink-0">
+            <button onclick="closeGame()" class="px-5 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-sm transition-colors shadow-md flex items-center gap-2">
+              <span>◀</span> 게임 닫고 목록으로
+            </button>
+            <a id="new-tab-link" href="#" target="_blank" rel="noopener noreferrer" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors shadow-md flex items-center gap-2 animate-bounce">
+              <span>↗️</span> 화면 짤림 / 키보드 오류 시 새 창 열기
+            </a>
+          </div>
+          
+          <div class="flex-1 w-full h-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 relative">
+            <iframe id="game-iframe" src="" class="w-full h-full border-0 absolute inset-0" allow="autoplay; fullscreen" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <!-- 마이페이지 탭 -->
+      <section id="content-mypage" class="space-y-6 hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm mb-6">
+          <h2 class="text-xl font-bold">나의 정보 및 마이페이지</h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+            <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-1.5">🎨 마이 캐릭터 선택</h3>
+            <p class="text-xs text-slate-400 mb-5">나를 대표할 자연스럽고 깔끔한 프로필 캐릭터를 골라보세요!</p>
+            <div class="w-full h-52 border border-slate-100 rounded-3xl bg-slate-50 flex items-center justify-center p-2 mb-6 shadow-inner">
+              <div id="mypage-avatar-viewer" class="w-full h-full max-w-[200px]"></div>
+            </div>
+            <div class="flex-1 flex flex-col justify-center">
+              <label class="block text-xs font-bold text-slate-500 mb-3 text-center">나의 프로필 캐릭터</label>
+              <div class="flex gap-3">
+                <button type="button" onclick="updateAvatar('gender', 'female')" data-gender="female" class="gender-btn flex-1 py-5 rounded-2xl text-sm font-bold border-2 transition-all flex flex-col items-center justify-center gap-2 focus:outline-none">
+                  <span class="text-2xl">👧</span> 여학생
+                </button>
+                <button type="button" onclick="updateAvatar('gender', 'male')" data-gender="male" class="gender-btn flex-1 py-5 rounded-2xl text-sm font-bold border-2 transition-all flex flex-col items-center justify-center gap-2 focus:outline-none">
+                  <span class="text-2xl">👦</span> 남학생
+                </button>
+              </div>
+            </div>
+            <button onclick="saveAvatarSettings()" class="w-full mt-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors shadow-md flex justify-center items-center gap-1.5">
+              <span>💾</span> 이 캐릭터로 프로필 저장하기
+            </button>
+          </div>
+
+          <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <h3 class="text-base font-bold text-slate-800 mb-4">⚙️ 회원정보 수정</h3>
+              <form id="mypage-info-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 mb-1">새 이름</label>
+                  <input type="text" id="mypage-name" required class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-500 mb-1">새 비밀번호 (6자 이상)</label>
+                  <input type="password" id="mypage-pw" required class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50" placeholder="기존 혹은 새 비밀번호">
+                </div>
+                <div class="sm:col-span-2 flex justify-end mt-2">
+                  <button type="submit" class="px-5 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl shadow-sm">변경사항 저장</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <div class="flex justify-between items-center mb-5">
+                <div>
+                  <h3 class="text-base font-bold text-slate-800">📅 출석 체크</h3>
+                  <p class="text-xs text-slate-400 mt-1">매일 출석체크 버튼을 클릭하세요.</p>
+                </div>
+                <div class="text-right bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
+                  <p class="text-[10px] font-bold text-blue-500">누적 출석일</p>
+                  <p class="text-2xl font-black text-blue-700"><span id="mypage-attendance-count">0</span><span class="text-sm">일</span></p>
+                </div>
+              </div>
+              <div id="attendance-stamp-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-5"></div>
+              <button onclick="handleAttendanceCheck()" class="w-full py-3 bg-blue-50 text-blue-700 font-bold rounded-xl text-xs border border-blue-200">📍 오늘 출석 체크 도장 찍기</button>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <h3 class="text-base font-bold text-slate-800 mb-1">📊 이번 달 공부현황</h3>
+              <p class="text-xs text-slate-400 mb-5">공부한 일자와 학습 강도를 색상 잔디로 구별합니다.</p>
+              <div class="bg-slate-50/70 p-5 rounded-xl border border-slate-100">
+                <div class="text-center font-black text-slate-800 text-sm mb-4" id="calendar-title-text">2026년 7월 (July)</div>
+                <div class="grid grid-cols-7 gap-1.5 text-center text-[10px] font-bold text-slate-400 mb-2">
+                  <div class="text-red-400">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-blue-400">토</div>
+                </div>
+                <div id="mypage-study-calendar" class="grid grid-cols-7 gap-1.5"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 질문마당 탭 -->
+      <section id="content-board" class="space-y-6 hidden">
+        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between gap-4">
+          <div><h2 class="text-lg font-bold text-slate-800">익명 질문 마당</h2></div>
+          <button onclick="openWriteModal(true)" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl shadow-md text-sm">✏️ 질문 올리기</button>
+        </div>
+        <div id="subject-filters" class="flex flex-wrap gap-2 pb-1 overflow-x-auto scrollbar-hide"></div>
+        <div id="board-posts" class="space-y-4"></div>
+      </section>
+
+      <!-- 스톱워치 탭 -->
+      <section id="content-timer" class="space-y-6 hidden">
+        <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-slate-100 max-w-xl mx-auto flex flex-col items-center">
+          <h2 class="text-xl font-bold text-slate-800 mb-2">🔥 열풍타 스톱워치</h2>
+          <div class="w-56 h-56 rounded-full border-8 border-slate-100 flex flex-col justify-center items-center relative mb-8 bg-slate-50 shadow-inner">
+            <span id="studying-ping" class="absolute h-48 w-48 rounded-full bg-blue-200 opacity-30 hidden animate-ping"></span>
+            <span id="timer-display" class="text-4xl font-black text-slate-800 tracking-wider z-10 font-mono">00:00:00</span>
+            <span id="timer-status" class="text-xs font-bold text-slate-400 mt-2 z-10">준비 완료</span>
+          </div>
+          <button id="btn-timer-toggle" onclick="toggleTimer()" class="w-full max-w-xs py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg text-sm">⏱️ 측정 시작하기</button>
+        </div>
+      </section>
+
+      <!-- 랭킹보드 탭 -->
+      <section id="content-ranking" class="space-y-6 hidden">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-lg font-bold text-slate-800">🏆 전교생 열공 랭킹보드</h2>
+            <span class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-100">실시간 동기화 중</span>
+          </div>
+          <div id="ranking-list" class="divide-y divide-slate-100/80 max-h-[600px] overflow-y-auto pr-2 space-y-1"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 py-8 mt-12">
+      <div class="max-w-6xl mx-auto px-4 text-center">
+        <p class="text-xs font-bold tracking-wider mb-2">계성고등학교 전교생 소통광장</p>
+        <p class="text-[10px] text-slate-500">© 2026. All rights reserved. Designed for Gyeseong High School.</p>
+      </div>
+    </footer>
+  </div>
+
+  <div id="modal-find-pw" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4 hidden transition-opacity">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative shadow-2xl">
+      <button onclick="openFindPwModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      <h3 class="text-lg font-bold text-slate-800 mb-4">비밀번호 찾기</h3>
+      <form id="find-pw-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">가입한 아이디 입력</label>
+          <input type="text" id="find-id-input" required placeholder="아이디를 입력하세요"
+            class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md">비밀번호 찾기</button>
+      </form>
+      <div id="find-pw-result" class="mt-4 p-4 bg-blue-50 rounded-xl text-xs text-blue-900 leading-relaxed border border-blue-100 hidden"></div>
+    </div>
+  </div>
+
+  <div id="modal-write-post" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4 hidden transition-opacity">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 relative shadow-2xl">
+      <button onclick="openWriteModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      <h3 class="text-lg font-bold text-slate-800 mb-4">새 익명 질문 올리기</h3>
+      <form id="write-post-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">질문 과목 선택</label>
+          <select id="post-subject" class="w-full px-4 py-2.5 border rounded-xl text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">제목</label>
+          <input type="text" id="post-title" required placeholder="질문의 한 줄 요약을 작성하세요"
+            class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">자세한 내용</label>
+          <textarea id="post-content" required rows="5" placeholder="궁금한 부분을 자세히 써주세요. 완벽하게 익명으로 게시됩니다."
+            class="w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-slate-50"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">사진 첨부 (선택)</label>
+          <input type="file" id="post-image-file" accept="image/*"
+            class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+          <div id="image-preview-container" class="mt-3 p-2 border rounded-xl inline-block bg-slate-50 hidden shadow-sm">
+            <img id="image-preview" src="" alt="프리뷰" class="h-24 w-auto rounded-lg object-cover">
+          </div>
+        </div>
+        <button type="submit" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-sm mt-2">질문 등록 완료</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentUserData = null;
+    let dbUsers = {};
+    let questions = [];
+    let selectedSubject = '전체';
+    const subjects = ['국어', '영어', '수학', '사회', '과학', '기타'];
+    let avatarConfig = { gender: 'female' };
+    let isStudying = false;
+    let studyTimeSeconds = 0;
+    let stopwatchInterval = null;
+
+    function getLocalData(key, defaultValue) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : defaultValue; }
+    function setLocalData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+
+    window.showAlert = function(message, title = "알림", icon = "📢") {
+      document.getElementById('alert-icon').innerText = icon; document.getElementById('alert-title').innerText = title;
+      document.getElementById('alert-message').innerText = message; document.getElementById('custom-alert').classList.remove('hidden');
+    };
+    window.closeAlert = function() { document.getElementById('custom-alert').classList.add('hidden'); };
+    
+    window.showAuthAlert = function(msg, type = 'error') {
+      const box = document.getElementById('auth-alert-box'); box.innerText = (type === 'error' ? '⚠️ ' : '🎉 ') + msg;
+      box.className = `mb-4 p-3 rounded-xl text-sm font-bold shadow-sm ${type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
+      box.classList.remove('hidden');
+    };
+
+    window.toggleAuthMode = function(registering) {
+      document.getElementById('login-form').classList.toggle('hidden', registering);
+      document.getElementById('register-form').classList.toggle('hidden', !registering);
+      document.getElementById('auth-alert-box').classList.add('hidden');
+    };
+
+    window.openFindPwModal = function(open) {
+      document.getElementById('modal-find-pw').classList.toggle('hidden', !open);
+      document.getElementById('find-id-input').value = '';
+      document.getElementById('find-pw-result').classList.add('hidden');
+    };
+
+    window.switchTab = function(tabName) {
+      ['home', 'board', 'timer', 'ranking', 'mypage', 'game'].forEach(name => {
+        const section = document.getElementById(`content-${name}`);
+        if(section) section.classList.toggle('hidden', tabName !== name);
+        const tabBtn = document.getElementById(`tab-${name}`);
+        if(tabBtn) {
+          if (tabName === name) tabBtn.className = "py-3 px-1 border-b-2 font-bold text-sm transition-all border-blue-600 text-blue-600 flex items-center gap-1";
+          else tabBtn.className = "py-3 px-1 border-b-2 font-bold text-sm transition-all border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap";
+        }
+      });
+      if (tabName !== 'game') { window.closeGame(); }
+    };
+
+    window.openGame = function(url) {
+      document.getElementById('game-menu').classList.add('hidden');
+      document.getElementById('game-canvas-area').classList.remove('hidden');
+      document.getElementById('game-iframe').src = url;
+      document.getElementById('new-tab-link').href = url;
+      
+      setTimeout(() => {
+        const iframe = document.getElementById('game-iframe');
+        if(iframe) {
+            iframe.focus();
+            if(iframe.contentWindow) iframe.contentWindow.focus();
+        }
+      }, 300);
+    };
+
+    window.closeGame = function() {
+      document.getElementById('game-menu').classList.remove('hidden');
+      document.getElementById('game-canvas-area').classList.add('hidden');
+      document.getElementById('game-iframe').src = '';
+      document.getElementById('new-tab-link').href = '#';
+    };
+
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600); const m = Math.floor((seconds % 3600) / 60); const s = seconds % 60;
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function renderDashboard() {
+      document.getElementById('auth-container').classList.add('hidden'); document.getElementById('main-container').classList.remove('hidden');
+      document.getElementById('user-display-name').innerText = currentUserData.name;
+      document.getElementById('user-display-id').innerText = `(${currentUserData.userId})`;
+      document.getElementById('user-display-studytime').innerText = formatTime(currentUserData.studyTime || 0);
+      document.getElementById('mypage-name').value = currentUserData.name; document.getElementById('mypage-pw').value = currentUserData.password;
+      renderAttendanceStamps(); renderStudyCalendar(); renderAvatarGraphics(); updateAvatarUI();
+    }
+
+    function renderRanking() {
+      const listContainer = document.getElementById('ranking-list'); listContainer.innerHTML = '';
+      const sortedUsers = Object.values(dbUsers).sort((a, b) => (b.studyTime || 0) - (a.studyTime || 0));
+      if (sortedUsers.length === 0) return;
+      sortedUsers.forEach((userItem, index) => {
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between py-3.5 px-4 rounded-2xl border-b border-slate-100`;
+        row.innerHTML = `<div class="font-bold">${index+1}위 ${userItem.name}</div><div class="text-blue-600">${formatTime(userItem.studyTime || 0)}</div>`;
+        listContainer.appendChild(row);
+      });
+    }
+
+    function renderAttendanceStamps() {
+      const grid = document.getElementById('attendance-stamp-grid'); grid.innerHTML = '';
+      const count = currentUserData.attendanceDays || 0; document.getElementById('mypage-attendance-count').innerText = count;
+      for (let i = 1; i <= Math.max(10, Math.ceil((count + 1) / 10) * 10); i++) {
+        const box = document.createElement('div');
+        box.className = `h-10 rounded-lg flex items-center justify-center border text-[10px] font-bold ${i <= count ? 'bg-blue-500 border-blue-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-300'}`;
+        box.innerHTML = i <= count ? '✔️' : i; grid.appendChild(box);
+      }
+    }
+
+    function renderStudyCalendar() {
+      const container = document.getElementById('mypage-study-calendar'); container.innerHTML = '';
+      const now = new Date(); const year = now.getFullYear(); const month = now.getMonth();
+      const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let i = 0; i < firstDay; i++) { const empty = document.createElement('div'); empty.className = 'h-8'; container.appendChild(empty); }
+      const dailyData = currentUserData.dailyStudy || {};
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const sec = dailyData[dateStr] || 0;
+        let bgClass = 'bg-white border-slate-200 text-slate-400';
+        if (sec > 0) bgClass = sec < 600 ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : (sec < 1800 ? 'bg-emerald-200 border-emerald-300' : 'bg-emerald-400 border-emerald-500 font-bold');
+        const cell = document.createElement('div'); cell.className = `h-8 rounded flex items-center justify-center text-[10px] border ${bgClass}`; cell.innerHTML = `<span>${day}</span>`; container.appendChild(cell);
+      }
+    }
+
+    function renderSubjectFilters() {
+      const container = document.getElementById('subject-filters'); container.innerHTML = '';
+      const allBtn = document.createElement('button');
+      allBtn.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all border ${selectedSubject === '전체' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600'}`;
+      allBtn.innerText = '전체 과목'; allBtn.onclick = () => { selectedSubject = '전체'; renderSubjectFilters(); renderBoardPosts(); }; container.appendChild(allBtn);
+
+      subjects.forEach(subj => {
+        const btn = document.createElement('button');
+        btn.className = `px-5 py-2.5 rounded-full text-xs font-bold transition-all border ${selectedSubject === subj ? 'bg-blue-600 text-white' : 'bg-white text-slate-600'}`;
+        btn.innerText = subj; btn.onclick = () => { selectedSubject = subj; renderSubjectFilters(); renderBoardPosts(); }; container.appendChild(btn);
+      });
+    }
+
+    function renderBoardPosts() {
+      const container = document.getElementById('board-posts'); container.innerHTML = '';
+      const filtered = questions.filter(q => selectedSubject === '전체' || q.subject === selectedSubject);
+      if (filtered.length === 0) { container.innerHTML = `<div class="bg-white text-center py-16 rounded-2xl text-slate-400 font-bold border border-slate-100">질문이 없습니다.</div>`; return; }
+
+      filtered.forEach(q => {
+        const card = document.createElement('div'); card.className = "bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4";
+        let repliesHtml = q.replies && q.replies.length > 0 ? q.replies.map(r => `<div class="bg-slate-50 p-3 rounded-xl"><span class="font-bold text-xs">🙋‍♂️ ${r.authorId}</span><p class="text-sm mt-1">${r.content}</p></div>`).join('') : '<p class="text-xs text-slate-400">답변이 없습니다.</p>';
+        let imgHtml = q.image ? `<img src="${q.image}" class="mt-2 rounded-xl max-h-48 object-cover">` : '';
+        
+        card.innerHTML = `
+          <div class="flex justify-between border-b pb-3 border-slate-100">
+            <div><span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">${q.subject}</span> <span class="text-xs font-bold ml-2">👤 익명</span></div>
+            <span class="text-[10px] text-slate-400">${new Date(q.createdAt).toLocaleString()}</span>
+          </div>
+          <h3 class="font-bold text-slate-800">${q.title}</h3><p class="text-sm text-slate-600">${q.content}</p>${imgHtml}
+          <div class="mt-2 border-t border-slate-100 pt-3">
+            <div class="space-y-2 mb-3">${repliesHtml}</div>
+            <div class="flex gap-2"><input type="text" id="reply-${q.id}" placeholder="답변 달기" class="flex-1 px-3 py-2 border rounded-lg text-xs"><button onclick="submitReply('${q.id}')" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs">작성</button></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function generateAvatarSvg(config) {
+      const gender = config.gender || 'female';
+      if (gender === 'female') {
+        return `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-sm"><defs><linearGradient id="femHair" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#5d4037" /><stop offset="100%" stop-color="#3e2723" /></linearGradient></defs><circle cx="50" cy="50" r="48" fill="#fdf2f8" /><path d="M 20,45 C 10,75 15,95 30,100 C 45,102 55,102 70,100 C 85,95 90,75 80,45 Z" fill="#3e2723" /><path d="M 15,100 C 15,70 85,70 85,100 Z" fill="#ffffff" /><path d="M 22,75 L 50,100 L 78,75 L 85,100 L 15,100 Z" fill="#1e293b" /><path d="M 50,85 L 42,95 L 46,78 Z" fill="#e11d48" /><path d="M 50,85 L 58,95 L 54,78 Z" fill="#e11d48" /><circle cx="50" cy="83" r="3.5" fill="#be123c" /><rect x="43" y="60" width="14" height="15" fill="#ffe4ce" /><path d="M 43,65 Q 50,72 57,65 L 57,75 L 43,75 Z" fill="#fbcfe8" opacity="0.5"/><path d="M 27,45 C 27,20 73,20 73,45 C 73,68 62,80 50,80 C 38,80 27,68 27,45 Z" fill="#ffe4ce" /><circle cx="37" cy="53" r="3.5" fill="#292524" /><circle cx="63" cy="53" r="3.5" fill="#292524" /><circle cx="36" cy="52" r="1.2" fill="#ffffff" /><circle cx="62" cy="52" r="1.2" fill="#ffffff" /><ellipse cx="31" cy="60" rx="4.5" ry="3" fill="#fda4af" opacity="0.6" /><ellipse cx="69" cy="60" rx="4.5" ry="3" fill="#fda4af" opacity="0.6" /><path d="M 46,67 Q 50,71 54,67" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" /><path d="M 50,15 C 25,15 18,30 18,50 C 18,65 20,75 25,80 C 27,68 28,55 32,45 C 34,50 38,45 42,50 C 46,45 52,48 55,42 C 60,48 65,42 68,48 C 72,55 73,68 75,80 C 80,75 82,65 82,50 C 82,30 75,15 50,15 Z" fill="#5d4037" /><path d="M 32,25 Q 35,38 32,45 M 42,22 Q 45,38 42,50 M 55,22 Q 52,32 55,42" fill="none" stroke="#3e2723" stroke-width="1.5" stroke-linecap="round" opacity="0.4" /></svg>`;
+      } else {
+        return `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-sm"><circle cx="50" cy="50" r="48" fill="#f0fdf4" /><path d="M 22,35 C 12,50 18,70 30,75 L 70,75 C 82,70 88,50 78,35 Z" fill="#0f172a" /><path d="M 15,100 C 15,70 85,70 85,100 Z" fill="#ffffff" /><path d="M 22,75 L 50,100 L 78,75 L 85,100 L 15,100 Z" fill="#64748b" /><path d="M 47,80 L 53,80 L 55,100 L 50,105 L 45,100 Z" fill="#0f172a" /><rect x="42" y="60" width="16" height="15" fill="#ffe4ce" /><path d="M 42,65 Q 50,73 58,65 L 58,75 L 42,75 Z" fill="#fbcfe8" opacity="0.5"/><path d="M 28,45 C 28,20 72,20 72,45 C 72,68 62,81 50,81 C 38,81 28,68 28,45 Z" fill="#ffe4ce" /><circle cx="37" cy="53" r="3.2" fill="#1e293b" /><circle cx="63" cy="53" r="3.2" fill="#1e293b" /><circle cx="36" cy="52" r="1" fill="#ffffff" /><circle cx="62" cy="52" r="1" fill="#ffffff" /><path d="M 31,46 L 42,47 M 69,46 L 58,47" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" /><path d="M 45,67 Q 50,70 55,67" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round" /><path d="M 50,16 C 25,16 18,35 18,50 C 18,55 21,62 23,65 C 25,58 26,50 28,45 C 31,46 34,44 34,44 C 38,52 44,42 50,48 C 56,42 62,52 66,44 C 66,44 69,46 72,45 C 74,50 75,58 77,65 C 79,62 82,55 82,50 C 82,35 75,16 50,16 Z" fill="#1e293b" /><path d="M 30,25 Q 35,35 33,45 M 45,20 Q 48,35 50,48 M 65,22 Q 62,35 67,45" fill="none" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg>`;
+      }
+    }
+
+    function renderAvatarGraphics() {
+      const svgCode = generateAvatarSvg(avatarConfig);
+      document.getElementById('header-avatar-container').innerHTML = svgCode;
+      document.getElementById('home-avatar-display').innerHTML = svgCode;
+      document.getElementById('mypage-avatar-viewer').innerHTML = svgCode;
+    }
+
+    function updateAvatarUI() {
+      document.querySelectorAll('.gender-btn').forEach(btn => {
+        if (btn.dataset.gender === avatarConfig.gender) {
+          btn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'ring-2', 'ring-blue-200'); btn.classList.remove('border-slate-200', 'text-slate-600', 'bg-white');
+        } else {
+          btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'ring-2', 'ring-blue-200'); btn.classList.add('border-slate-200', 'text-slate-600', 'bg-white');
+        }
+      });
+    }
+
+    window.updateAvatar = function(part, value) { avatarConfig[part] = value; renderAvatarGraphics(); updateAvatarUI(); };
+    window.saveAvatarSettings = async function() {
+      if (!currentUserData) return;
+      currentUserData.avatar = { ...avatarConfig }; dbUsers[currentUserData.userId].avatar = { ...avatarConfig };
+      setLocalData('school_db_users_gs', dbUsers); renderAvatarGraphics();
+      if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { avatar: avatarConfig }); } catch (e) { } }
+      window.showAlert("선택하신 캐릭터가 내 프로필로 적용되었습니다!", "캐릭터 저장 완료", "🎨");
+    };
+
+    window.toggleTimer = async function() {
+      if (!isStudying) {
+        isStudying = true; studyTimeSeconds = 0;
+        document.getElementById('timer-status').innerText = '🔥 초집중 모드 진행 중...';
+        document.getElementById('btn-timer-toggle').innerHTML = '🛑 기록 종료 및 저장';
+        stopwatchInterval = setInterval(() => { studyTimeSeconds++; document.getElementById('timer-display').innerText = formatTime(studyTimeSeconds); }, 1000);
+      } else await forceSaveTime();
+    };
+
+    async function forceSaveTime() {
+      isStudying = false; clearInterval(stopwatchInterval);
+      if (!currentUserData) return;
+      const accumulated = (currentUserData.studyTime || 0) + studyTimeSeconds;
+      currentUserData.studyTime = accumulated;
+      
+      const d = new Date(); const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (!currentUserData.dailyStudy) currentUserData.dailyStudy = {};
+      currentUserData.dailyStudy[todayStr] = (currentUserData.dailyStudy[todayStr] || 0) + studyTimeSeconds;
+      
+      dbUsers[currentUserData.userId] = currentUserData; setLocalData('school_db_users_gs', dbUsers);
+      document.getElementById('user-display-studytime').innerText = formatTime(accumulated);
+      renderStudyCalendar(); renderRanking();
+      
+      if (window.fbUpdateDoc) {
+        try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { studyTime: accumulated, dailyStudy: currentUserData.dailyStudy }); } catch (e) { }
+      }
+      studyTimeSeconds = 0; document.getElementById('timer-status').innerText = '준비 완료'; document.getElementById('btn-timer-toggle').innerHTML = '⏱️ 측정 시작하기';
+    }
+
+    window.handleAttendanceCheck = async function() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (!currentUserData.attendanceDates) currentUserData.attendanceDates = [];
+      if (currentUserData.attendanceDates.includes(todayStr)) return window.showAlert("오늘은 이미 출석체크를 완료했습니다!");
+      currentUserData.attendanceDates.push(todayStr); currentUserData.attendanceDays = (currentUserData.attendanceDays || 0) + 1;
+      dbUsers[currentUserData.userId] = currentUserData; setLocalData('school_db_users_gs', dbUsers); renderAttendanceStamps();
+      if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { attendanceDays: currentUserData.attendanceDays, attendanceDates: currentUserData.attendanceDates }); } catch (e) {} }
+      window.showAlert("출석 체크 완료! 🎉");
+    };
+
+    window.openWriteModal = function(open = true) {
+      document.getElementById('modal-write-post').classList.toggle('hidden', !open);
+      if (open) {
+        const sel = document.getElementById('post-subject'); sel.innerHTML = '';
+        subjects.forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.innerText = s; sel.appendChild(opt); });
+        document.getElementById('post-title').value = ''; document.getElementById('post-content').value = '';
+        document.getElementById('image-preview-container').classList.add('hidden');
+      }
+    };
+
+    window.submitReply = async function(id) {
+      const el = document.getElementById(`reply-${id}`); const val = el.value.trim(); if (!val) return;
+      const idx = questions.findIndex(q => q.id === id); if (idx === -1) return;
+      if (!questions[idx].replies) questions[idx].replies = [];
+      questions[idx].replies.push({ id: crypto.randomUUID(), authorId: currentUserData.userId, content: val, createdAt: Date.now() });
+      setLocalData('school_db_questions_gs', questions); renderBoardPosts();
+      if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_posts', id, { replies: questions[idx].replies }); } catch (e) {} }
+    };
+
+    window.syncUsersFromDB = function(usersData) {
+      dbUsers = { ...dbUsers, ...usersData }; setLocalData('school_db_users_gs', dbUsers);
+      if (currentUserData && dbUsers[currentUserData.userId]) currentUserData = dbUsers[currentUserData.userId];
+      renderRanking();
+    };
+
+    window.syncPostsFromDB = function(postsData) {
+      postsData.sort((a, b) => b.createdAt - a.createdAt); questions = postsData; setLocalData('school_db_questions_gs', questions); renderBoardPosts();
+    };
+
+    window.onload = function() {
+      renderSubjectFilters(); updateAvatarUI();
+      dbUsers = { ...getLocalData('school_db_users_gs', {}) }; questions = getLocalData('school_db_questions_gs', []); renderBoardPosts();
+      
+      const savedSession = localStorage.getItem('school_user_session');
+      if (savedSession) {
+        const parsed = JSON.parse(savedSession);
+        if (dbUsers[parsed.userId]) {
+          currentUserData = dbUsers[parsed.userId];
+          if (currentUserData.avatar) avatarConfig = { gender: 'female', ...currentUserData.avatar };
+          renderDashboard(); renderRanking();
+        } else localStorage.removeItem('school_user_session');
+      }
+
+      document.getElementById('login-form').onsubmit = function(e) {
+        e.preventDefault(); const id = document.getElementById('login-id').value.trim(); const pw = document.getElementById('login-pw').value;
+        dbUsers = { ...getLocalData('school_db_users_gs', {}) };
+        if (!dbUsers[id] || dbUsers[id].password !== pw) { window.showAuthAlert('아이디나 비밀번호가 일치하지 않습니다.', 'error'); return; }
+        currentUserData = dbUsers[id];
+        if (currentUserData.avatar) avatarConfig = { gender: 'female', ...currentUserData.avatar };
+        localStorage.setItem('school_user_session', JSON.stringify({ userId: id }));
+        document.getElementById('login-id').value = ''; document.getElementById('login-pw').value = '';
+        renderDashboard(); renderRanking(); window.switchTab('home'); 
+      };
+
+      document.getElementById('register-form').onsubmit = async function(e) {
+        e.preventDefault();
+        const id = document.getElementById('reg-id').value.trim(); const pw = document.getElementById('reg-pw').value;
+        dbUsers = { ...getLocalData('school_db_users_gs', {}) };
+        if (pw.length < 6) return window.showAuthAlert('비밀번호는 최소 6자 이상이어야 합니다.', 'error');
+        if (dbUsers[id]) return window.showAuthAlert('이미 사용중인 아이디입니다.', 'error');
+        
+        const newUserData = {
+          userId: id, password: pw, name: document.getElementById('reg-name').value.trim(), studentId: document.getElementById('reg-student-id').value.trim(),
+          studyTime: 0, attendanceDays: 0, attendanceDates: [], dailyStudy: {}, avatar: { ...avatarConfig }, createdAt: Date.now()
+        };
+        dbUsers[id] = newUserData; setLocalData('school_db_users_gs', dbUsers);
+        if (window.fbSetDoc) { try { await window.fbSetDoc('school_accounts', id, newUserData); } catch (e) { } }
+        window.showAuthAlert('회원가입 완료! 로그인해 주세요.', 'success'); window.toggleAuthMode(false);
+      };
+
+      document.getElementById('btn-logout').onclick = async function() {
+        if (isStudying) await forceSaveTime();
+        currentUserData = null; localStorage.removeItem('school_user_session');
+        document.getElementById('main-container').classList.add('hidden'); document.getElementById('auth-container').classList.remove('hidden');
+      };
+
+      document.getElementById('find-pw-form').onsubmit = function(e) {
+        e.preventDefault();
+        const id = document.getElementById('find-id-input').value.trim(); const resBox = document.getElementById('find-pw-result');
+        dbUsers = { ...getLocalData('school_db_users_gs', {}) };
+        if (!dbUsers[id]) {
+          resBox.innerText = '존재하지 않는 아이디입니다.'; resBox.className = 'mt-4 p-4 bg-red-50 text-red-700 rounded-xl text-xs border border-red-100'; resBox.classList.remove('hidden'); return;
+        }
+        resBox.innerHTML = `아이디 <strong>${id}</strong>님의 비밀번호가 등록된 이메일로 전송되었습니다.<br><span class="mt-2 block bg-emerald-100 p-2 rounded-lg text-emerald-900 font-bold">비밀번호 확인: ${dbUsers[id].password}</span>`;
+        resBox.className = 'mt-4 p-4 bg-emerald-50 text-emerald-900 rounded-xl text-xs border border-emerald-100'; resBox.classList.remove('hidden');
+      };
+
+      document.getElementById('mypage-info-form').onsubmit = async function(e) {
+        e.preventDefault();
+        const newName = document.getElementById('mypage-name').value.trim(); const newPw = document.getElementById('mypage-pw').value;
+        if (newPw.length < 6) return window.showAlert("비밀번호는 최소 6자 이상이어야 합니다.");
+        currentUserData.name = newName; currentUserData.password = newPw;
+        dbUsers[currentUserData.userId].name = newName; dbUsers[currentUserData.userId].password = newPw;
+        setLocalData('school_db_users_gs', dbUsers); renderDashboard();
+        if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { name: newName, password: newPw }); } catch (err) {} }
+        window.showAlert("회원 정보가 성공적으로 변경되었습니다!", "수정 완료", "⚙️");
+      };
+
+      document.getElementById('write-post-form').onsubmit = async function(e) {
+        e.preventDefault();
+        const title = document.getElementById('post-title').value.trim(); const content = document.getElementById('post-content').value.trim();
+        const subject = document.getElementById('post-subject').value;
+        const imgContainer = document.getElementById('image-preview-container');
+        const base64Img = imgContainer.classList.contains('hidden') ? '' : document.getElementById('image-preview').src;
+        if (!title || !content) return window.showAlert("제목과 내용을 확인해주세요.");
+        const newPost = { id: crypto.randomUUID(), title, content, subject, image: base64Img, authorId: currentUserData.userId, authorName: '익명', createdAt: Date.now(), replies: [] };
+        questions.unshift(newPost); setLocalData('school_db_questions_gs', questions); renderBoardPosts();
+        if (window.fbSetDoc) { try { await window.fbSetDoc('school_posts', newPost.id, newPost); } catch (e) {} }
+        window.openWriteModal(false); window.showAlert("질문이 등록되었습니다!", "등록 완료", "🎉");
+      };
+      
+      document.getElementById('post-image-file').onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.size > 1024 * 1024) { window.showAlert("첨부 파일 크기는 1MB 이하여야 합니다.", "파일 제한", "⚠️"); e.target.value = ''; return; }
+          const reader = new FileReader();
+          reader.onload = (evt) => { document.getElementById('image-preview').src = evt.target.result; document.getElementById('image-preview-container').classList.remove('hidden'); };
+          reader.readAsDataURL(file);
+        }
+      };
+    };
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    try {
+      const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+      if (firebaseConfig && firebaseConfig.apiKey) {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'school-community-app';
+
+        window.fbSetDoc = async (colName, docId, data) => {
+          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
+        };
+        window.fbUpdateDoc = async (colName, docId, data) => {
+          await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
+        };
+
+        const initAuth = async () => {
+          try {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+              await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+              await signInAnonymously(auth);
+            }
+          } catch (e) {
+            console.error("Firebase Auth Error", e);
+          }
+        };
+
+        initAuth().then(() => {
+          onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+            
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_accounts'), (snapshot) => {
+              const tempUsers = {}; snapshot.forEach(d => tempUsers[d.id] = d.data());
+              if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
+            }, (err) => console.error(err));
+            
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_posts'), (snapshot) => {
+              const list = []; snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
+              if (window.syncPostsFromDB) window.syncPostsFromDB(list);
+            }, (err) => console.error(err));
+          });
+        });
+      }
+    } catch (e) {
+      console.log("Firebase connection bypassed. Local storage mode active.");
+    }
+  </script>
+</body>
+</html>
+
+
+
