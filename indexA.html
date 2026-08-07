@@ -148,7 +148,7 @@
                 <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded">스톱워치</span>
               </div>
               <div class="mt-4">
-                <h4 class="font-bold text-slate-800 text-base group-hover:text-emerald-600 transition-colors">열풍타 측정기</h4>
+                <h4 class="font-bold text-slate-800 text-base group-hover:text-emerald-600 transition-colors">계품타 측정기</h4>
                 <p class="text-xs text-slate-400 mt-1">집중 공부 모드를 활성화하고 실력을 높이세요.</p>
               </div>
             </div>
@@ -182,30 +182,41 @@
       <!-- 미니 게임 탭 (내부 게임 실행 및 새창 열기 지원) -->
       <section id="content-game" class="space-y-6 hidden">
         <!-- 게임 선택 메뉴 -->
-        <div id="game-menu" class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center max-w-4xl mx-auto">
+        <div id="game-menu" class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center max-w-5xl mx-auto">
           <h2 class="text-2xl font-black text-slate-800 mb-2">🎮 미니 게임 & 활동</h2>
           <p class="text-xs text-slate-500 mb-8 text-center bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium">
             원하는 게임을 클릭하여 바로 실행하세요!<br class="sm:hidden">
             (화면이 잘리거나 키보드 조작이 안 되면 새 창 열기를 추천합니다)
           </p>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-            <div onclick="openGame('https://yeonahsong.github.io/gyeseong_codecraft/')" class="bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-400 transition-all cursor-pointer rounded-2xl p-8 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            <div onclick="openGame('https://yeonahsong.github.io/gyeseong_codecraft/indexC.html')" class="bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-400 transition-all cursor-pointer rounded-2xl p-6 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
               <div class="absolute top-4 right-4 text-blue-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <span>클릭하여 시작</span>
               </div>
-              <span class="text-6xl mb-5 group-hover:scale-110 transition-transform">🗺️</span>
-              <h3 class="text-lg font-black text-slate-800 mb-2 group-hover:text-blue-700 transition-colors">계성고등학교 가상 투어<br>& 스탬프 챌린지</h3>
-              <p class="text-xs text-slate-500 leading-relaxed">가상으로 구현된 학교를 돌아다니며 숨겨진 스탬프를 찾고 전교생 랭킹을 올려보세요!</p>
+              <span class="text-5xl mb-4 group-hover:scale-110 transition-transform">🗺️</span>
+              <h3 class="text-base font-black text-slate-800 mb-2 group-hover:text-blue-700 transition-colors">가상 투어<br>& 스탬프 챌린지</h3>
+              <p class="text-[11px] text-slate-500 leading-relaxed">가상으로 구현된 학교를 돌아다니며 숨겨진 스탬프를 찾고 랭킹을 올려보세요!</p>
             </div>
 
-            <div onclick="openGame('https://youknow-1043.github.io/2d-education-shooting-game-final-/')" class="bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-400 transition-all cursor-pointer rounded-2xl p-8 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
+            <!-- 새로 교체한 슈팅게임 링크 -->
+            <div onclick="openGame('https://lxurx1342-afk.github.io/shooting/')" class="bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-400 transition-all cursor-pointer rounded-2xl p-6 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
               <div class="absolute top-4 right-4 text-purple-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <span>클릭하여 시작</span>
               </div>
-              <span class="text-6xl mb-5 group-hover:scale-110 transition-transform">🚀</span>
-              <h3 class="text-lg font-black text-slate-800 mb-2 group-hover:text-purple-700 transition-colors">수학 사칙연산<br>2D 슈팅게임</h3>
-              <p class="text-xs text-slate-500 leading-relaxed">다가오는 사칙연산 문제의 정답을 맞추며 우주선을 지키는 짜릿한 두뇌 풀가동 슈팅 게임입니다!</p>
+              <span class="text-5xl mb-4 group-hover:scale-110 transition-transform">🚀</span>
+              <h3 class="text-base font-black text-slate-800 mb-2 group-hover:text-purple-700 transition-colors">2D 슈팅 게임<br>&nbsp;</h3>
+              <p class="text-[11px] text-slate-500 leading-relaxed">다가오는 적들을 조준하고 물리치는 짜릿한 두뇌 풀가동 슈팅 게임입니다!</p>
+            </div>
+            
+            <!-- 새로 추가한 매직 디펜스 링크 -->
+            <div onclick="openGame('https://lxurx1342-afk.github.io/magic-defense/')" class="bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-400 transition-all cursor-pointer rounded-2xl p-6 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
+              <div class="absolute top-4 right-4 text-amber-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>클릭하여 시작</span>
+              </div>
+              <span class="text-5xl mb-4 group-hover:scale-110 transition-transform">🪄</span>
+              <h3 class="text-base font-black text-slate-800 mb-2 group-hover:text-amber-700 transition-colors">매직 디펜스<br>&nbsp;</h3>
+              <p class="text-[11px] text-slate-500 leading-relaxed">몰려오는 몬스터들을 마법으로 막아내는 흥미진진한 짜릿한 디펜스 게임입니다!</p>
             </div>
           </div>
         </div>
@@ -318,7 +329,7 @@
       <!-- 스톱워치 탭 -->
       <section id="content-timer" class="space-y-6 hidden">
         <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-slate-100 max-w-xl mx-auto flex flex-col items-center">
-          <h2 class="text-xl font-bold text-slate-800 mb-2">🔥 열풍타 스톱워치</h2>
+          <h2 class="text-xl font-bold text-slate-800 mb-2">🔥 계품타 스톱워치</h2>
           <div class="w-56 h-56 rounded-full border-8 border-slate-100 flex flex-col justify-center items-center relative mb-8 bg-slate-50 shadow-inner">
             <span id="studying-ping" class="absolute h-48 w-48 rounded-full bg-blue-200 opacity-30 hidden animate-ping"></span>
             <span id="timer-display" class="text-4xl font-black text-slate-800 tracking-wider z-10 font-mono">00:00:00</span>
@@ -810,6 +821,3 @@
   </script>
 </body>
 </html>
-
-
-
