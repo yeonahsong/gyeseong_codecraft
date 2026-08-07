@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>교육용 2d 슈팅게임</title>
+    <!-- 깔끔하고 세련된 폰트 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1e272e; /* 바깥 배경을 완전히 어둡게 하여 플레이 영역(흰색)과 100% 분리 */
+            margin-top: 30px;
+            font-family: 'Noto Sans KR', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            color: #dfe6e9; /* 바깥 글씨 색상 밝게 */
+        }
+
+        h1 {
+            color: #74b9ff; /* 배경이 어두워졌으므로 제목 색상 변경 */
+            text-shadow: 0 0 10px rgba(116, 185, 255, 0.3);
+            margin-bottom: 10px;
+        }
+
+        canvas {
+            background-color: #ffffff;
+            border: 6px solid #6c5ce7; /* 테두리를 조금 더 굵게 */
+            border-radius: 16px;            
+            box-shadow: 0px 0px 40px rgba(108, 92, 231, 0.5); /* 경기장처럼 바깥으로 뿜어져 나오는 빛 효과 추가 */
+            cursor: crosshair; 
+            /* 세련된 도트(모눈) 패턴 */
+            background-image: radial-gradient(#dfe6e9 2px, transparent 2px);
+            background-size: 30px 30px;
+            max-width: 100%; /* 화면 밖으로 삐져나가지 않게 반응형 처리 */
+            height: auto;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 25px;
+            left: 35px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3436;
+        }
+        #ui-layer > div { margin-bottom: 8px; }
+
+        #user-info-display {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3436;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        #stage-info {
+            font-size: 15px;
+            color: #636e72;
+        }
+
+        /* 2. 수학 퀴즈 모달이 깨져보이는 현상을 해결하기 위해 #reload-modal 스타일 추가 및 fixed 적용 */
+        .overlay-screen, #reload-modal {
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6); /* 어두운 반투명 배경으로 모달 집중도 상승 */
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #2d3436;
+            z-index: 10000; /* 최상단 배치 보장 */
+        }
+
+        .overlay-screen h1 {
+            font-size: 40px;
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        /* 로그인 및 모달 박스 공통 스타일 (둥글고 세련되게) */
+        .login-box, .modal-box {
+            background: #ffffff;
+            padding: 45px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0px 12px 30px rgba(0,0,0,0.08);
+        }
+
+        .login-box h2 { color: #2d3436; margin-bottom: 25px; }
+
+        .login-box input, #math-answer {
+            font-size: 16px;
+            padding: 14px 20px;
+            margin-bottom: 15px;
+            width: 240px;
+            border: 1px solid #dfe6e9;
+            border-radius: 12px;
+            text-align: center;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background-color: #fdfdfd;
+        }
+        .login-box input:focus, #math-answer:focus {
+            outline: none;
+            border-color: #74b9ff;
+            box-shadow: 0 0 0 4px rgba(116, 185, 255, 0.15);
+        }
+
+        #math-question {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 20px 0;
+            color: #2d3436;
+        }
+
+        #error-msg {
+            color: #ff7675;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 10px;
+            height: 20px;
+        }
+
+        /* 수료증(클리어 화면) 모던 스타일 */
+        .certificate-box {
+            background: #ffffff;
+            color: #2d3436;
+            padding: 60px;
+            border-radius: 24px;
+            text-align: center;
+            width: 550px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        /* 상단 컬러 포인트 줄 */
+        .certificate-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #74b9ff, #a29bfe);
+        }
+        .certificate-box h1 {
+            color: #2d3436;
+            margin-top: 0;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+        .certificate-box h2 {
+            font-size: 20px;
+            color: #636e72;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+        .certificate-box p {
+            font-size: 18px;
+            line-height: 1.7;
+            margin: 30px 0;
+            color: #636e72;
+        }
+
+        .tutorial {
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .tutorial p { font-size: 16px; margin: 10px 0; color: #636e72; }
+        .tutorial b { color: #2d3436; }
+
+        /* 버튼 스타일 모던하게 둥글게 */
+        button {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 700;
+            background-color: #74b9ff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 6px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        button:hover { 
+            background-color: #0984e3; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(9, 132, 227, 0.2);
+        }
+
+        .btn-danger { background-color: #6c5ce7; }
+        .btn-danger:hover { background-color: #5f27cd; box-shadow: 0 4px 12px rgba(95, 39, 205, 0.2); }
+        
+        .btn-secondary { background-color: #b2bec3; color: #2d3436; }
+        .btn-secondary:hover { background-color: #dfe6e9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        #gameContainer {
+            position: relative;   
+            width: 1400px;        
+            height: 600px;        
+            margin-top: 5px; /* 타이틀과 캔버스 간격 조정 */
+        }
+
+        /* =========================================
+           📱 모바일 전용 트윈스틱 스타일
+           ========================================= */
+        .mobile-only { display: none; }
+
+        @media (pointer: coarse), (max-width: 1200px) {
+            body { background-color: #1e272e; margin: 0; padding: 0; }
+            h1 { display: none; }
+            #gameContainer { width: 100vw; height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+            canvas { width: 100vw !important; height: 100vh !important; max-height: 100vh; object-fit: contain; border-radius: 0; }
+            #user-info-display { top: 15px; right: 15px; font-size: 13px; padding: 6px 12px; box-shadow: none; border: 1px solid #dfe6e9; }
+            #ui-layer { top: 15px; left: 15px; font-size: 15px; }
+            #stage-info { font-size: 13px; }
+            
+            .certificate-box { width: 85%; padding: 30px; }
+            .certificate-box h1 { font-size: 32px; }
+            .certificate-box h2 { font-size: 16px; }
+            .certificate-box p { font-size: 15px; }
+
+            .mobile-only { display: flex; justify-content: space-between; align-items: flex-end; width: 100vw; position: fixed; bottom: 25px; left: 0; padding: 0 30px; box-sizing: border-box; z-index: 9999; }
+            #joystick-zone-right { display: flex; align-items: flex-end; gap: 15px; }
+            .joy-base { width: 100px; height: 100px; background-color: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; position: relative; touch-action: none; }
+            .joy-stick { width: 46px; height: 46px; background-color: #74b9ff; border-radius: 50%; position: absolute; top: 27px; left: 27px; pointer-events: none; box-shadow: 0 4px 10px rgba(116, 185, 255, 0.3); }
+            .mob-btn { width: 60px; height: 60px; border-radius: 50%; background-color: #6c5ce7; color: white; font-weight: 700; border: none; font-size: 14px; padding: 0; margin-bottom: 20px; touch-action: manipulation; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
+        }
+    </style>
+</head>
+<body>
+    <h1>교육용 2d 슈팅게임</h1>
+    
+    <div id="gameContainer">
+        <!-- 로그인 화면 -->
+        <div id="login-screen" class="overlay-screen">
+            <h1>교육용 2d 슈팅게임</h1>
+            <div class="login-box">
+                <h2 style="margin-top: 0;">로그인</h2>
+                <input type="text" id="input-student-id" placeholder="학번 입력 (예: 10101)" autocomplete="off"><br>
+                <input type="text" id="input-student-name" placeholder="이름 입력 (예: 홍길동)" autocomplete="off"><br>
+                <button id="login-btn">입장하기</button>
+            </div>
+        </div>
+
+        <div id="ui-layer">
+            <div>체력: <span id="hpCount" style="color: #e74c3c;">♥♥♥</span> (부활: <span id="retryCount">1</span>번)</div>
+            <div>탄약: <span id="ammoCount">20</span> / <span id="maxAmmoCount">20</span></div>
+            <div id="stage-info">STAGE: <span id="currentStage">1</span> / 5 (남은 적: <span id="enemiesLeft">5</span>마리)</div>
+        </div>
+        
+        <!-- 우측 상단 학번/이름 표시 -->
+        <div id="user-info-display" style="display: none;"></div>
+
+        <canvas id="gameCanvas" width="1400" height="600"></canvas>
+        
+        <div id="mobile-ui" class="mobile-only">
+            <div id="joystick-zone-left">
+                <div id="joystick-base-left" class="joy-base">
+                    <div id="joystick-stick-left" class="joy-stick"></div>
+                </div>
+            </div>
+            <div id="joystick-zone-right">
+                <button id="btn-reload" class="mob-btn">장전</button>
+                <div id="joystick-base-right" class="joy-base">
+                    <div id="joystick-stick-right" class="joy-stick"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="reload-modal" style="display: none;">
+            <div class="modal-box">
+                <h2 id="modal-title"> 재장전! 문제를 푸세요 </h2>
+                <div id="math-question">15 + 23 = ?</div>
+                <input type="number" id="math-answer" placeholder="정답 입력" autocomplete="off">
+                <div id="error-msg"></div>
+            </div>
+        </div>
+        
+        <div id="start-screen" class="overlay-screen" style="display: none;">
+            <h1>교육용 2d 슈팅게임</h1>
+            <div class="tutorial">
+                <h3> 조작 방법</h3>
+                <p><b>W, A, S, D</b> 또는 <b>방향키 (←↑↓→)</b> : 이동</p>
+                <p><b>마우스 이동</b> : 조준 (항상 희미한 선 표시)</p>
+                <p><b>마우스 우클릭 유지</b> : 붉은색 정밀 조준선</p>
+                <p><b>마우스 좌클릭 유지</b> : 사격</p>
+                <p><b>R 키</b> : 수학 문제 풀고 장전</p>
+                <p style="color:#f1c40f; margin-top:15px;"><b>📱 모바일</b> : 왼쪽 스틱(이동), 오른쪽 스틱(조준/사격)</p>
+            </div>
+            <button id="start-btn" class="btn-danger">게임 시작</button>
+        </div>
+
+        <div id="game-over-screen" class="overlay-screen" style="display: none;">
+            <h1 style="color: #e74c3c;">게임 오버!</h1>
+            <p style="font-size: 24px;">외계인에게 당했습니다...</p>
+            <div>
+                <button id="restart-btn">다시 시작하기</button>
+                <button id="logout-btn" class="btn-secondary">그만하기 (로그아웃)</button>
+            </div>
+        </div>
+
+        <div id="game-clear-screen" class="overlay-screen" style="display: none;">
+            <!-- 인증샷을 위한 수료증 디자인 -->
+            <div class="certificate-box">
+                <h1>수 료 증</h1>
+                <h2 id="cert-user-name">학번: 10101 이름: 홍길동</h2>
+                <p>
+                    위 학생은 뛰어난 사격 솜씨와 놀라운 수학 실력으로<br>
+                    모든 스테이지의 외계인을 물리치고 우주 평화를 지켜냈기에<br>
+                    이 증서를 수여합니다.
+                </p>
+                <div style="margin-top: 40px;">
+                    <button id="clear-restart-btn">처음부터 다시하기</button>
+                    <button id="clear-logout-btn" class="btn-secondary">그만하기 (로그아웃)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // === 추가된 부분: 못 가는 영역(벽) 패턴 만들기 ===
+        const patternCanvas = document.createElement('canvas');
+        patternCanvas.width = 20;
+        patternCanvas.height = 20;
+        const pctx = patternCanvas.getContext('2d');
+        pctx.fillStyle = "#f4f6f8"; // 옅은 회색 바탕
+        pctx.fillRect(0, 0, 20, 20);
+        pctx.strokeStyle = "#dfe6e9"; // 빗금 색상
+        pctx.lineWidth = 4;
+        pctx.beginPath();
+        pctx.moveTo(-5, 25);
+        pctx.lineTo(25, -5);
+        pctx.stroke();
+        
+        let wallPattern = null;
+        const wallSize = 25; // 접근 불가능한 벽의 두께
+        // ===========================================
+
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
+        let mobMoveX = 0;
+        let mobMoveY = 0;
+        let isMobShooting = false;
+
+        // 로그인 관련 변수
+        let studentId = "";
+        let studentName = "";
+
+        const loginScreen = document.getElementById("login-screen");
+        const inputStudentId = document.getElementById("input-student-id");
+        const inputStudentName = document.getElementById("input-student-name");
+        const loginBtn = document.getElementById("login-btn");
+        const userInfoDisplay = document.getElementById("user-info-display");
+        const certUserName = document.getElementById("cert-user-name");
+
+        const ammoDisplay = document.getElementById("ammoCount");
+        const maxAmmoDisplay = document.getElementById("maxAmmoCount");
+        const hpDisplay = document.getElementById("hpCount"); 
+        const retryDisplay = document.getElementById("retryCount"); 
+        const reloadModal = document.getElementById("reload-modal");
+        const mathQuestionDisplay = document.getElementById("math-question");
+        const mathAnswerInput = document.getElementById("math-answer");
+        const errorMsg = document.getElementById("error-msg");
+        const stageDisplay = document.getElementById("currentStage");
+        const enemiesLeftDisplay = document.getElementById("enemiesLeft");
+
+        const startScreen = document.getElementById("start-screen");
+        const gameOverScreen = document.getElementById("game-over-screen");
+        const gameClearScreen = document.getElementById("game-clear-screen");
+        const startBtn = document.getElementById("start-btn");
+        
+        const restartBtn = document.getElementById("restart-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+        const clearRestartBtn = document.getElementById("clear-restart-btn");
+        const clearLogoutBtn = document.getElementById("clear-logout-btn");
+
+        let gameState = "LOGIN"; 
+        let currentMathAnswer = 0;
+        let stage = 1;
+        const maxStage = 5;
+        let enemiesKilledInStage = 0;
+        let retryChance = 1; 
+
+        function getRequiredEnemies(st) { return st * 5; }
+        function getMaxEnemiesOnScreen(st) { return 3 + (st * 2); }
+
+        // 플레이어 색상 세련되게 변경
+        const player = { x: canvas.width / 2, y: canvas.height / 2, radius: 20, color: "#6c5ce7", speed: 5, angle: 0, hp: 3 };
+        const keys = { w: false, a: false, s: false, d: false, arrowup: false, arrowdown: false, arrowleft: false, arrowright: false };
+        const mouse = { x: 0, y: 0, leftDown: false, rightDown: false };
+        const weapon = { ammo: 20, maxAmmo: 20, fireRate: 100, lastFired: 0 };
+
+        let bullets = [];
+        let enemies = [];
+
+        // 로그인 처리
+        loginBtn.addEventListener("click", () => {
+            studentId = inputStudentId.value.trim();
+            studentName = inputStudentName.value.trim();
+            
+            if (!studentId || !studentName) {
+                alert("학번과 이름을 모두 입력해주세요!");
+                return;
+            }
+
+            userInfoDisplay.innerText = `👤 ${studentId} ${studentName}`;
+            certUserName.innerText = `학번: ${studentId} | 이름: ${studentName}`;
+            
+            userInfoDisplay.style.display = "block";
+            loginScreen.style.display = "none";
+            startScreen.style.display = "flex";
+            gameState = "START";
+        });
+
+        // 엔터키로도 로그인 가능하게
+        inputStudentName.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") loginBtn.click();
+        });
+
+        function spawnEnemy() {
+            const baseSpeed = 1.0;
+            const baseHp = 2;
+            // 적 색상을 부드러운 파스텔톤으로 변경
+            const modernColors = ["#ff7675", "#fdcb6e", "#00b894", "#0984e3", "#e17055"]; 
+            enemies.push({
+                x: Math.random() < 0.5 ? 0 : canvas.width, 
+                y: Math.random() * canvas.height,
+                radius: 15,
+                color: modernColors[(stage - 1) % modernColors.length],
+                speed: baseSpeed + (stage - 1) * 0.3,
+                hp: baseHp + Math.floor(stage / 2) 
+            });
+        }
+
+        function initStage() {
+            enemiesKilledInStage = 0;
+            bullets = [];
+            enemies = [];
+            weapon.maxAmmo = 20 + ((stage - 1) * 10); 
+            weapon.ammo = weapon.maxAmmo; 
+            retryChance = 1; 
+            
+            ammoDisplay.innerText = weapon.ammo;
+            maxAmmoDisplay.innerText = weapon.maxAmmo;
+            stageDisplay.innerText = stage;
+            enemiesLeftDisplay.innerText = getRequiredEnemies(stage);
+            retryDisplay.innerText = retryChance;
+            updateHpDisplay();
+            
+            const spawnCount = getMaxEnemiesOnScreen(stage);
+            for(let i=0; i<spawnCount; i++){ spawnEnemy(); }
+        }
+
+        function updateHpDisplay() {
+            let hpText = "";
+            for (let i = 0; i < player.hp; i++) hpText += "♥";
+            hpDisplay.innerText = hpText || "사망";
+        }
+
+        function resetGame() {
+            stage = 1;
+            player.x = canvas.width / 2;
+            player.y = canvas.height / 2;
+            player.hp = 3;
+            initStage();
+        }
+
+        startBtn.addEventListener("click", () => {
+            startScreen.style.display = "none";
+            gameState = "PLAYING";
+            initStage();
+        });
+
+        // 다시하기 버튼 (로그인 유지)
+        const handleRestart = () => {
+            gameOverScreen.style.display = "none";
+            gameClearScreen.style.display = "none";
+            resetGame();
+            gameState = "PLAYING";
+        };
+        restartBtn.addEventListener("click", handleRestart);
+        clearRestartBtn.addEventListener("click", handleRestart);
+
+        // 로그아웃 버튼 (초기 화면으로)
+        const handleLogout = () => {
+            gameOverScreen.style.display = "none";
+            gameClearScreen.style.display = "none";
+            
+            inputStudentId.value = "";
+            inputStudentName.value = "";
+            studentId = "";
+            studentName = "";
+            
+            userInfoDisplay.style.display = "none";
+            loginScreen.style.display = "flex";
+            gameState = "LOGIN";
+            
+            // 초기화
+            stage = 1;
+            player.x = canvas.width / 2;
+            player.y = canvas.height / 2;
+            player.hp = 3;
+            bullets = [];
+            enemies = [];
+        };
+        logoutBtn.addEventListener("click", handleLogout);
+        clearLogoutBtn.addEventListener("click", handleLogout);
+
+        canvas.addEventListener("contextmenu", e => e.preventDefault());
+        canvas.addEventListener("mousemove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            // 캔버스 크기 비율에 맞춰 마우스 좌표 보정
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            mouse.x = (e.clientX - rect.left) * scaleX;
+            mouse.y = (e.clientY - rect.top) * scaleY;
+        });
+        canvas.addEventListener("mousedown", (e) => {
+            if (e.button === 0) mouse.leftDown = true; 
+            if (e.button === 2) mouse.rightDown = true; 
+        });
+        canvas.addEventListener("mouseup", (e) => {
+            if (e.button === 0) mouse.leftDown = false;
+            if (e.button === 2) mouse.rightDown = false;
+        });
+
+        window.addEventListener("keydown", (e) => {
+            const key = e.key.toLowerCase();
+            if (keys.hasOwnProperty(key)) keys[key] = true;
+            if (key === 'r' && gameState === "PLAYING" && weapon.ammo < weapon.maxAmmo + 1) startReload();
+        });
+        window.addEventListener("keyup", (e) => {
+            const key = e.key.toLowerCase();
+            if (keys.hasOwnProperty(key)) keys[key] = false;
+        });
+
+        window.addEventListener("blur", () => {
+            for (let k in keys) keys[k] = false;
+        });
+
+        mathAnswerInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") checkMathAnswer();
+        });
+
+        function startReload() {
+            gameState = "RELOADING";
+            mouse.leftDown = false; 
+            isMobShooting = false; 
+            
+            let num1, num2, num3;
+            let questionText = "";
+            
+            if (stage === 1) {
+                num1 = Math.floor(Math.random() * 20) + 1;
+                num2 = Math.floor(Math.random() * 20) + 1;
+                currentMathAnswer = num1 + num2;
+                questionText = `${num1} + ${num2} = ?`;
+            } 
+            else if (stage === 2) {
+                num1 = Math.floor(Math.random() * 30) + 15;
+                num2 = Math.floor(Math.random() * 15) + 1;
+                currentMathAnswer = num1 - num2;
+                questionText = `${num1} - ${num2} = ?`;
+            } 
+            else if (stage === 3) {
+                num1 = Math.floor(Math.random() * 8) + 2; 
+                num2 = Math.floor(Math.random() * 9) + 1; 
+                currentMathAnswer = num1 * num2;
+                questionText = `${num1} × ${num2} = ?`;
+            } 
+            else if (stage === 4) {
+                num2 = Math.floor(Math.random() * 8) + 2; 
+                currentMathAnswer = Math.floor(Math.random() * 9) + 1; 
+                num1 = num2 * currentMathAnswer; 
+                questionText = `${num1} ÷ ${num2} = ?`;
+            } 
+            else {
+                num1 = Math.floor(Math.random() * 30) + 10;
+                num2 = Math.floor(Math.random() * 20) + 10;
+                num3 = Math.floor(Math.random() * 20) + 5;
+                currentMathAnswer = num1 + num2 - num3;
+                questionText = `${num1} + ${num2} - ${num3} = ?`;
+            }
+
+            document.getElementById("modal-title").innerText = `STAGE ${stage} 재장전!`;
+            mathQuestionDisplay.innerText = questionText;
+            mathAnswerInput.value = "";
+            errorMsg.innerText = "";
+            reloadModal.style.display = "flex"; 
+            mathAnswerInput.focus(); 
+        }
+
+        function checkMathAnswer() {
+            const userAnswer = parseInt(mathAnswerInput.value);
+            if (userAnswer === currentMathAnswer) {
+                if (weapon.ammo > 0) weapon.ammo = weapon.maxAmmo + 1;
+                else weapon.ammo = weapon.maxAmmo;
+                ammoDisplay.innerText = weapon.ammo;
+                reloadModal.style.display = "none";
+                gameState = "PLAYING";
+            } else {
+                errorMsg.innerText = "틀렸습니다! 다시 계산해보세요.";
+                mathAnswerInput.value = "";
+                mathAnswerInput.focus();
+            }
+        }
+
+        function shoot() {
+            const now = Date.now();
+            if (weapon.ammo > 0 && now - weapon.lastFired > weapon.fireRate) {
+                const bulletSpeed = 15;
+                bullets.push({
+                    x: player.x, y: player.y,
+                    vx: Math.cos(player.angle) * bulletSpeed,
+                    vy: Math.sin(player.angle) * bulletSpeed,
+                    radius: 4, color: "#74b9ff" // 탄환 색상 변경
+                });
+                weapon.ammo--; 
+                ammoDisplay.innerText = weapon.ammo; 
+                weapon.lastFired = now;
+                if (weapon.ammo === 0) startReload();
+            }
+        }
+
+        // alert 대신 텍스트로 알림
+        function showStageMessage(msg) {
+            const msgBox = document.createElement("div");
+            msgBox.innerText = msg;
+            msgBox.style.position = "absolute";
+            msgBox.style.top = "30%";
+            msgBox.style.left = "50%";
+            msgBox.style.transform = "translate(-50%, -50%)";
+            msgBox.style.color = "#2d3436"; // 알림 메시지 색상 부드럽게
+            msgBox.style.fontSize = "28px";
+            msgBox.style.fontWeight = "700";
+            msgBox.style.zIndex = "50";
+            msgBox.style.pointerEvents = "none";
+            msgBox.style.textAlign = "center";
+            msgBox.style.whiteSpace = "pre-wrap";
+            msgBox.style.background = "rgba(255,255,255,0.9)";
+            msgBox.style.padding = "15px 30px";
+            msgBox.style.borderRadius = "16px";
+            msgBox.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)";
+            document.getElementById("gameContainer").appendChild(msgBox);
+
+            let opacity = 1;
+            let topPos = 30;
+            const fade = setInterval(() => {
+                opacity -= 0.02;
+                topPos -= 0.1;
+                msgBox.style.opacity = opacity;
+                msgBox.style.top = `${topPos}%`;
+                if (opacity <= 0) {
+                    clearInterval(fade);
+                    msgBox.remove();
+                }
+            }, 30);
+        }
+
+        function checkStageClear() {
+            if (enemiesKilledInStage >= getRequiredEnemies(stage)) {
+                if (stage >= maxStage) {
+                    gameState = "GAMECLEAR";
+                    gameClearScreen.style.display = "flex";
+                } else {
+                    stage++;
+                    gameState = "PLAYING";
+                    showStageMessage(`STAGE ${stage} 진입!\n탄약이 늘어납니다!`);
+                    initStage();
+                }
+            }
+        }
+
+        function update() {
+            if (gameState === "RELOADING" || gameState === "START" || gameState === "LOGIN" || gameState === "GAMEOVER" || gameState === "GAMECLEAR" || gameState === "RETRYING") return; 
+
+            if (enemies.length < getMaxEnemiesOnScreen(stage) && (enemiesKilledInStage + enemies.length) < getRequiredEnemies(stage)) {
+                spawnEnemy();
+            }
+
+            let isUp = keys.w || keys.arrowup || mobMoveY < -0.2;
+            let isDown = keys.s || keys.arrowdown || mobMoveY > 0.2;
+            let isLeft = keys.a || keys.arrowleft || mobMoveX < -0.2;
+            let isRight = keys.d || keys.arrowright || mobMoveX > 0.2;
+
+            // 벽(wallSize)을 고려하여 이동 제한 범위 수정
+            if (isUp && player.y - player.radius > wallSize) player.y -= player.speed;
+            if (isDown && player.y + player.radius < canvas.height - wallSize) player.y += player.speed;
+            if (isLeft && player.x - player.radius > wallSize) player.x -= player.speed;
+            if (isRight && player.x + player.radius < canvas.width - wallSize) player.x += player.speed;
+
+            if (!isMobile) {
+                player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+            }
+
+            if (mouse.leftDown || isMobShooting) shoot();
+
+            // 총알이 벽에 닿으면 사라지도록 수정
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].x += bullets[i].vx;
+                bullets[i].y += bullets[i].vy;
+                if (bullets[i].x < wallSize || bullets[i].x > canvas.width - wallSize || bullets[i].y < wallSize || bullets[i].y > canvas.height - wallSize) {
+                    bullets.splice(i, 1);
+                }
+            }
+            
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let enemy = enemies[i];
+                let angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+                enemy.x += Math.cos(angle) * enemy.speed;
+                enemy.y += Math.sin(angle) * enemy.speed;
+
+                let distToPlayer = Math.hypot(enemy.x - player.x, enemy.y - player.y);
+                if (distToPlayer < enemy.radius + player.radius) {
+                    enemies.splice(i, 1); 
+                    player.hp -= 1;        
+                    updateHpDisplay();
+                    
+                    if (player.hp <= 0) {
+                        if (retryChance > 0) {
+                            retryChance--;
+                            retryDisplay.innerText = retryChance;
+                            gameState = "RETRYING";
+                            showStageMessage(`기회가 ${retryChance}번 남았습니다!\n스테이지를 다시 시작합니다!`);
+                            
+                            setTimeout(() => {
+                                player.hp = 3;
+                                player.x = canvas.width / 2;
+                                player.y = canvas.height / 2;
+                                initStage(); 
+                                gameState = "PLAYING";
+                            }, 2500);
+                        } else {
+                            gameState = "GAMEOVER";
+                            gameOverScreen.style.display = "flex";
+                        }
+                    }
+                    continue; 
+                }
+
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    let bullet = bullets[j];
+                    let dist = Math.hypot(enemy.x - bullet.x, enemy.y - bullet.y);
+                    if (dist < enemy.radius + bullet.radius) {
+                        bullets.splice(j, 1); 
+                        enemy.hp -= 1;        
+                        if (enemy.hp <= 0) {
+                            enemies.splice(i, 1);
+                            enemiesKilledInStage++;
+                            enemiesLeftDisplay.innerText = getRequiredEnemies(stage) - enemiesKilledInStage;
+                            checkStageClear(); 
+                            break; 
+                        }
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // === 추가된 부분: 화면 가장자리에 못 가는 벽(빗금) 그리기 ===
+            if (!wallPattern) wallPattern = ctx.createPattern(patternCanvas, 'repeat');
+            ctx.fillStyle = wallPattern;
+            
+            // 상/하/좌/우 벽 칠하기
+            ctx.fillRect(0, 0, canvas.width, wallSize);
+            ctx.fillRect(0, canvas.height - wallSize, canvas.width, wallSize);
+            ctx.fillRect(0, wallSize, wallSize, canvas.height - wallSize * 2);
+            ctx.fillRect(canvas.width - wallSize, wallSize, wallSize, canvas.height - wallSize * 2);
+            
+            // 벽 안쪽을 구분하는 진한 경계선
+            ctx.strokeStyle = "#b2bec3";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(wallSize, wallSize, canvas.width - wallSize * 2, canvas.height - wallSize * 2);
+            // =========================================================
+
+            // 적 그리기 (부드러운 원형 + 내부 디테일)
+            enemies.forEach(enemy => {
+                ctx.beginPath();
+                ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+                ctx.fillStyle = enemy.color;
+                ctx.fill();
+                
+                // 안쪽에 은은한 원형 디테일 추가
+                ctx.beginPath();
+                ctx.arc(enemy.x, enemy.y, enemy.radius * 0.4, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.fill();
+            });
+
+            // 총알 그리기 (꼬리 효과 추가하여 레이저 느낌)
+            bullets.forEach(b => {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - b.vx * 1.5, b.y - b.vy * 1.5);
+                ctx.strokeStyle = b.color;
+                ctx.lineWidth = b.radius * 1.5;
+                ctx.lineCap = "round";
+                ctx.stroke();
+            });
+
+            // 조준선 세련되게 변경
+            if (gameState === "PLAYING") {
+                ctx.beginPath();
+                ctx.moveTo(player.x, player.y);
+                const lineLength = 2000; 
+                ctx.lineTo(player.x + Math.cos(player.angle) * lineLength, player.y + Math.sin(player.angle) * lineLength);
+                
+                if (mouse.rightDown || isMobShooting) {
+                    ctx.strokeStyle = "rgba(108, 92, 231, 0.9)"; // 정밀조준 시 뚜렷한 보라색으로 가시성 개선
+                    ctx.lineWidth = 2;
+                } else {
+                    ctx.strokeStyle = "rgba(45, 52, 54, 0.5)"; // 1. 평상시 진한 회색으로 변경하여 가시성 확보
+                    ctx.lineWidth = 1.5;
+                }
+                
+                ctx.setLineDash([12, 8]); // 1. 점선 간격을 늘려서 더 뚜렷하게 보이도록 수정
+                ctx.stroke();
+                ctx.setLineDash([]); 
+            }
+
+            // 플레이어 그리기 (세련된 비행체 형태의 다각형)
+            ctx.save(); 
+            ctx.translate(player.x, player.y); 
+            ctx.rotate(player.angle); 
+            
+            ctx.beginPath();
+            ctx.moveTo(player.radius, 0); // 앞 코
+            ctx.lineTo(-player.radius * 0.7, player.radius * 0.7); // 오른쪽 날개
+            ctx.lineTo(-player.radius * 0.3, 0); // 뒤쪽 파임
+            ctx.lineTo(-player.radius * 0.7, -player.radius * 0.7); // 왼쪽 날개
+            ctx.closePath();
+            
+            ctx.fillStyle = player.color;
+            ctx.fill();
+            
+            ctx.restore(); 
+        }
+
+        function gameLoop() {
+            update(); 
+            draw();   
+            requestAnimationFrame(gameLoop); 
+        }
+
+        if (isMobile) {
+            const leftBase = document.getElementById("joystick-base-left");
+            const leftStick = document.getElementById("joystick-stick-left");
+            const rightBase = document.getElementById("joystick-base-right");
+            const rightStick = document.getElementById("joystick-stick-right");
+            const btnReload = document.getElementById("btn-reload");
+
+            btnReload.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                if (gameState === "PLAYING" && weapon.ammo < weapon.maxAmmo + 1) {
+                    startReload(); 
+                }
+            }, { passive: false });
+
+            const handleJoystick = (base, stick, isLeftStick) => {
+                let activeTouchId = null;
+
+                base.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        if (activeTouchId === null) {
+                            activeTouchId = e.changedTouches[i].identifier;
+                        }
+                    }
+                }, { passive: false });
+
+                base.addEventListener("touchmove", (e) => {
+                    e.preventDefault();
+                    if (activeTouchId === null) return;
+                    
+                    let touch = null;
+                    for (let i = 0; i < e.touches.length; i++) {
+                        if (e.touches[i].identifier === activeTouchId) {
+                            touch = e.touches[i];
+                            break;
+                        }
+                    }
+                    if (!touch) return;
+
+                    let rect = base.getBoundingClientRect();
+                    let dx = touch.clientX - (rect.left + rect.width / 2);
+                    let dy = touch.clientY - (rect.top + rect.height / 2);
+                    
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    let maxDist = 30; 
+                    
+                    if (distance > maxDist) {
+                        dx = (dx / distance) * maxDist;
+                        dy = (dy / distance) * maxDist;
+                    }
+
+                    stick.style.transform = `translate(${dx}px, ${dy}px)`;
+                    
+                    if (isLeftStick) {
+                        mobMoveX = dx / maxDist;
+                        mobMoveY = dy / maxDist;
+                    } else {
+                        player.angle = Math.atan2(dy, dx);
+                        isMobShooting = distance > 10;
+                    }
+                }, { passive: false });
+
+                const resetJoystick = (e) => {
+                    e.preventDefault();
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        if (e.changedTouches[i].identifier === activeTouchId) {
+                            activeTouchId = null;
+                            stick.style.transform = `translate(0px, 0px)`; 
+                            if (isLeftStick) {
+                                mobMoveX = 0; mobMoveY = 0;
+                            } else {
+                                isMobShooting = false;
+                            }
+                            break;
+                        }
+                    }
+                };
+
+                base.addEventListener("touchend", resetJoystick, { passive: false });
+                base.addEventListener("touchcancel", resetJoystick, { passive: false });
+            };
+
+            handleJoystick(leftBase, leftStick, true);  
+            handleJoystick(rightBase, rightStick, false); 
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
