@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏰 판타지 매직 타워 디펜스 - 확장판</title>
+    <!-- 귀여운 게임용 웹 폰트 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Jua', sans-serif;
+            background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            min-height: 100vh;
+            user-select: none;
+            touch-action: manipulation; /* 모바일 더블탭 줌 방지 */
+        }
+        h1 { 
+            margin: 10px 0 20px 0; 
+            font-size: clamp(24px, 5vw, 32px); 
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            color: #f1c40f;
+        }
+        
+        /* 반응형 컨테이너 */
+        #game-container {
+            display: inline-block;
+            background-color: rgba(44, 46, 62, 0.85);
+            padding: clamp(10px, 2vw, 25px);
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            position: relative;
+            width: 100%;
+            max-width: 850px;
+            border: 2px solid #34495e;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 상태바 */
+        #status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            font-size: clamp(16px, 3vw, 22px);
+            font-weight: normal;
+            margin-bottom: 15px;
+            background: rgba(17, 18, 26, 0.9);
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 4px 15px rgba(241,196,15,0.15);
+            gap: 10px;
+        }
+        .coin-highlight { color: #f1c40f; text-shadow: 0 0 8px rgba(241,196,15,0.6); }
+        
+        /* 캔버스 반응형 설정 */
+        canvas {
+            background-color: #27ae60;
+            border: 4px solid #16a085;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4 / 3;
+        }
+        
+        .instructions {
+            margin-top: 15px;
+            font-size: clamp(12px, 2.5vw, 15px);
+            color: #bdc3c7;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        /* 팝업 공통 스타일 (반응형) */
+        .overlay {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1f2833 0%, #0b0c10 100%);
+            border: 3px solid #f1c40f; border-radius: 15px;
+            padding: 25px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            z-index: 20;
+            width: 90%;
+        }
+        
+        /* 버튼 스타일 */
+        button { font-family: 'Jua', sans-serif; }
+        .btn-manage {
+            display: block; width: 100%; padding: 14px; margin-bottom: 12px;
+            font-size: 18px; color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .btn-manage:active { transform: scale(0.98); }
+        .btn-upgrade { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .btn-upgrade:hover { background: #1f618d; box-shadow: 0 0 15px rgba(52,152,219,0.5); }
+        .btn-sell { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .btn-sell:hover { background: #a04000; box-shadow: 0 0 15px rgba(230,126,34,0.5); }
+        .btn-cancel { background: #7f8c8d; }
+
+        /* 수료증 팝업 전용 스타일 */
+        #certificate-overlay {
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: #2c3e50;
+            border: 6px double #d4af37;
+            max-width: 450px;
+        }
+        #certificate-overlay h2 { color: #b8860b; font-size: 32px; margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .cert-ribbon { font-size: 40px; margin: 10px 0; }
+        
+        /* 타워 선택 팝업 */
+        #tower-select-overlay { max-width: 450px; }
+        #tower-select-overlay h3 { color: #f1c40f; font-size: 22px; margin-bottom: 18px; }
+        .tower-choice {
+            display: inline-block; width: 30%; min-width: 100px; margin: 5px;
+            background: #1e2233; border: 2px solid #444; border-radius: 12px; padding: 15px 5px;
+            cursor: pointer; transition: all 0.2s; vertical-align: top;
+        }
+        .tower-choice:hover { border-color: #f1c40f; background: #2a324a; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(241,196,15,0.2); }
+        .tower-choice .tc-icon { font-size: 32px; margin-bottom: 8px; }
+        .tower-choice .tc-name { font-size: 16px; margin-bottom: 6px; color: white;}
+        .tower-choice .tc-cost { color: #f1c40f; font-size: 14px; margin-bottom: 6px; }
+        .tower-choice .tc-desc { color: #a4b0be; font-size: 12px; line-height: 1.4; }
+        .tower-choice.disabled { opacity: 0.4; cursor: not-allowed; border-color:#444 !important; background:#1e2233 !important; transform:none !important; box-shadow: none !important;}
+
+        /* 타워 관리 팝업 */
+        #tower-manage-overlay { max-width: 320px; }
+        #tower-manage-overlay h3 { color: #fff; margin-bottom: 15px; font-size: 24px;}
+        
+        /* 다시 시작 버튼 (게임 오버시) */
+        #restart-btn {
+            display: none; position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%);
+            padding: 15px 35px; font-size: 22px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;
+            border: none; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(231,76,60,0.5); z-index: 10; transition: 0.2s;
+        }
+        #restart-btn:hover { transform: translate(-50%, -50%) scale(1.05); }
+
+        /* 퀴즈 팝업 */
+        #quiz-overlay { max-width: 340px; }
+        #quiz-question { font-size: 32px; margin-bottom: 15px; color: #f1c40f; letter-spacing: 2px;}
+        #quiz-input {
+            width: 150px; padding: 12px; font-size: 24px; text-align: center;
+            border-radius: 8px; border: 2px solid #f1c40f; margin-bottom: 15px;
+            outline: none; background-color: rgba(255,255,255,0.9); color: #2c3e50;
+            font-family: 'Jua', sans-serif;
+        }
+        #quiz-submit {
+            padding: 12px 30px; font-size: 20px; background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(46,204,113,0.4);
+        }
+        #timer-container {
+            width: 100%; background-color: #34495e; height: 14px; border-radius: 7px;
+            margin-bottom: 15px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        #timer-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #f1c40f, #e74c3c); transition: width 0.1s linear; }
+
+        /* 스킬 버튼 */
+        #skill-btn {
+            padding: 12px 25px; font-size: 16px; border: none; border-radius: 10px;
+            cursor: not-allowed; background: #3d3f50; color: #7f8c8d; transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        #skill-btn.ready { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; cursor: pointer; animation: pulse 1s infinite alternate; }
+        #skill-btn.active { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; cursor: not-allowed; box-shadow: 0 0 15px #9b59b6; }
+        @keyframes pulse { from { box-shadow: 0 0 10px rgba(243,156,18,0.4); } to { box-shadow: 0 0 25px rgba(243,156,18,0.9); } }
+    </style>
+</head>
+<body>
+    <h1>✨ 판타지 매직 타워 디펜스 ✨</h1>
+    <div id="game-container">
+        <div id="status-bar">
+            <div>❤️ 목숨: <span id="lives">10</span></div>
+            <div class="coin-highlight">💰 코인: <span id="coins">450</span></div>
+            <div>🌊 웨이브: <span id="wave">1</span><span id="max-wave-text"> / 10</span></div>
+            <div style="color:#bdc3c7;">남은 적: <span id="enemies-left">0</span></div>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <button id="restart-btn" onclick="showModeSelect()">다시 도전 🔄</button>
+        
+        <!-- 모드 선택 팝업 -->
+        <div id="mode-select-overlay" class="overlay" style="display:block; z-index:30; max-width: 400px;">
+            <h2 style="color: #f1c40f; margin-bottom: 25px;">난이도 / 모드 선택</h2>
+            <button class="btn-manage btn-upgrade" onclick="startGame(5)">🟡 초스피드 (5 웨이브)</button>
+            <button class="btn-manage" style="background: linear-gradient(135deg, #2ecc71, #27ae60);" onclick="startGame(10)">🟢 가볍게 (10 웨이브)</button>
+            <button class="btn-manage" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="startGame(15)">🔵 표준 (15 웨이브)</button>
+            <button class="btn-manage btn-sell" onclick="startGame(Infinity)">🔴 무한 모드 (끝없는 도전)</button>
+        </div>
+
+        <!-- 수료증(결과) 팝업 -->
+        <div id="certificate-overlay" class="overlay" style="z-index: 35;">
+            <div class="cert-ribbon" id="cert-icon">🏅</div>
+            <h2 id="cert-title">대마법사 수료증</h2>
+            <p style="font-size: 20px; margin: 15px 0;">이름: <strong>위대한 수호자</strong></p>
+            <p id="cert-desc" style="font-size: 18px; line-height: 1.6; margin-bottom: 25px; color: #555;">
+                위 사람은 뛰어난 전략과 끈기로<br>적들을 물리쳤음을 증명합니다.
+            </p>
+            <button class="btn-manage btn-upgrade" onclick="closeCertificate()">새로운 도전 시작하기</button>
+        </div>
+
+        <!-- 퀴즈 팝업 -->
+        <div id="quiz-overlay" class="overlay">
+            <div id="timer-container"><div id="timer-bar"></div></div>
+            <div style="font-size:15px;color:#bdc3c7;margin-bottom:10px;">대마법사 소환 주문 (제한 7초!)</div>
+            <div id="quiz-question">0 + 0 = ?</div>
+            <input type="number" id="quiz-input" placeholder="정답" onkeydown="if(event.key==='Enter') submitAnswer()">
+            <br>
+            <button id="quiz-submit" onclick="submitAnswer()">마법 발동 ✨</button>
+            <button class="btn-manage btn-cancel" style="margin-top:15px; padding:10px;" onclick="cancelQuiz()">취소</button>
+        </div>
+        
+        <!-- 타워 선택 -->
+        <div id="tower-select-overlay" class="overlay">
+            <h3>🏗️ 어떤 타워를 건설할까요?</h3>
+            <div id="tc-magic" class="tower-choice" onclick="selectTower('magic')">
+                <div class="tc-icon">🧙</div><div class="tc-name">마법사 타워</div>
+                <div class="tc-cost">💰 100</div><div class="tc-desc">단일 공격<br>데미지 15</div>
+            </div>
+            <div id="tc-ice" class="tower-choice" onclick="selectTower('ice')">
+                <div class="tc-icon">❄️</div><div class="tc-name">얼음 타워</div>
+                <div class="tc-cost">💰 150</div><div class="tc-desc">적 이동속도<br>50% 감소</div>
+            </div>
+            <div id="tc-electric" class="tower-choice" onclick="selectTower('electric')">
+                <div class="tc-icon">⚡</div><div class="tc-name">전기 타워</div>
+                <div class="tc-cost">💰 200</div><div class="tc-desc">다중 타격<br>0.5초 기절</div>
+            </div>
+            <div style="margin-top:15px;">
+                <button class="btn-manage btn-cancel" style="padding:10px;" onclick="closeTowerSelect()">취소</button>
+            </div>
+        </div>
+
+        <!-- 타워 관리 (업그레이드/판매) -->
+        <div id="tower-manage-overlay" class="overlay">
+            <h3 id="tm-title">타워 관리</h3>
+            <div style="color:#bdc3c7; font-size:16px; margin-bottom:15px;" id="tm-stats">레벨 1 -> 2</div>
+            <button id="tm-upgrade-btn" class="btn-manage btn-upgrade" onclick="upgradeSelectedTower()">업그레이드 (💰 150)</button>
+            <button class="btn-manage btn-sell" onclick="sellSelectedTower()">판매하기 (💰 <span id="tm-sell-price">50</span>)</button>
+            <button class="btn-manage btn-cancel" onclick="closeTowerManage()">닫기</button>
+        </div>
+
+        <div style="margin-top:20px;display:flex;align-items:center;gap:15px;justify-content:center;">
+            <button id="skill-btn" onclick="activateSkill()" disabled>⚡ 속도 강화 충전 중...</button>
+            <div id="skill-status" style="font-size:15px;color:#a4b0be;"></div>
+        </div>
+        <div class="instructions">
+            💡 <b>조작법:</b> 빈 땅 클릭 → <b>퀴즈 해결</b> → 타워 건설! (틀리면 벌금) <br>
+            건설된 타워를 클릭해 <b>업그레이드 및 판매</b>하세요. 목표 웨이브를 클리어하면 멋진 <b>수료증</b>을 받습니다!
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    // 캔버스 기본 글꼴 설정
+    ctx.font = "16px 'Jua', Arial, sans-serif";
+    
+    // UI 요소
+    const restartBtn = document.getElementById("restart-btn");
+    const quizOverlay = document.getElementById("quiz-overlay");
+    const towerSelectOverlay = document.getElementById("tower-select-overlay");
+    const towerManageOverlay = document.getElementById("tower-manage-overlay");
+    const certOverlay = document.getElementById("certificate-overlay");
+    const quizQuestion = document.getElementById("quiz-question");
+    const quizInput = document.getElementById("quiz-input");
+    const timerBar = document.getElementById("timer-bar");
+
+    // ── 상수 ──────────────────────────────────────────────
+    const TOWER_COSTS = { 'magic': 100, 'ice': 150, 'electric': 200 };
+    const STUN_DURATION = 500;
+    const SLOW_DURATION = 2000;
+    let MAX_WAVES = 10;
+    const PATH = [
+        {x:0,y:100},{x:650,y:100},{x:650,y:300},
+        {x:150,y:300},{x:150,y:500},{x:850,y:500}
+    ];
+
+    // ── 게임 상태 ──────────────────────────────────────────
+    let lives, coins, wave;
+    let monsters, towers, projectiles, particles, floatingTexts, decorationGrass;
+    let waveQueue = [];
+    let lastSpawnTime, isGameOver, isVictory, firstFrame, waveEndTime;
+    let isPopupActive = false;
+    let isGameStarted = false;
+    let pendingTowerX, pendingTowerY, quizCorrectAnswer, quizTimer, quizTimeLeft;
+    let selectedTowerForManage = null;
+    let gameTime = 0; 
+    let spawnInterval = 1200;
+
+    // ── 스킬 상태 ──────────────────────────────────────────
+    const SKILL_COOLDOWN = 25000, SKILL_DURATION = 8000;
+    let skillReady = false, skillActive = false;
+    let skillChargeStart = 0, skillActiveEnd = 0;
+
+    // ── 유틸 함수 ──────────────────────────────────────────
+    function getDistanceToSegment(x, y, p1, p2) {
+        let A=x-p1.x, B=y-p1.y, C=p2.x-p1.x, D=p2.y-p1.y;
+        let dot=A*C+B*D, lenSq=C*C+D*D;
+        let param = lenSq!==0 ? dot/lenSq : -1;
+        let xx, yy;
+        if(param<0){xx=p1.x;yy=p1.y;}
+        else if(param>1){xx=p2.x;yy=p2.y;}
+        else{xx=p1.x+param*C;yy=p1.y+param*D;}
+        return Math.sqrt((x-xx)**2+(y-yy)**2);
+    }
+
+    function addCoins(amount, x, y) {
+        coins += amount;
+        document.getElementById("coins").innerText = coins;
+        if(x && y) floatingTexts.push(new FloatingText(x, y, `+${amount}`, "#f1c40f"));
+    }
+
+    function createExplosion(x, y, color) {
+        for(let i=0; i<15; i++) {
+            particles.push(new Particle(x, y, color));
+        }
+    }
+
+    // ── 웨이브 생성 로직 ────────────────────────────────────
+    function generateWave() {
+        waveQueue = [];
+        const isBossWave = (wave % 5 === 0);
+        const hpMult = 1 + (wave - 1) * 0.25;
+        
+        if (wave === MAX_WAVES && MAX_WAVES !== Infinity) {
+            waveQueue.push({type: 'final_boss', hp: 2500 * hpMult}); // 대마왕
+            for(let i=0; i<5; i++) waveQueue.push({type: 'normal', hp: 150 * hpMult});
+        } else if (isBossWave) {
+            waveQueue.push({type: 'boss', hp: 700 * hpMult});
+            for(let i=0; i<3; i++) waveQueue.push({type: 'normal', hp: 100 * hpMult});
+        } else {
+            let count = 5 + Math.floor(wave * 1.5);
+            for(let i=0; i<count; i++){
+                let r = Math.random();
+                let type = 'normal', hp = 100;
+                if(r < 0.25) { type = 'fast'; hp = 60; }
+                else if(r < 0.45) { type = 'tank'; hp = 250; }
+                waveQueue.push({type: type, hp: hp * hpMult});
+            }
+        }
+        document.getElementById("enemies-left").innerText = waveQueue.length + monsters.length;
+    }
+
+    // ── 초기화 및 수료증 ────────────────────────────────────
+    function resetGame() {
+        lives=10; coins=450; wave=1;
+        isGameOver=false; isVictory=false; isPopupActive=false; firstFrame=true;
+        waveEndTime=null;
+        skillReady=false; skillActive=false;
+        skillChargeStart=performance.now(); skillActiveEnd=0;
+        
+        document.getElementById("skill-btn").className=""; 
+        document.getElementById("skill-btn").disabled=true;
+        
+        quizOverlay.style.display="none";
+        towerSelectOverlay.style.display="none";
+        towerManageOverlay.style.display="none";
+        certOverlay.style.display="none";
+        document.getElementById("mode-select-overlay").style.display="none";
+        clearInterval(quizTimer);
+        
+        monsters=[]; towers=[]; projectiles=[]; particles=[]; floatingTexts=[];
+        decorationGrass=[];
+        for (let i = 0; i < 40; i++) {
+            decorationGrass.push({ x: Math.random() * 800, y: Math.random() * 600, size: Math.random() * 6 + 10 });
+        }
+        
+        document.getElementById("lives").innerText=lives;
+        document.getElementById("coins").innerText=coins;
+        document.getElementById("wave").innerText=wave;
+        document.getElementById("max-wave-text").innerText = (MAX_WAVES === Infinity) ? " (무한)" : ` / ${MAX_WAVES}`;
+        restartBtn.style.display="none";
+        isGameStarted = true;
+        
+        generateWave();
+    }
+
+    function showModeSelect() {
+        isGameStarted = false;
+        isGameOver = false;
+        certOverlay.style.display="none";
+        restartBtn.style.display="none";
+        document.getElementById("mode-select-overlay").style.display="block";
+        ctx.fillStyle="rgba(0,0,0,0.85)"; ctx.fillRect(0,0,800,600);
+    }
+
+    function startGame(waves) {
+        MAX_WAVES = waves;
+        resetGame();
+    }
+    
+    function closeCertificate() {
+        certOverlay.style.display = "none";
+        showModeSelect();
+    }
+
+    // ── 클래스 정의 ─────────────────────────────────────────
+    class FloatingText {
+        constructor(x, y, text, color) {
+            this.x = x; this.y = y; this.text = text; this.color = color;
+            this.life = 1.0;
+        }
+        update() { this.y -= 0.8; this.life -= 0.02; }
+        draw() {
+            ctx.globalAlpha = Math.max(0, this.life);
+            ctx.fillStyle = this.color; ctx.font = "bold 18px 'Jua', Arial";
+            ctx.strokeStyle = "black"; ctx.lineWidth = 3;
+            ctx.strokeText(this.text, this.x, this.y);
+            ctx.fillText(this.text, this.x, this.y);
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x; this.y = y; this.color = color;
+            this.vx = (Math.random() - 0.5) * 6;
+            this.vy = (Math.random() - 0.5) * 6;
+            this.life = 1.0;
+            this.size = Math.random() * 5 + 3;
+        }
+        update() {
+            this.x += this.vx; this.y += this.vy;
+            this.life -= 0.03; this.size *= 0.95;
+        }
+        draw() {
+            ctx.globalAlpha = Math.max(0, this.life);
+            ctx.fillStyle = this.color;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    class Monster {
+        constructor(type, hp) {
+            this.x=PATH[0].x; this.y=PATH[0].y; this.pathIndex=0;
+            this.type = type; this.maxHp = hp; this.hp = hp;
+            this.stunUntil=0; this.slowUntil=0;
+            
+            if(type === 'fast') { this.speed=3.5; this.emoji="🦇"; this.reward = 8; this.size=12; }
+            else if(type === 'tank') { this.speed=1.3; this.emoji="🛡️"; this.reward = 20; this.size=18; }
+            else if(type === 'boss') { this.speed=0.9; this.emoji="👹"; this.reward = 100; this.size=26; }
+            else if(type === 'final_boss') { this.speed=0.6; this.emoji="🐉"; this.reward = 500; this.size=35; }
+            else { this.speed=2.2; this.emoji="👾"; this.reward = 12; this.size=14; }
+        }
+        update() {
+            if(isPopupActive) return;
+            if(gameTime < this.stunUntil) return;
+            
+            let currentSpeed = this.speed;
+            if(gameTime < this.slowUntil) currentSpeed *= 0.5; // 얼음 타워 효과
+            
+            let tgt = PATH[this.pathIndex+1];
+            if(!tgt) return;
+            let dx=tgt.x-this.x, dy=tgt.y-this.y, dist=Math.sqrt(dx*dx+dy*dy);
+            if(dist < currentSpeed){
+                this.x=tgt.x; this.y=tgt.y; this.pathIndex++;
+                if(this.pathIndex >= PATH.length-1){
+                    lives -= (this.type==='boss' ? 3 : (this.type==='final_boss' ? 5 : 1));
+                    document.getElementById("lives").innerText=Math.max(0,lives);
+                    this.hp=-1;
+                }
+            } else { this.x+=dx/dist*currentSpeed; this.y+=dy/dist*currentSpeed; }
+        }
+        draw() {
+            ctx.globalAlpha=0.3; ctx.fillStyle="#000";
+            ctx.beginPath(); ctx.ellipse(this.x, this.y+this.size, this.size, this.size/2, 0, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha=1.0;
+
+            let wobble = Math.sin(gameTime / 100) * 3 * (this.speed/2);
+            if(gameTime < this.stunUntil) wobble = 0;
+
+            ctx.font=`${this.size*2.2}px 'Jua', Arial`; ctx.textAlign="center"; ctx.textBaseline="middle";
+            ctx.fillText(this.emoji, this.x, this.y - this.size/2 + wobble);
+
+            if(this.type === 'final_boss') {
+                ctx.shadowColor = "#e74c3c"; ctx.shadowBlur = 15;
+                ctx.fillText("👑", this.x, this.y - this.size*1.8 + wobble);
+                ctx.shadowBlur = 0;
+            }
+
+            if(gameTime < this.stunUntil){
+                ctx.fillText("💫", this.x, this.y - this.size*2);
+            } else if (gameTime < this.slowUntil) {
+                ctx.fillStyle = "rgba(0, 200, 255, 0.4)";
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size*1.5, 0, Math.PI*2); ctx.fill();
+            }
+
+            if(this.hp>0){
+                const bw=40, bh=6;
+                ctx.fillStyle="rgba(0,0,0,0.7)"; ctx.fillRect(this.x-bw/2,this.y-this.size*1.5-10,bw,bh);
+                const pct=Math.max(0, this.hp/this.maxHp);
+                ctx.fillStyle= (this.type==='boss' || this.type==='final_boss') ? "#e74c3c" : "#2ecc71"; 
+                ctx.fillRect(this.x-bw/2,this.y-this.size*1.5-10,bw*pct,bh);
+            }
+        }
+    }
+
+    class Tower {
+        constructor(x, y, type) {
+            this.x=x; this.y=y; this.type=type; this.level=1; this.cooldown=0;
+            this.setupStats();
+        }
+        setupStats() {
+            if(this.type === 'magic') {
+                this.icon = "🧙"; this.color = "#9b59b6"; this.baseDamage = 15;
+                this.range = 220 + (this.level*15); this.fireRate = 45 - (this.level*3);
+            } else if (this.type === 'ice') {
+                this.icon = "❄️"; this.color = "#3498db"; this.baseDamage = 5;
+                this.range = 190 + (this.level*10); this.fireRate = 50 - (this.level*2);
+            } else if (this.type === 'electric') {
+                this.icon = "⚡"; this.color = "#f1c40f"; this.baseDamage = 20;
+                this.range = 200 + (this.level*15); this.fireRate = 60 - (this.level*4);
+            }
+            this.upgradeCost = Math.floor(TOWER_COSTS[this.type] * 0.8 * this.level);
+            this.sellPrice = Math.floor(TOWER_COSTS[this.type] * 0.5 + (this.level-1) * this.upgradeCost * 0.4);
+        }
+        upgrade() {
+            if(coins >= this.upgradeCost && this.level < 4) {
+                coins -= this.upgradeCost;
+                this.level++;
+                this.setupStats();
+                createExplosion(this.x, this.y, "#f1c40f");
+                document.getElementById("coins").innerText = coins;
+                return true;
+            }
+            return false;
+        }
+        update() {
+            if(isPopupActive) return;
+            if(this.cooldown>0){ this.cooldown--; return; }
+            
+            let inRange = monsters.filter(m=>m.hp>0 && Math.sqrt((m.x-this.x)**2+(m.y-this.y)**2)<=this.range);
+            if(inRange.length === 0) return;
+
+            let actualFireRate = skillActive ? Math.max(10, Math.floor(this.fireRate*0.4)) : this.fireRate;
+            
+            if(this.type === 'electric') {
+                inRange.slice(0, 2 + Math.floor(this.level/2)).forEach(m => {
+                    projectiles.push(new Projectile(this.x, this.y-20, m, this));
+                });
+                this.cooldown = actualFireRate;
+            } else {
+                inRange.sort((a,b) => b.pathIndex - a.pathIndex);
+                projectiles.push(new Projectile(this.x, this.y-20, inRange[0], this));
+                this.cooldown = actualFireRate;
+            }
+        }
+        draw() {
+            if(selectedTowerForManage === this) {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.range, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(255,255,255,0.1)"; ctx.fill();
+                ctx.strokeStyle = this.color; ctx.lineWidth = 1.5; ctx.stroke();
+            }
+
+            ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(this.x-14, this.y-2, 28, 30);
+            ctx.fillStyle = "#34495e"; ctx.fillRect(this.x-14, this.y-4, 28, 30);
+            
+            ctx.fillStyle = this.color;
+            ctx.beginPath(); ctx.moveTo(this.x, this.y-35); ctx.lineTo(this.x-18, this.y-4); ctx.lineTo(this.x+18, this.y-4); ctx.fill();
+            
+            ctx.font = "24px 'Jua', Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+            ctx.fillText(this.icon, this.x, this.y-18);
+            
+            ctx.fillStyle = "#f1c40f"; ctx.font = "12px 'Jua', Arial";
+            let stars = "★".repeat(this.level);
+            ctx.fillText(stars, this.x, this.y+15);
+        }
+    }
+
+    class Projectile {
+        constructor(x, y, target, tower) {
+            this.x=x; this.y=y; this.target=target; this.tower=tower;
+            this.speed = 12; this.damage = tower.baseDamage + (tower.level * 5);
+        }
+        update() {
+            if(isPopupActive) return;
+            if(this.target.hp<=0){ this.x=-999; return; }
+            let dx=this.target.x-this.x, dy=this.target.y-this.y, dist=Math.sqrt(dx*dx+dy*dy);
+            
+            if(Math.random() < 0.5) particles.push(new Particle(this.x, this.y, this.tower.color));
+
+            if(dist < this.speed){
+                this.target.hp -= this.damage;
+                floatingTexts.push(new FloatingText(this.target.x, this.target.y-20, `-${this.damage}`, "#ff7675"));
+                createExplosion(this.target.x, this.target.y, this.tower.color);
+
+                if(this.tower.type === 'ice') this.target.slowUntil = gameTime + SLOW_DURATION + (this.tower.level*500);
+                if(this.tower.type === 'electric') this.target.stunUntil = gameTime + STUN_DURATION;
+
+                if(this.target.hp <= 0 && this.target.hp > -999) { 
+                    addCoins(this.target.reward, this.target.x, this.target.y);
+                    this.target.hp = -1000; 
+                }
+                this.x = -999;
+            } else { this.x+=dx/dist*this.speed; this.y+=dy/dist*this.speed; }
+        }
+        draw() {
+            if(this.x<0) return;
+            ctx.beginPath(); ctx.arc(this.x, this.y, 6, 0, Math.PI*2);
+            ctx.fillStyle = "white"; ctx.fill();
+            ctx.strokeStyle = this.tower.color; ctx.lineWidth=3; ctx.stroke();
+        }
+    }
+
+    // ── UI 상호작용 ─────────────────────────────────────────
+    function cancelQuiz() {
+        clearInterval(quizTimer);
+        isPopupActive = false;
+        quizOverlay.style.display = "none";
+    }
+
+    function openQuizPopup(x, y) {
+        isPopupActive=true; pendingTowerX=x; pendingTowerY=y;
+        const ops=['+','-','*'], op=ops[Math.floor(Math.random()*3)];
+        let n1, n2;
+        let diff = Math.floor(Math.min(15, wave * 1.5)); 
+        if(op==='+'){n1=Math.floor(Math.random()*40)+10+diff;n2=Math.floor(Math.random()*40)+10;quizCorrectAnswer=n1+n2;}
+        else if(op==='-'){n1=Math.floor(Math.random()*50)+50+diff;n2=Math.floor(Math.random()*40)+10;quizCorrectAnswer=n1-n2;}
+        else{n1=Math.floor(Math.random()*6)+2;n2=Math.floor(Math.random()*6)+2;quizCorrectAnswer=n1*n2;}
+        
+        quizQuestion.innerText=`${n1} ${op} ${n2} = ?`;
+        quizInput.value=""; quizOverlay.style.display="block"; quizInput.focus();
+        
+        quizTimeLeft=7.0; timerBar.style.width="100%";
+        clearInterval(quizTimer);
+        quizTimer=setInterval(()=>{
+            quizTimeLeft-=0.1;
+            timerBar.style.width=`${Math.max(0,(quizTimeLeft/7)*100)}%`;
+            if(quizTimeLeft<=0){ clearInterval(quizTimer); handleQuizResult(false,"시간 초과! 😢"); }
+        }, 100);
+    }
+
+    function submitAnswer() {
+        if(!isPopupActive || quizOverlay.style.display==="none") return;
+        clearInterval(quizTimer);
+        const ans = parseInt(quizInput.value);
+        if(ans === quizCorrectAnswer) handleQuizResult(true,"정답입니다! 🎉");
+        else handleQuizResult(false,"틀렸습니다! 😢");
+    }
+
+    function handleQuizResult(isCorrect, message) {
+        quizOverlay.style.display="none";
+        if(isCorrect){
+            Object.keys(TOWER_COSTS).forEach(type => {
+                const el = document.getElementById(`tc-${type}`);
+                if(coins < TOWER_COSTS[type]) el.classList.add("disabled");
+                else el.classList.remove("disabled");
+            });
+            towerSelectOverlay.style.display="block";
+        } else {
+            isPopupActive = false;
+            let penalty = 30; 
+            coins = Math.max(0, coins - penalty);
+            document.getElementById("coins").innerText=coins;
+            floatingTexts.push(new FloatingText(pendingTowerX, pendingTowerY, `-${penalty} (벌금)`, "#e74c3c"));
+        }
+    }
+
+    function closeTowerSelect() {
+        towerSelectOverlay.style.display="none";
+        isPopupActive = false;
+    }
+
+    function selectTower(type) {
+        if(coins < TOWER_COSTS[type]) return;
+        coins -= TOWER_COSTS[type];
+        towers.push(new Tower(pendingTowerX, pendingTowerY, type));
+        document.getElementById("coins").innerText=coins;
+        createExplosion(pendingTowerX, pendingTowerY, "white");
+        closeTowerSelect();
+    }
+
+    function openTowerManage(tower) {
+        isPopupActive = true;
+        selectedTowerForManage = tower;
+        document.getElementById("tm-title").innerText = `${tower.icon} 타워 정보`;
+        
+        const upBtn = document.getElementById("tm-upgrade-btn");
+        if(tower.level >= 4) {
+            document.getElementById("tm-stats").innerText = `레벨 ${tower.level} (최대 레벨)`;
+            upBtn.innerText = "최대 레벨 도달"; upBtn.disabled = true; upBtn.style.opacity = 0.5;
+        } else {
+            document.getElementById("tm-stats").innerText = `레벨 ${tower.level} ➡️ ${tower.level+1} (데미지/사거리 증가)`;
+            upBtn.innerText = `업그레이드 (💰 ${tower.upgradeCost})`;
+            upBtn.disabled = false; upBtn.style.opacity = 1;
+        }
+        document.getElementById("tm-sell-price").innerText = tower.sellPrice;
+        towerManageOverlay.style.display="block";
+    }
+    
+    function closeTowerManage() {
+        towerManageOverlay.style.display="none";
+        isPopupActive = false;
+        selectedTowerForManage = null;
+    }
+
+    function upgradeSelectedTower() {
+        if(selectedTowerForManage.upgrade()) {
+            closeTowerManage();
+        } else {
+            alert("코인이 부족합니다!");
+        }
+    }
+
+    function sellSelectedTower() {
+        addCoins(selectedTowerForManage.sellPrice, selectedTowerForManage.x, selectedTowerForManage.y);
+        towers = towers.filter(t => t !== selectedTowerForManage);
+        createExplosion(selectedTowerForManage.x, selectedTowerForManage.y, "#bdc3c7");
+        closeTowerManage();
+    }
+
+    // 반응형 클릭 좌표 계산 적용
+    canvas.addEventListener("click", function(e){
+        if(!isGameStarted || lives<=0 || isPopupActive) return;
+        const rect = canvas.getBoundingClientRect();
+        // 렌더링된 크기와 실제 캔버스(800x600)의 비율을 계산하여 좌표 보정
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mx = (e.clientX - rect.left) * scaleX;
+        const my = (e.clientY - rect.top) * scaleY;
+        
+        for(let t of towers) {
+            if(Math.sqrt((mx-t.x)**2 + (my-t.y)**2) < 30) {
+                openTowerManage(t);
+                return;
+            }
+        }
+
+        if(coins >= TOWER_COSTS['magic']){
+            let valid = true, msg = "";
+            for (let i=0; i<PATH.length-1; i++) {
+                if(getDistanceToSegment(mx,my,PATH[i],PATH[i+1])<40) { valid=false; msg="길 위입니다!"; break; }
+            }
+            if(valid && Math.sqrt((mx-35)**2+(my-100)**2)<50) { valid=false; msg="포탈 근처입니다."; }
+            if(valid && mx>700 && my>410) { valid=false; msg="성 근처입니다."; }
+            for(let t of towers) if(valid && Math.sqrt((mx-t.x)**2+(my-t.y)**2)<40) { valid=false; msg="너무 가깝습니다."; }
+            
+            if(valid) openQuizPopup(mx,my);
+            else floatingTexts.push(new FloatingText(mx, my, msg, "#e74c3c"));
+        } else {
+            floatingTexts.push(new FloatingText(mx, my, "코인 부족!", "#e74c3c"));
+        }
+    });
+
+    function activateSkill() {
+        if(!skillReady || skillActive || lives<=0) return;
+        skillReady = false; skillActive = true;
+        skillActiveEnd = performance.now() + SKILL_DURATION;
+        const btn = document.getElementById("skill-btn");
+        btn.textContent = "⚡ 속도 강화 중!"; btn.className = "active"; btn.disabled = true;
+        ctx.fillStyle="rgba(241, 196, 15, 0.2)"; ctx.fillRect(0,0,800,600);
+    }
+
+    function updateSkillUI(timestamp) {
+        const btn = document.getElementById("skill-btn");
+        const status = document.getElementById("skill-status");
+        if(skillActive) {
+            const left = Math.ceil((skillActiveEnd - timestamp) / 1000);
+            if(timestamp >= skillActiveEnd) {
+                skillActive = false; skillChargeStart = timestamp;
+                btn.className = ""; btn.disabled = true;
+            } else { status.textContent = `남은 시간: ${left}초`; return; }
+        }
+        if(!skillReady) {
+            const elapsed = timestamp - skillChargeStart;
+            const left = Math.ceil((SKILL_COOLDOWN - elapsed) / 1000);
+            if(elapsed >= SKILL_COOLDOWN) {
+                skillReady = true; btn.textContent = "⚡ 속도 강화 (클릭)";
+                btn.className = "ready"; btn.disabled = false;
+                status.textContent = "스킬 사용 가능!";
+            } else {
+                btn.textContent = `⚡ 충전 중... (${left}초)`; status.textContent = "";
+            }
+        }
+    }
+
+    function drawBackground() {
+        ctx.fillStyle="#1e6b38"; ctx.fillRect(0,0,800,600);
+        for(let i=0;i<800;i+=60) for(let j=0;j<600;j+=60){
+            ctx.fillStyle=(((i+j)/60)%2===0)?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.05)";
+            ctx.fillRect(i,j,60,60);
+        }
+        decorationGrass.forEach(g => {
+            ctx.font=`${g.size}px Arial`; ctx.fillText("🌿",g.x,g.y);
+        });
+
+        ctx.lineWidth=54; ctx.strokeStyle="#5e2c00"; ctx.lineJoin="round";
+        ctx.beginPath(); ctx.moveTo(PATH[0].x,PATH[0].y); PATH.slice(1).forEach(p=>ctx.lineTo(p.x,p.y)); ctx.stroke();
+        ctx.lineWidth=46; ctx.strokeStyle="#a0522d";
+        ctx.beginPath(); ctx.moveTo(PATH[0].x,PATH[0].y); PATH.slice(1).forEach(p=>ctx.lineTo(p.x,p.y)); ctx.stroke();
+
+        // 포탈
+        ctx.fillStyle="rgba(41,128,185,0.8)"; ctx.beginPath(); ctx.arc(35,100,30,0,Math.PI*2); ctx.fill();
+        ctx.font="24px 'Jua'"; ctx.fillText("🌀", 35, 100);
+
+        // 성
+        ctx.fillStyle="#7f8c8d"; ctx.fillRect(720,440,80,80);
+        ctx.fillStyle="#2c3e50"; ctx.fillRect(745,490,30,30);
+        ctx.fillStyle="white"; ctx.font="20px 'Jua', Arial"; ctx.fillText("🏰 방어선", 760, 420);
+    }
+
+    function gameLoop(timestamp) {
+        if(!isGameStarted) {
+            requestAnimationFrame(gameLoop);
+            return;
+        }
+        if(isGameOver) return;
+        if(firstFrame){ lastSpawnTime=timestamp; skillChargeStart=timestamp; firstFrame=false; }
+        gameTime = timestamp;
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        drawBackground();
+
+        // 게임 오버 또는 승리 로직
+        if(lives<=0 || isVictory){
+            isGameOver = true; 
+            ctx.fillStyle = "rgba(0,0,0,0.85)"; ctx.fillRect(0,0,800,600);
+            
+            if(isVictory) {
+                // 승리 시 수료증 팝업 표시
+                document.getElementById('cert-icon').innerText = "🏅";
+                document.getElementById('cert-title').innerText = "대마법사 수료증";
+                document.getElementById('cert-desc').innerHTML = `위 사람은 뛰어난 전략과 끈기로<br><strong style="color:#e74c3c">${MAX_WAVES}</strong> 웨이브의 대마왕을 물리치고<br>왕국의 평화를 지켰음을 증명합니다.`;
+                certOverlay.style.display = "block";
+            } else if(MAX_WAVES === Infinity) {
+                // 무한 모드 패배 시 기록증 표시
+                document.getElementById('cert-icon').innerText = "🏆";
+                document.getElementById('cert-title').innerText = "명예의 전당 기록증";
+                document.getElementById('cert-desc').innerHTML = `위 사람은 끝없는 적들의 공세 속에서<br><strong style="color:#e74c3c">${wave}</strong> 웨이브까지 굳건히 버텨내며<br>위대한 용기를 증명했습니다.`;
+                certOverlay.style.display = "block";
+            } else {
+                // 일반 패배
+                ctx.fillStyle="#e74c3c"; ctx.font="bold 65px 'Jua', Arial"; ctx.fillText("GAME OVER",400,300);
+                restartBtn.style.display="block"; 
+            }
+            return;
+        }
+
+        updateSkillUI(timestamp);
+
+        towers.forEach(t=>{t.update();t.draw();});
+        monsters=monsters.filter(m=>m.hp>0);
+        monsters.forEach(m=>{m.update();m.draw();});
+        projectiles=projectiles.filter(p=>p.x>=0);
+        projectiles.forEach(p=>{p.update();p.draw();});
+        
+        particles=particles.filter(p=>p.life>0);
+        particles.forEach(p=>{p.update();p.draw();});
+        
+        floatingTexts=floatingTexts.filter(f=>f.life>0);
+        floatingTexts.forEach(f=>{f.update();f.draw();});
+
+        if(!isPopupActive && waveEndTime===null) {
+            if(waveQueue.length > 0 && timestamp - lastSpawnTime > spawnInterval) {
+                let mData = waveQueue.shift();
+                monsters.push(new Monster(mData.type, mData.hp));
+                lastSpawnTime = timestamp;
+                document.getElementById("enemies-left").innerText = waveQueue.length + monsters.length;
+            }
+        } else if (isPopupActive) {
+            lastSpawnTime = timestamp;
+        }
+
+        if(waveQueue.length===0 && monsters.length===0 && waveEndTime===null){
+            if (wave === MAX_WAVES && MAX_WAVES !== Infinity) {
+                isVictory = true; 
+            } else {
+                waveEndTime = timestamp;
+            }
+        }
+
+        if(waveEndTime!==null){
+            const remaining = Math.ceil((4000 - (timestamp-waveEndTime))/1000);
+            if(remaining>0){
+                ctx.fillStyle="rgba(0,0,0,0.7)"; ctx.fillRect(240, 250, 320, 110);
+                ctx.fillStyle="#f1c40f"; ctx.font="32px 'Jua', Arial"; ctx.fillText(`✅ 웨이브 ${wave} 클리어!`, 400, 290);
+                ctx.fillStyle="white"; ctx.font="22px 'Jua', Arial"; ctx.fillText(`다음 웨이브: ${remaining}초`, 400, 335);
+            } else {
+                wave++; 
+                document.getElementById("wave").innerText=wave;
+                generateWave();
+                waveEndTime=null; lastSpawnTime=timestamp;
+            }
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    // 게임 폰트 로드 대기 후 시작 (선택 사항)
+    document.fonts.ready.then(function() {
+        showModeSelect();
+        requestAnimationFrame(gameLoop);
+    });
+</script>
+</body>
+</html>
