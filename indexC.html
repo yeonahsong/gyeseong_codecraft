@@ -952,7 +952,6 @@
             if (window.currentGameInterval) clearInterval(window.currentGameInterval);
             if (window.currentGameTimeout) clearTimeout(window.currentGameTimeout);
             
-            // 한자 애니메이션용 프레임 정리 방어 코드 추가
             if (window.currentAnimId) {
                 cancelAnimationFrame(window.currentAnimId);
                 window.currentAnimId = null;
@@ -1211,7 +1210,7 @@
                 answerArea.innerHTML = '';
                 
                 const shuffled = [...currentProblem.code].sort(() => Math.random() - 0.5);
-                shuffled.forEach((line, i) => {
+                shuffled.forEach((line) => {
                     const div = document.createElement('button');
                     div.className = 'w-full text-left bg-slate-700 hover:bg-slate-600 text-sky-100 font-mono text-[13px] px-4 py-3 rounded-lg cursor-pointer border border-slate-600 shadow-md whitespace-pre overflow-x-auto transition-colors focus:outline-none';
                     div.textContent = line;
@@ -1260,32 +1259,32 @@
         function setupForeignHanjaGame(container) {
             const vocabPool = {
                 chinese: [
-                    { hanja: "環境保護", meaning: "환경 보호" }, 
-                    { hanja: "人工智能", meaning: "인공지능" },
-                    { hanja: "信息社會", meaning: "정보 사회" }, 
-                    { hanja: "氣候變化", meaning: "기후 변화" },
-                    { hanja: "文化遺産", meaning: "문화 유산" }, 
-                    { hanja: "經濟發展", meaning: "경제 발전" },
-                    { hanja: "教育改革", meaning: "교육 개혁" }, 
-                    { hanja: "技術革新", meaning: "기술 혁신" },
-                    { hanja: "國際合作", meaning: "국제 협력" }, 
-                    { hanja: "和平發展", meaning: "평화 발전" },
-                    { hanja: "老齡化社會", meaning: "고령화 사회" }, 
-                    { hanja: "一帶一路", meaning: "일대일로" }
+                    { hanja: "學校", meaning: "학교" },
+                    { hanja: "老師", meaning: "선생님" },
+                    { hanja: "朋友", meaning: "친구" },
+                    { hanja: "運動", meaning: "운동" },
+                    { hanja: "讀書", meaning: "독서" },
+                    { hanja: "旅遊", meaning: "여행" },
+                    { hanja: "音樂", meaning: "음악" },
+                    { hanja: "幸福", meaning: "행복" },
+                    { hanja: "時間", meaning: "시간" },
+                    { hanja: "圖書館", meaning: "도서관" },
+                    { hanja: "歷史", meaning: "역사" },
+                    { hanja: "科學", meaning: "과학" }
                 ],
                 japanese: [
-                    { hanja: "環境保護", meaning: "환경 보호" }, 
-                    { hanja: "人工知能", meaning: "인공지능" },
-                    { hanja: "情報社会", meaning: "정보 사회" }, 
-                    { hanja: "気候変動", meaning: "기후 변화" },
-                    { hanja: "文化遺産", meaning: "문화 유산" }, 
-                    { hanja: "経済発展", meaning: "경제 발전" },
-                    { hanja: "教育改革", meaning: "교육 개혁" }, 
-                    { hanja: "技術革新", meaning: "기술 혁신" },
-                    { hanja: "国際協力", meaning: "국제 협력" }, 
-                    { hanja: "平和発展", meaning: "평화 발전" },
-                    { hanja: "高齢化社会", meaning: "고령화 사회" }, 
-                    { hanja: "一帯一路", meaning: "일대일로" }
+                    { hanja: "がっこう", meaning: "학교" },
+                    { hanja: "せんせい", meaning: "선생님" },
+                    { hanja: "ともだち", meaning: "친구" },
+                    { hanja: "うんどう", meaning: "운동" },
+                    { hanja: "りょこう", meaning: "여행" },
+                    { hanja: "おんがく", meaning: "음악" },
+                    { hanja: "しあわせ", meaning: "행복" },
+                    { hanja: "じかん", meaning: "시간" },
+                    { hanja: "としょかん", meaning: "도서관" },
+                    { hanja: "りんご", meaning: "사과" },
+                    { hanja: "ねこ", meaning: "고양이" },
+                    { hanja: "いぬ", meaning: "개" }
                 ]
             };
 
@@ -1294,8 +1293,8 @@
                     <div id="hanja-choice-screen">
                         <p class="text-xs text-slate-500 font-bold mb-4">도전할 제2외국어 과목을 선택하세요!</p>
                         <div class="flex flex-col sm:flex-row justify-center gap-4">
-                            <button class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-all active:scale-95" onclick="startHanjaGame('chinese')">🇨🇳 중국어 한자 매칭</button>
-                            <button class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-all active:scale-95" onclick="startHanjaGame('japanese')">🇯🇵 일본어 한자 매칭</button>
+                            <button class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-all active:scale-95" onclick="startHanjaGame('chinese')">🇨🇳 중국어 단어 매칭</button>
+                            <button class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-all active:scale-95" onclick="startHanjaGame('japanese')">🇯🇵 일본어 단어 매칭</button>
                         </div>
                     </div>
 
@@ -1306,8 +1305,8 @@
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4 text-sm font-bold text-slate-700">
-                            <div>단어 카드</div>
-                            <div>의미 카드</div>
+                            <div>외국어 단어 카드</div>
+                            <div>한글 의미 카드</div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 mt-2 mb-4">
@@ -1385,7 +1384,6 @@
                         selectedLeft = { card, data };
                     } else if (selectedLeft) {
                         if (selectedLeft.data.meaning === data.meaning) {
-                            
                             playBeep('success');
                             selectedLeft.card.className = 'bg-emerald-100 border-2 border-emerald-400 text-emerald-800 p-3 rounded-xl min-h-[50px] flex items-center justify-center font-bold text-sm opacity-60';
                             card.className = 'bg-emerald-100 border-2 border-emerald-400 text-emerald-800 p-3 rounded-xl min-h-[50px] flex items-center justify-center font-bold text-sm opacity-60';
@@ -1399,7 +1397,6 @@
                                 }, 500);
                             }
                         } else {
-                            
                             playBeep('fail');
                             selectedLeft.card.classList.add('shake-anim', 'border-rose-400');
                             card.classList.add('shake-anim', 'border-rose-400');
@@ -1575,7 +1572,6 @@
                 const optsDiv = document.getElementById('math-options');
                 optsDiv.innerHTML = '';
 
-                // 보기 섞기
                 let optsWithIndex = prob.opts.map((opt, i) => ({ text: opt, isCorrect: i === prob.ans }));
                 optsWithIndex.sort(() => Math.random() - 0.5);
 
@@ -1609,8 +1605,7 @@
         }
 
         function setupQuizGame(container, subject) {
-            const list = quizBank[subject] || quizBank['physics']; // fallback
-            let currentIdx = 0;
+            const list = quizBank[subject] || quizBank['physics'];
             let successStreak = 0;
             let usedIndexes = []; 
 
@@ -1624,7 +1619,7 @@
                     randomIdx = Math.floor(Math.random() * list.length);
                 }
                 usedIndexes.push(randomIdx);
-                currentIdx = randomIdx;
+                const currentIdx = randomIdx;
 
                 const quiz = list[currentIdx];
                 container.innerHTML = `
@@ -1854,8 +1849,7 @@
                     </div>
                     <p class="text-xs text-slate-500">💡 <b>가장 먼저 일어난 역사적 사건</b>부터 순서대로 맞히세요!</p>
 
-                    <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto" id="history-grid-blocks">
-                    </div>
+                    <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto" id="history-grid-blocks"></div>
 
                     <div class="flex justify-between items-center text-xs font-bold text-slate-500 px-2 max-w-sm mx-auto">
                         <span>진행률: <strong id="history-progress" class="text-sky-500 text-sm">0 / 4</strong></span>
@@ -2359,7 +2353,7 @@
             const board = document.getElementById('english-card-board');
             let firstCard = null;
             let secondCard = null;
-            let lock = true; // 처음 노출하는 동안 터치 잠금
+            let lock = true;
             let successCount = 0;
 
             cardsData.forEach((c, idx) => {
@@ -2443,8 +2437,7 @@
                     <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-sm text-base font-serif" id="korean-sentence">
                         철수는 어제 <span class="text-rose-500 font-black underline underline-offset-4">공원</span>에서 축구를 했다.
                     </div>
-                    <div class="grid grid-cols-3 gap-2" id="korean-choices">
-                    </div>
+                    <div class="grid grid-cols-3 gap-2" id="korean-choices"></div>
                     <div class="text-xs font-bold text-slate-500">
                         연속 매칭 스택: <span id="kor-combo" class="text-indigo-600 text-sm">0</span> / 4회 성공 타겟
                     </div>
