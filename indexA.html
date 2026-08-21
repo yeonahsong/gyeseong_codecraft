@@ -16,7 +16,7 @@
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
 
-  <!-- 커스텀 알림 모달 -->
+  <!-- STREAMING_CHUNK:Rendering custom alert modal... -->
   <div id="custom-alert" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center animate-in fade-in duration-200">
       <span class="text-3xl text-blue-500 block mb-2" id="alert-icon">📢</span>
@@ -28,15 +28,9 @@
     </div>
   </div>
 
-  <!-- 비로그인 화면 (로그인 / 회원가입) -->
+  <!-- STREAMING_CHUNK:Rendering auth container... -->
   <div id="auth-container" class="flex-1 flex flex-col justify-center items-center p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 relative">
-      <div class="absolute top-6 right-6">
-        <span id="cloud-status-indicator" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-          ⚠️ 클라우드 연결 대기중
-        </span>
-      </div>
-
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
       <div class="text-center mb-8">
         <span class="text-4xl">🏫</span>
         <h1 class="text-2xl font-black text-slate-800 mt-3">계성고등학교 소통광장</h1>
@@ -79,7 +73,7 @@
     </div>
   </div>
 
-  <!-- 메인 대시보드 화면 -->
+  <!-- STREAMING_CHUNK:Rendering main dashboard layout... -->
   <div id="main-container" class="hidden flex-1 flex flex-col">
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
       <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -121,7 +115,7 @@
 
     <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">
       
-      <!-- 홈 화면 탭 -->
+      <!-- STREAMING_CHUNK:Rendering home tab section... -->
       <section id="content-home" class="space-y-6">
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm">
           <h2 class="text-xl font-bold">계성고 소통광장에 오신 것을 환영합니다!</h2>
@@ -185,7 +179,7 @@
         </div>
       </section>
 
-      <!-- 미니 게임 탭 -->
+      <!-- STREAMING_CHUNK:Rendering mini games tab section... -->
       <section id="content-game" class="space-y-6 hidden">
         <div id="game-menu" class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center max-w-5xl mx-auto">
           <h2 class="text-2xl font-black text-slate-800 mb-2">🎮 미니 게임 & 활동</h2>
@@ -240,7 +234,7 @@
         </div>
       </section>
 
-      <!-- 마이페이지 탭 -->
+      <!-- STREAMING_CHUNK:Rendering mypage tab section with Admin Panel... -->
       <section id="content-mypage" class="space-y-6 hidden">
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm mb-6">
           <h2 class="text-xl font-bold">나의 정보 및 마이페이지</h2>
@@ -270,6 +264,22 @@
           </div>
 
           <div class="lg:col-span-2 space-y-6">
+            <!-- 관리자용 테스트 데이터 초기화 패널 -->
+            <div class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200">
+              <h3 class="text-base font-bold text-amber-900 mb-1 flex items-center gap-2">
+                <span>🛠️ 관리자 테스트 데이터 초기화 패널</span>
+              </h3>
+              <p class="text-xs text-amber-700 mb-4">테스트 과정에서 생성된 불필요한 계정이나 질문들을 깔끔하게 삭제할 수 있습니다.</p>
+              <div class="flex flex-wrap gap-3">
+                <button onclick="adminResetAccounts()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
+                  <span>🗑️</span> 테스트 계정/랭킹 리셋
+                </button>
+                <button onclick="adminResetQuestions()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
+                  <span>📝</span> 질문마당 게시글 전체 삭제
+                </button>
+              </div>
+            </div>
+
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
               <h3 class="text-base font-bold text-slate-800 mb-4">⚙️ 회원정보 수정</h3>
               <form id="mypage-info-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -317,7 +327,7 @@
         </div>
       </section>
 
-      <!-- 질문마당 탭 -->
+      <!-- STREAMING_CHUNK:Rendering board and ranking sections... -->
       <section id="content-board" class="space-y-6 hidden">
         <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between gap-4">
           <div><h2 class="text-lg font-bold text-slate-800">익명 질문 마당</h2></div>
@@ -327,7 +337,6 @@
         <div id="board-posts" class="space-y-4"></div>
       </section>
 
-      <!-- 스톱워치 탭 -->
       <section id="content-timer" class="space-y-6 hidden">
         <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-slate-100 max-w-xl mx-auto flex flex-col items-center">
           <h2 class="text-xl font-bold text-slate-800 mb-2">🔥 계품타 스톱워치</h2>
@@ -340,12 +349,11 @@
         </div>
       </section>
 
-      <!-- 랭킹보드 탭 -->
       <section id="content-ranking" class="space-y-6 hidden">
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-lg font-bold text-slate-800">🏆 전교생 열공 랭킹보드</h2>
-            <span id="ranking-sync-badge" class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-100">동기화 대기중</span>
+            <span class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-100">실시간 동기화 중</span>
           </div>
           <div id="ranking-list" class="divide-y divide-slate-100/80 max-h-[600px] overflow-y-auto pr-2 space-y-1"></div>
         </div>
@@ -409,6 +417,7 @@
     </div>
   </div>
 
+  <!-- STREAMING_CHUNK:Initializing application logic... -->
   <script>
     let currentUserData = null;
     let dbUsers = {};
@@ -419,6 +428,13 @@
     let isStudying = false;
     let studyTimeSeconds = 0;
     let stopwatchInterval = null;
+
+    async function hashPassword(password) {
+      const msgBuffer = new TextEncoder().encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     function getLocalData(key, defaultValue) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : defaultValue; }
     function setLocalData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
@@ -492,21 +508,30 @@
       document.getElementById('user-display-name').innerText = currentUserData.name;
       document.getElementById('user-display-id').innerText = `(${currentUserData.userId})`;
       document.getElementById('user-display-studytime').innerText = formatTime(currentUserData.studyTime || 0);
-      document.getElementById('mypage-name').value = currentUserData.name; document.getElementById('mypage-pw').value = currentUserData.password;
+      document.getElementById('mypage-name').value = currentUserData.name;
       renderAttendanceStamps(); renderStudyCalendar(); renderAvatarGraphics(); updateAvatarUI();
     }
 
     function renderRanking() {
       const listContainer = document.getElementById('ranking-list'); listContainer.innerHTML = '';
-      const sortedUsers = Object.values(dbUsers).sort((a, b) => (b.studyTime || 0) - (a.studyTime || 0));
+      const validUsers = Object.values(dbUsers).filter(u => u && u.userId && u.name);
+      const sortedUsers = validUsers.sort((a, b) => (b.studyTime || 0) - (a.studyTime || 0));
+      
       if (sortedUsers.length === 0) {
         listContainer.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs font-semibold">등록된 사용자가 없습니다.</div>`;
         return;
       }
+
       sortedUsers.forEach((userItem, index) => {
         const row = document.createElement('div');
         row.className = `flex items-center justify-between py-3.5 px-4 rounded-2xl border-b border-slate-100 ${currentUserData && userItem.userId === currentUserData.userId ? 'bg-blue-50/60 font-bold border-blue-100' : ''}`;
-        row.innerHTML = `<div class="flex items-center gap-3"><span class="w-6 text-center font-black ${index === 0 ? 'text-amber-500 text-base' : index === 1 ? 'text-slate-400' : index === 2 ? 'text-amber-700' : 'text-slate-500'}">${index+1}</span><div><p class="text-sm font-bold text-slate-800">${userItem.name} <span class="text-[10px] text-slate-400 font-normal">(${userItem.userId})</span></p></div></div><div class="text-sm font-black text-blue-600">${formatTime(userItem.studyTime || 0)}</div>`;
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 text-center font-black ${index === 0 ? 'text-amber-500 text-base' : index === 1 ? 'text-slate-400' : index === 2 ? 'text-amber-700' : 'text-slate-500'}">${index+1}</span>
+            <div><p class="text-sm font-bold text-slate-800">${userItem.name}</p></div>
+          </div>
+          <div class="text-sm font-black text-blue-600">${formatTime(userItem.studyTime || 0)}</div>
+        `;
         listContainer.appendChild(row);
       });
     }
@@ -648,6 +673,27 @@
       window.showAlert("출석 체크 완료! 🎉");
     };
 
+    window.adminResetAccounts = function() {
+      if (confirm("모든 테스트 계정 및 랭킹 데이터를 초기화하시겠습니까?")) {
+        dbUsers = {};
+        localStorage.removeItem('school_db_users_gs');
+        localStorage.removeItem('school_user_session');
+        currentUserData = null;
+        renderRanking();
+        window.showAlert("테스트 계정 데이터가 초기화되었습니다.", "초기화 완료", "🧹");
+        setTimeout(() => location.reload(), 1000);
+      }
+    };
+
+    window.adminResetQuestions = function() {
+      if (confirm("질문마당의 모든 게시글을 삭제하시겠습니까?")) {
+        questions = [];
+        localStorage.removeItem('school_db_questions_gs');
+        renderBoardPosts();
+        window.showAlert("질문마당 게시글이 모두 삭제되었습니다.", "초기화 완료", "🧹");
+      }
+    };
+
     window.openWriteModal = function(open = true) {
       document.getElementById('modal-write-post').classList.toggle('hidden', !open);
       if (open) {
@@ -668,7 +714,14 @@
     };
 
     window.syncUsersFromDB = function(usersData) {
-      dbUsers = { ...dbUsers, ...usersData }; setLocalData('school_db_users_gs', dbUsers);
+      const cleaned = {};
+      Object.keys(usersData).forEach(k => {
+        if (usersData[k] && usersData[k].userId && usersData[k].name && usersData[k].passwordHash) {
+          cleaned[k] = usersData[k];
+        }
+      });
+      dbUsers = { ...cleaned }; 
+      setLocalData('school_db_users_gs', dbUsers);
       if (currentUserData && dbUsers[currentUserData.userId]) currentUserData = dbUsers[currentUserData.userId];
       renderRanking();
     };
@@ -691,10 +744,19 @@
         } else localStorage.removeItem('school_user_session');
       }
 
-      document.getElementById('login-form').onsubmit = function(e) {
-        e.preventDefault(); const id = document.getElementById('login-id').value.trim(); const pw = document.getElementById('login-pw').value;
+      document.getElementById('login-form').onsubmit = async function(e) {
+        e.preventDefault(); 
+        const id = document.getElementById('login-id').value.trim(); 
+        const rawPw = document.getElementById('login-pw').value;
+        const pwHash = await hashPassword(rawPw);
+
         dbUsers = { ...getLocalData('school_db_users_gs', {}) };
-        if (!dbUsers[id] || dbUsers[id].password !== pw) { window.showAuthAlert('아이디나 비밀번호가 일치하지 않습니다.', 'error'); return; }
+        
+        if (!dbUsers[id] || dbUsers[id].passwordHash !== pwHash) { 
+          window.showAuthAlert('아이디나 비밀번호가 일치하지 않습니다.', 'error'); 
+          return; 
+        }
+        
         currentUserData = dbUsers[id];
         if (currentUserData.avatar) avatarConfig = { gender: 'female', ...currentUserData.avatar };
         localStorage.setItem('school_user_session', JSON.stringify({ userId: id }));
@@ -704,18 +766,32 @@
 
       document.getElementById('register-form').onsubmit = async function(e) {
         e.preventDefault();
-        const id = document.getElementById('reg-id').value.trim(); const pw = document.getElementById('reg-pw').value;
+        const id = document.getElementById('reg-id').value.trim(); 
+        const rawPw = document.getElementById('reg-pw').value;
         dbUsers = { ...getLocalData('school_db_users_gs', {}) };
-        if (pw.length < 6) return window.showAuthAlert('비밀번호는 최소 6자 이상이어야 합니다.', 'error');
+        
+        if (rawPw.length < 6) return window.showAuthAlert('비밀번호는 최소 6자 이상이어야 합니다.', 'error');
         if (dbUsers[id]) return window.showAuthAlert('이미 사용중인 아이디입니다.', 'error');
         
+        const passwordHash = await hashPassword(rawPw);
+
         const newUserData = {
-          userId: id, password: pw, name: document.getElementById('reg-name').value.trim(), studentId: document.getElementById('reg-student-id').value.trim(),
+          userId: id, 
+          passwordHash: passwordHash,
+          name: document.getElementById('reg-name').value.trim(), 
+          studentId: document.getElementById('reg-student-id').value.trim(),
           studyTime: 0, attendanceDays: 0, attendanceDates: [], dailyStudy: {}, avatar: { ...avatarConfig }, createdAt: Date.now()
         };
-        dbUsers[id] = newUserData; setLocalData('school_db_users_gs', dbUsers);
-        if (window.fbSetDoc) { try { await window.fbSetDoc('school_accounts', id, newUserData); } catch (e) { } }
-        window.showAuthAlert('회원가입 완료! 로그인해 주세요.', 'success'); window.toggleAuthMode(false);
+        
+        dbUsers[id] = newUserData; 
+        setLocalData('school_db_users_gs', dbUsers);
+        
+        if (window.fbSetDoc) { 
+          try { await window.fbSetDoc('school_accounts', id, newUserData); } catch (e) { } 
+        }
+        
+        window.showAuthAlert('회원가입 완료! 로그인해 주세요.', 'success'); 
+        window.toggleAuthMode(false);
       };
 
       document.getElementById('btn-logout').onclick = async function() {
@@ -731,18 +807,31 @@
         if (!dbUsers[id]) {
           resBox.innerText = '존재하지 않는 아이디입니다.'; resBox.className = 'mt-4 p-4 bg-red-50 text-red-700 rounded-xl text-xs border border-red-100'; resBox.classList.remove('hidden'); return;
         }
-        resBox.innerHTML = `아이디 <strong>${id}</strong>님의 비밀번호가 등록된 이메일로 전송되었습니다.<br><span class="mt-2 block bg-emerald-100 p-2 rounded-lg text-emerald-900 font-bold">비밀번호 확인: ${dbUsers[id].password}</span>`;
-        resBox.className = 'mt-4 p-4 bg-emerald-50 text-emerald-900 rounded-xl text-xs border border-emerald-100'; resBox.classList.remove('hidden');
+        resBox.innerHTML = `아이디 <strong>${id}</strong>님의 비밀번호는 보안상 직접 안내가 불가합니다.<br>새 계정 생성이 필요하신 경우 관리자에게 문의하세요.`;
+        resBox.className = 'mt-4 p-4 bg-amber-50 text-amber-900 rounded-xl text-xs border border-amber-100'; resBox.classList.remove('hidden');
       };
 
       document.getElementById('mypage-info-form').onsubmit = async function(e) {
         e.preventDefault();
-        const newName = document.getElementById('mypage-name').value.trim(); const newPw = document.getElementById('mypage-pw').value;
-        if (newPw.length < 6) return window.showAlert("비밀번호는 최소 6자 이상이어야 합니다.");
-        currentUserData.name = newName; currentUserData.password = newPw;
-        dbUsers[currentUserData.userId].name = newName; dbUsers[currentUserData.userId].password = newPw;
-        setLocalData('school_db_users_gs', dbUsers); renderDashboard();
-        if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { name: newName, password: newPw }); } catch (err) {} }
+        const newName = document.getElementById('mypage-name').value.trim(); 
+        const rawNewPw = document.getElementById('mypage-pw').value;
+        
+        if (rawNewPw.length < 6) return window.showAlert("비밀번호는 최소 6자 이상이어야 합니다.");
+        
+        const newPwHash = await hashPassword(rawNewPw);
+
+        currentUserData.name = newName; 
+        currentUserData.passwordHash = newPwHash;
+        
+        dbUsers[currentUserData.userId].name = newName; 
+        dbUsers[currentUserData.userId].passwordHash = newPwHash;
+        
+        setLocalData('school_db_users_gs', dbUsers); 
+        renderDashboard();
+        
+        if (window.fbUpdateDoc) { 
+          try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { name: newName, passwordHash: newPwHash }); } catch (err) {} 
+        }
         window.showAlert("회원 정보가 성공적으로 변경되었습니다!", "수정 완료", "⚙️");
       };
 
@@ -771,14 +860,15 @@
     };
   </script>
 
+  <!-- ========================================================================= -->
+  <!-- [관리자 설정 영역] 본인의 파이어베이스 콘솔 설정 정보를 아래에 넣으세요! -->
+  <!-- ========================================================================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    /* =========================================================================
-     * [관리자 설정 영역] 본인이 만드신 파이어베이스 콘솔의 설정 정보를 아래에 넣으세요!
-     * ========================================================================= */
+    // 아래 빈 칸에 본인의 파이어베이스 프로젝트 정보를 입력하세요.
     const myFirebaseConfig = {
       apiKey: "AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s",
       authDomain: "gyeseong-codecraft-webpage.firebaseapp.com",
@@ -793,7 +883,7 @@
         const app = initializeApp(myFirebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'gyeseong-official-community'; // 전교생이 공용으로 쓸 고유 앱 ID
+        const appId = 'gyeseong-official-community'; // 전교생 공용 고유 앱 ID
 
         window.fbSetDoc = async (colName, docId, data) => {
           await setDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
@@ -802,26 +892,20 @@
           await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
         };
 
-        // 파이어베이스 익명 인증 연결
+        // 익명 인증 실행
         signInAnonymously(auth).then(() => {
-          const badge = document.getElementById('cloud-status-indicator');
-          if (badge) {
-            badge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200";
-            badge.innerText = "☁️ 클라우드 동기화 연결됨";
-          }
-          const rankingBadge = document.getElementById('ranking-sync-badge');
-          if (rankingBadge) {
-            rankingBadge.className = "px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-100";
-            rankingBadge.innerText = "실시간 동기화 중";
-          }
-
           onAuthStateChanged(auth, (user) => {
             if (!user) return;
             
             // 모든 계정 데이터 실시간 동기화 (랭킹보드용)
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_accounts'), (snapshot) => {
               const tempUsers = {}; 
-              snapshot.forEach(d => tempUsers[d.id] = d.data());
+              snapshot.forEach(d => {
+                const data = d.data();
+                if (data && data.userId && data.name) {
+                  tempUsers[d.id] = data;
+                }
+              });
               if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
             }, (err) => console.error(err));
             
