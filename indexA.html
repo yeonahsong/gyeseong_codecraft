@@ -767,56 +767,58 @@
     };
   </script>
 
+  <!-- 파이어베이스 연동 스크립트 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // 👇👇👇 여기에 파이어베이스 콘솔에서 복사한 설정값을 그대로 덮어쓰세요 👇👇👇
+    const firebaseConfig = {
+      apiKey: "AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s",
+      authDomain: "gyeseong-codecraft-webpage.firebaseapp.com",
+      projectId: "gyeseong-codecraft-webpage",
+      storageBucket: "gyeseong-codecraft-webpage.firebasestorage.app",
+      messagingSenderId: "282778032593",
+      appId: "1:282778032593:web:fba992e180d1284eb628f0"
+    };
+    // 👆👆👆 ----------------------------------------------------------- 👆👆👆
+
     try {
-      const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-      if (firebaseConfig && firebaseConfig.apiKey) {
+      if (firebaseConfig.apiKey !== "여기에_API_KEY_입력") {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'school-community-app';
 
         window.fbSetDoc = async (colName, docId, data) => {
-          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
+          await setDoc(doc(db, colName, docId), data);
         };
         window.fbUpdateDoc = async (colName, docId, data) => {
-          await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
+          await updateDoc(doc(db, colName, docId), data);
         };
 
-        const initAuth = async () => {
-          try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-              await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-              await signInAnonymously(auth);
-            }
-          } catch (e) {
-            console.error("Firebase Auth Error", e);
-          }
-        };
-
-        initAuth().then(() => {
+        signInAnonymously(auth).then(() => {
           onAuthStateChanged(auth, (user) => {
             if (!user) return;
             
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_accounts'), (snapshot) => {
+            // 랭킹 데이터 실시간 동기화
+            onSnapshot(collection(db, 'school_accounts'), (snapshot) => {
               const tempUsers = {}; snapshot.forEach(d => tempUsers[d.id] = d.data());
               if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
             }, (err) => console.error(err));
             
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_posts'), (snapshot) => {
+            // 질문마당 데이터 실시간 동기화
+            onSnapshot(collection(db, 'school_posts'), (snapshot) => {
               const list = []; snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
               if (window.syncPostsFromDB) window.syncPostsFromDB(list);
             }, (err) => console.error(err));
           });
-        });
+        }).catch(e => console.error("Firebase 인증 에러:", e));
+      } else {
+        console.log("Firebase 설정이 아직 입력되지 않아 로컬 모드로 작동합니다.");
       }
     } catch (e) {
-      console.log("Firebase connection bypassed. Local storage mode active.");
+      console.log("Firebase 연동 대기 중...", e);
     }
   </script>
 </body>
