@@ -234,7 +234,7 @@
         </div>
       </section>
 
-      <!-- STREAMING_CHUNK:Rendering mypage tab section with Admin Panel... -->
+      <!-- STREAMING_CHUNK:Rendering mypage tab section with Admin Password Protection... -->
       <section id="content-mypage" class="space-y-6 hidden">
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm mb-6">
           <h2 class="text-xl font-bold">나의 정보 및 마이페이지</h2>
@@ -264,12 +264,12 @@
           </div>
 
           <div class="lg:col-span-2 space-y-6">
-            <!-- 관리자용 테스트 데이터 초기화 패널 -->
+            <!-- 관리자 비밀번호 보호형 테스트 데이터 초기화 패널 -->
             <div class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200">
               <h3 class="text-base font-bold text-amber-900 mb-1 flex items-center gap-2">
-                <span>🛠️ 관리자 테스트 데이터 초기화 패널</span>
+                <span>🛠️ 관리자 전용 데이터 초기화 패널</span>
               </h3>
-              <p class="text-xs text-amber-700 mb-4">테스트 과정에서 생성된 불필요한 계정이나 질문들을 깔끔하게 삭제할 수 있습니다.</p>
+              <p class="text-xs text-amber-700 mb-4">데이터를 초기화하려면 관리자 비밀번호를 입력해야 합니다.</p>
               <div class="flex flex-wrap gap-3">
                 <button onclick="adminResetAccounts()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
                   <span>🗑️</span> 테스트 계정/랭킹 리셋
@@ -428,6 +428,9 @@
     let isStudying = false;
     let studyTimeSeconds = 0;
     let stopwatchInterval = null;
+
+    // 관리자 비밀번호 (원하시는 비밀번호로 아래 문자열을 수정하세요!)
+    const ADMIN_SECRET_PW = "admin2026";
 
     async function hashPassword(password) {
       const msgBuffer = new TextEncoder().encode(password);
@@ -673,25 +676,32 @@
       window.showAlert("출석 체크 완료! 🎉");
     };
 
+    // 관리자 비밀번호 확인 후 리셋 실행 함수
     window.adminResetAccounts = function() {
-      if (confirm("모든 테스트 계정 및 랭킹 데이터를 초기화하시겠습니까?")) {
-        dbUsers = {};
-        localStorage.removeItem('school_db_users_gs');
-        localStorage.removeItem('school_user_session');
-        currentUserData = null;
-        renderRanking();
-        window.showAlert("테스트 계정 데이터가 초기화되었습니다.", "초기화 완료", "🧹");
-        setTimeout(() => location.reload(), 1000);
+      const inputPw = prompt("관리자 비밀번호를 입력하세요:");
+      if (inputPw === null) return;
+      if (inputPw !== ADMIN_SECRET_PW) {
+        return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
       }
+      dbUsers = {};
+      localStorage.removeItem('school_db_users_gs');
+      localStorage.removeItem('school_user_session');
+      currentUserData = null;
+      renderRanking();
+      window.showAlert("테스트 계정 데이터가 초기화되었습니다.", "초기화 완료", "🧹");
+      setTimeout(() => location.reload(), 1000);
     };
 
     window.adminResetQuestions = function() {
-      if (confirm("질문마당의 모든 게시글을 삭제하시겠습니까?")) {
-        questions = [];
-        localStorage.removeItem('school_db_questions_gs');
-        renderBoardPosts();
-        window.showAlert("질문마당 게시글이 모두 삭제되었습니다.", "초기화 완료", "🧹");
+      const inputPw = prompt("관리자 비밀번호를 입력하세요:");
+      if (inputPw === null) return;
+      if (inputPw !== ADMIN_SECRET_PW) {
+        return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
       }
+      questions = [];
+      localStorage.removeItem('school_db_questions_gs');
+      renderBoardPosts();
+      window.showAlert("질문마당 게시글이 모두 삭제되었습니다.", "초기화 완료", "🧹");
     };
 
     window.openWriteModal = function(open = true) {
