@@ -423,7 +423,7 @@
     /* =========================================================================
      * 🔑 [관리자 비밀번호 설정 영역]
      * 전체 리셋 버튼을 누를 때 입력해야 하는 비밀번호입니다.
-     * 아래 따옴표 안의 "admin1234"를 원하시는 비밀번호로 변경하세요!
+     * 아래 따옴표 안의 "admin1234"를 원하시는 관리자 비밀번호로 변경하세요!
      * ========================================================================= */
     const ADMIN_SECRET_PW = "admin2026";
 
@@ -681,7 +681,7 @@
       window.showAlert("출석 체크 완료! 🎉");
     };
 
-    // 🔄 내 계정 포함 모든 사용자 계정 및 랭킹 데이터 전체 삭제 함수
+    // 🔄 내 계정 포함 모든 사용자 계정 전체 리셋 (관리자 비밀번호 필요)
     window.adminResetAccounts = async function() {
       const inputPw = prompt("관리자 비밀번호를 입력하세요:");
       if (inputPw === null) return;
@@ -689,7 +689,7 @@
         return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
       }
 
-      // 파이어베이스에 저장된 모든 사용자 문서 삭제
+      // 1. 파이어베이스에 저장된 모든 사용자 문서 일괄 삭제
       if (window.fbDeleteDoc && window.allUserIds) {
         try {
           for (const uid of window.allUserIds) {
@@ -700,12 +700,13 @@
         }
       }
 
-      // 로컬 스토리지 및 메모리 데이터 완전 초기화 (현재 로그인된 내 계정 포함)
+      // 2. 로컬 스토리지 및 메모리 데이터 완전 초기화 (내 로그인 세션 포함)
       dbUsers = {};
       localStorage.removeItem('school_db_users_gs');
       localStorage.removeItem('school_user_session');
       currentUserData = null;
 
+      // 3. 화면을 로그인 창으로 강제 전환
       document.getElementById('main-container').classList.add('hidden');
       document.getElementById('auth-container').classList.remove('hidden');
 
@@ -754,14 +755,17 @@
       });
       dbUsers = { ...cleaned }; 
       setLocalData('school_db_users_gs', dbUsers);
-      if (currentUserData && dbUsers[currentUserData.userId]) {
-        currentUserData = dbUsers[currentUserData.userId];
-      } else if (currentUserData && !dbUsers[currentUserData.userId]) {
-        // 만약 관리자에 의해 내 계정도 삭제되었다면 로그아웃 처리
-        currentUserData = null;
-        localStorage.removeItem('school_user_session');
-        document.getElementById('main-container').classList.add('hidden');
-        document.getElementById('auth-container').classList.remove('hidden');
+      
+      if (currentUserData) {
+        if (dbUsers[currentUserData.userId]) {
+          currentUserData = dbUsers[currentUserData.userId];
+        } else {
+          // 파이어베이스나 다른 곳에서 내 계정이 삭제된 경우 강제 로그아웃
+          currentUserData = null;
+          localStorage.removeItem('school_user_session');
+          document.getElementById('main-container').classList.add('hidden');
+          document.getElementById('auth-container').classList.remove('hidden');
+        }
       }
       renderRanking();
     };
@@ -971,3 +975,4 @@
   </script>
 </body>
 </html>
+```eof
