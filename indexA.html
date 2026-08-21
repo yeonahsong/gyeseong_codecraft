@@ -179,7 +179,7 @@
         </div>
       </section>
 
-      <!-- 미니 게임 탭 (내부 게임 실행 및 새창 열기 지원) -->
+      <!-- 미니 게임 탭 -->
       <section id="content-game" class="space-y-6 hidden">
         <!-- 게임 선택 메뉴 -->
         <div id="game-menu" class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center max-w-5xl mx-auto">
@@ -199,7 +199,6 @@
               <p class="text-[11px] text-slate-500 leading-relaxed">가상으로 구현된 학교를 돌아다니며 숨겨진 스탬프를 찾고 랭킹을 올려보세요!</p>
             </div>
 
-            <!-- 새로 교체한 슈팅게임 링크 -->
             <div onclick="openGame('https://lxurx1342-afk.github.io/shooting/')" class="bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-400 transition-all cursor-pointer rounded-2xl p-6 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
               <div class="absolute top-4 right-4 text-purple-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <span>클릭하여 시작</span>
@@ -209,7 +208,6 @@
               <p class="text-[11px] text-slate-500 leading-relaxed">다가오는 적들을 조준하고 물리치는 짜릿한 두뇌 풀가동 슈팅 게임입니다!</p>
             </div>
             
-            <!-- 새로 추가한 매직 디펜스 링크 -->
             <div onclick="openGame('https://lxurx1342-afk.github.io/magic-defense/')" class="bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-400 transition-all cursor-pointer rounded-2xl p-6 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
               <div class="absolute top-4 right-4 text-amber-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <span>클릭하여 시작</span>
@@ -408,6 +406,7 @@
     </div>
   </div>
 
+  <!-- 자바스크립트 기본 영역 -->
   <script>
     let currentUserData = null;
     let dbUsers = {};
@@ -663,8 +662,8 @@
       if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_posts', id, { replies: questions[idx].replies }); } catch (e) {} }
     };
 
+    // 🛡️ 보안 필터링: 파이어베이스에서 데이터를 받아올 때 민감 정보 삭제
     window.syncUsersFromDB = function(usersData) {
-      // 🛡️ 보안 업데이트: 클라우드에서 다른 사람의 데이터가 들어올 때 민감한 비밀번호 정보는 삭제!
       const safeUsersData = {};
       for (const key in usersData) {
         safeUsersData[key] = { ...usersData[key] };
@@ -673,7 +672,6 @@
           delete safeUsersData[key].password; 
         }
       }
-      
       dbUsers = { ...dbUsers, ...safeUsersData }; 
       setLocalData('school_db_users_gs', dbUsers);
       if (currentUserData && dbUsers[currentUserData.userId]) currentUserData = dbUsers[currentUserData.userId];
@@ -778,12 +776,13 @@
     };
   </script>
 
+  <!-- 파이어베이스 실시간 연동 영역 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 👇👇👇 여기에 본인의 파이어베이스 설정값을 복사해서 붙여넣으세요! 👇👇👇
+    // 👇 여기에 본인의 파이어베이스 설정값을 꼭 붙여넣으세요! 👇
     const firebaseConfig = {
       apiKey: "AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s",
       authDomain: "gyeseong-codecraft-webpage.firebaseapp.com",
@@ -792,16 +791,15 @@
       messagingSenderId: "282778032593",
       appId: "1:282778032593:web:fba992e180d1284eb628f0"
     };
-    // 👆👆👆 여기까지 👆👆👆
 
-    try {
-      // API 키를 정상적으로 넣었을 때만 진짜 파이어베이스 실행
-      if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "본인의_API_KEY") {
+    // 설정값이 안 들어갔으면 로컬 모드로 작동 (빨간 에러 방지용)
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "본인의_API_KEY") {
+      try {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 데이터를 저장하거나 수정할 때 에러가 나지 않도록 모두 병합(merge: true) 모드로 덮어쓰기
+        // 파이어베이스에 데이터를 덮어쓸 수 있도록 merge: true 추가!
         window.fbSetDoc = async (colName, docId, data) => {
           await setDoc(doc(db, colName, docId), data, { merge: true });
         };
@@ -809,37 +807,30 @@
           await setDoc(doc(db, colName, docId), data, { merge: true });
         };
 
-        // 익명 로그인 후 실시간 데이터 동기화 시작
         signInAnonymously(auth).then(() => {
           onAuthStateChanged(auth, (user) => {
             if (!user) return;
             
-            // 랭킹 및 유저 정보 실시간 가져오기
+            // 랭킹보드 동기화 
             onSnapshot(collection(db, 'school_accounts'), (snapshot) => {
               const tempUsers = {}; 
-              snapshot.forEach(d => {
-                const data = d.data();
-                // 🛡️ 보안: 남의 비밀번호는 내 브라우저로 가져오지 않고 삭제
-                if (window.currentUserData == null || d.id !== window.currentUserData.userId) {
-                  delete data.password;
-                }
-                tempUsers[d.id] = data;
-              });
+              snapshot.forEach(d => tempUsers[d.id] = d.data());
+              // 보안 필터링이 적용된 전역 함수로 데이터 전달
               if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
             }, (err) => console.error("랭킹 동기화 에러:", err));
             
-            // 질문마당 게시글 실시간 가져오기
+            // 질문마당 동기화
             onSnapshot(collection(db, 'school_posts'), (snapshot) => {
               const list = []; snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
               if (window.syncPostsFromDB) window.syncPostsFromDB(list);
-            }, (err) => console.error("질문마당 동기화 에러:", err));
+            }, (err) => console.error("질문 동기화 에러:", err));
           });
-        }).catch((e) => console.error("인증 에러:", e));
-      } else {
-        console.log("파이어베이스 설정값이 입력되지 않아 로컬(오프라인) 모드로 작동합니다.");
+        }).catch(e => console.error("Firebase Auth Error:", e));
+      } catch (e) {
+        console.error("Firebase 연동 에러:", e);
       }
-    } catch (e) {
-      console.error("Firebase 초기화 에러:", e);
+    } else {
+      console.log("파이어베이스 설정값이 입력되지 않아 오프라인 모드로 작동합니다.");
     }
   </script>
 </body>
