@@ -179,7 +179,7 @@
         </div>
       </section>
 
-      <!-- 미니 게임 탭 -->
+      <!-- 미니 게임 탭 (내부 게임 실행 및 새창 열기 지원) -->
       <section id="content-game" class="space-y-6 hidden">
         <!-- 게임 선택 메뉴 -->
         <div id="game-menu" class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center max-w-5xl mx-auto">
@@ -199,6 +199,7 @@
               <p class="text-[11px] text-slate-500 leading-relaxed">가상으로 구현된 학교를 돌아다니며 숨겨진 스탬프를 찾고 랭킹을 올려보세요!</p>
             </div>
 
+            <!-- 새로 교체한 슈팅게임 링크 -->
             <div onclick="openGame('https://lxurx1342-afk.github.io/shooting/')" class="bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-400 transition-all cursor-pointer rounded-2xl p-6 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
               <div class="absolute top-4 right-4 text-purple-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <span>클릭하여 시작</span>
@@ -208,6 +209,7 @@
               <p class="text-[11px] text-slate-500 leading-relaxed">다가오는 적들을 조준하고 물리치는 짜릿한 두뇌 풀가동 슈팅 게임입니다!</p>
             </div>
             
+            <!-- 새로 추가한 매직 디펜스 링크 -->
             <div onclick="openGame('https://lxurx1342-afk.github.io/magic-defense/')" class="bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-400 transition-all cursor-pointer rounded-2xl p-6 flex flex-col items-center text-center group shadow-sm relative overflow-hidden">
               <div class="absolute top-4 right-4 text-amber-500 font-bold bg-white px-2 py-1 rounded text-[10px] shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <span>클릭하여 시작</span>
@@ -406,7 +408,6 @@
     </div>
   </div>
 
-  <!-- 자바스크립트 기본 영역 -->
   <script>
     let currentUserData = null;
     let dbUsers = {};
@@ -662,14 +663,13 @@
       if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_posts', id, { replies: questions[idx].replies }); } catch (e) {} }
     };
 
-    // 🛡️ 보안 필터링: 파이어베이스에서 데이터를 받아올 때 민감 정보 삭제
     window.syncUsersFromDB = function(usersData) {
+      console.log("📥 파이어베이스에서 유저 목록 수신:", usersData);
       const safeUsersData = {};
       for (const key in usersData) {
         safeUsersData[key] = { ...usersData[key] };
-        // 현재 로그인한 내 계정이 아닌 '다른 사람'의 정보라면 비밀번호를 브라우저에서 날려버림
         if (currentUserData == null || key !== currentUserData.userId) {
-          delete safeUsersData[key].password; 
+          delete safeUsersData[key].password;
         }
       }
       dbUsers = { ...dbUsers, ...safeUsersData }; 
@@ -683,6 +683,7 @@
     };
 
     window.onload = function() {
+      console.log("🚀 웹사이트 로드 완료");
       renderSubjectFilters(); updateAvatarUI();
       dbUsers = { ...getLocalData('school_db_users_gs', {}) }; questions = getLocalData('school_db_questions_gs', []); renderBoardPosts();
       
@@ -697,9 +698,21 @@
       }
 
       document.getElementById('login-form').onsubmit = function(e) {
-        e.preventDefault(); const id = document.getElementById('login-id').value.trim(); const pw = document.getElementById('login-pw').value;
+        e.preventDefault();
+        const id = document.getElementById('login-id').value.trim();
+        const pw = document.getElementById('login-pw').value;
+        console.log("🔑 로그인 버튼 클릭됨! 입력 아이디:", id);
+        
         dbUsers = { ...getLocalData('school_db_users_gs', {}) };
-        if (!dbUsers[id] || dbUsers[id].password !== pw) { window.showAuthAlert('아이디나 비밀번호가 일치하지 않습니다.', 'error'); return; }
+        console.log("📂 현재 내 브라우저에 저장된 DB 목록:", dbUsers);
+
+        if (!dbUsers[id] || dbUsers[id].password !== pw) {
+          console.warn("⚠️ 로그인 실패: 아이디가 없거나 비밀번호가 틀림");
+          window.showAuthAlert('아이디나 비밀번호가 일치하지 않습니다.', 'error');
+          return;
+        }
+
+        console.log("🎉 로그인 성공!");
         currentUserData = dbUsers[id];
         if (currentUserData.avatar) avatarConfig = { gender: 'female', ...currentUserData.avatar };
         localStorage.setItem('school_user_session', JSON.stringify({ userId: id }));
@@ -719,7 +732,8 @@
           studyTime: 0, attendanceDays: 0, attendanceDates: [], dailyStudy: {}, avatar: { ...avatarConfig }, createdAt: Date.now()
         };
         dbUsers[id] = newUserData; setLocalData('school_db_users_gs', dbUsers);
-        if (window.fbSetDoc) { try { await window.fbSetDoc('school_accounts', id, newUserData); } catch (e) { } }
+        console.log("💾 회원가입 정보 저장됨:", newUserData);
+        if (window.fbSetDoc) { try { await window.fbSetDoc('school_accounts', id, newUserData); } catch (e) { console.error("서버 저장 실패", e); } }
         window.showAuthAlert('회원가입 완료! 로그인해 주세요.', 'success'); window.toggleAuthMode(false);
       };
 
@@ -737,7 +751,7 @@
           resBox.innerText = '존재하지 않는 아이디입니다.'; resBox.className = 'mt-4 p-4 bg-red-50 text-red-700 rounded-xl text-xs border border-red-100'; resBox.classList.remove('hidden'); return;
         }
         resBox.innerHTML = `아이디 <strong>${id}</strong>님의 비밀번호가 등록된 이메일로 전송되었습니다.<br><span class="mt-2 block bg-emerald-100 p-2 rounded-lg text-emerald-900 font-bold">비밀번호 확인: ${dbUsers[id].password}</span>`;
-        resBox.className = 'mt-4 p-4 bg-emerald-50 text-emerald-900 rounded-xl text-xs border border-emerald-100'; resBox.classList.remove('hidden');
+        resBox.className = 'mt-4 p-4 bg-emerald-50 text-emerald-900 rounded-xl text-xs border border-emerald-100'; resBox.classList..remove('hidden');
       };
 
       document.getElementById('mypage-info-form').onsubmit = async function(e) {
@@ -776,13 +790,12 @@
     };
   </script>
 
-  <!-- 파이어베이스 연동 영역 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 👇 여기에 본인의 파이어베이스 설정값을 꼭 붙여넣으세요! 👇
+    // 💡 여기에 본인의 파이어베이스 설정을 넣어주세요!
     const firebaseConfig = {
       apiKey: "AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s",
       authDomain: "gyeseong-codecraft-webpage.firebaseapp.com",
@@ -792,42 +805,44 @@
       appId: "1:282778032593:web:fba992e180d1284eb628f0"
     };
 
-    // 설정값이 들어갔을 때만 파이어베이스 연동을 시도하도록 방어
     if (firebaseConfig.apiKey !== "본인의_API_KEY") {
       try {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 저장 경로를 복잡한 AI 테스트용에서 실제 배포용으로 깔끔하게 변경
         window.fbSetDoc = async (colName, docId, data) => {
           await setDoc(doc(db, colName, docId), data, { merge: true });
         };
         window.fbUpdateDoc = async (colName, docId, data) => {
-          await setDoc(doc(db, colName, docId), data, { merge: true });
+          await updateDoc(doc(db, colName, docId), data);
         };
 
         signInAnonymously(auth).then(() => {
+          console.log("🔥 Firebase 익명 인증 성공!");
           onAuthStateChanged(auth, (user) => {
             if (!user) return;
             
             onSnapshot(collection(db, 'school_accounts'), (snapshot) => {
-              const tempUsers = {}; snapshot.forEach(d => tempUsers[d.id] = d.data());
+              const tempUsers = {};
+              snapshot.forEach(d => tempUsers[d.id] = d.data());
               if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
-            }, (err) => console.error("동기화 에러:", err));
+            }, (err) => console.error("accounts sync error:", err));
             
             onSnapshot(collection(db, 'school_posts'), (snapshot) => {
-              const list = []; snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
+              const list = [];
+              snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
               if (window.syncPostsFromDB) window.syncPostsFromDB(list);
-            }, (err) => console.error("동기화 에러:", err));
+            }, (err) => console.error("posts sync error:", err));
           });
-        }).catch(e => console.error("인증 에러:", e));
+        }).catch(e => console.error("Firebase auth error:", e));
       } catch (e) {
-        console.error("Firebase 연결 에러:", e);
+        console.error("Firebase init error:", e);
       }
     } else {
-      console.log("설정값이 없어 로컬 모드로 작동합니다.");
+      console.log("ℹ️ firebaseConfig 설정값이 비어있어 로컬 저장소 모드로 작동합니다.");
     }
   </script>
 </body>
 </html>
+```eof
