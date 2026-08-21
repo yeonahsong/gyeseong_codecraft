@@ -28,60 +28,19 @@
     </div>
   </div>
 
-  <!-- 파이어베이스 프로젝트 설정 모달 -->
-  <div id="modal-firebase" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-      <h3 class="text-lg font-black text-slate-800 mb-2">⚙️ 파이어베이스(Firebase) 프로젝트 설정</h3>
-      <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-        본인의 파이어베이스 콘솔에서 복사한 프로젝트 설정 정보를 입력해주세요. 입력 후 저장하면 익명 인증 및 실시간 클라우드 모드가 활성화됩니다.
-      </p>
-      <form id="firebase-config-form" class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">apiKey</label>
-          <input type="text" id="fb-apikey" placeholder="AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s" class="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 font-mono" required>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">authDomain</label>
-          <input type="text" id="fb-authdomain" placeholder="gyeseong-codecraft-webpage.firebaseapp.com" class="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 font-mono">
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">projectId</label>
-          <input type="text" id="fb-projectid" placeholder="gyeseong-codecraft-webpage" class="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 font-mono" required>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">storageBucket</label>
-          <input type="text" id="fb-storagebucket" placeholder="gyeseong-codecraft-webpage.firebasestorage.app" class="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 font-mono">
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">messagingSenderId</label>
-          <input type="text" id="fb-messagingsenderid" placeholder="282778032593" class="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 font-mono">
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">appId</label>
-          <input type="text" id="fb-appid" placeholder="1:282778032593:web:fba992e180d1284eb628f0" class="w-full px-3 py-2 border rounded-lg text-xs bg-slate-50 font-mono">
-        </div>
-        <div class="flex gap-2 pt-2">
-          <button type="submit" class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 shadow-sm">설정 저장 및 익명 인증 연결</button>
-          <button type="button" onclick="toggleFirebaseModal(false)" class="px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-200">닫기</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- 비로그인 화면 (로그인 / 회원가입) -->
   <div id="auth-container" class="flex-1 flex flex-col justify-center items-center p-4">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 relative">
-      <button onclick="toggleFirebaseModal(true)" class="absolute top-6 right-6 text-xs text-blue-600 font-bold bg-blue-50 px-2.5 py-1.5 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1">
-        <span>⚙️</span> Firebase 설정
-      </button>
+      <div class="absolute top-6 right-6">
+        <span id="cloud-status-indicator" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+          ⚠️ 클라우드 연결 대기중
+        </span>
+      </div>
 
       <div class="text-center mb-8">
         <span class="text-4xl">🏫</span>
         <h1 class="text-2xl font-black text-slate-800 mt-3">계성고등학교 소통광장</h1>
         <p class="text-sm text-slate-500 mt-1">학생 모두가 함께 공부하고 질문하는 공간</p>
-        <div id="cloud-status-badge" class="inline-block mt-3 px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">
-          ⚠️ 로컬 모드 (우측 상단 'Firebase 설정'을 통해 내 프로젝트 연결 가능)
-        </div>
       </div>
 
       <div id="auth-alert-box" class="mb-4 p-3 rounded-lg text-sm font-semibold hidden"></div>
@@ -283,9 +242,8 @@
 
       <!-- 마이페이지 탭 -->
       <section id="content-mypage" class="space-y-6 hidden">
-        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm mb-6 flex justify-between items-center">
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm mb-6">
           <h2 class="text-xl font-bold">나의 정보 및 마이페이지</h2>
-          <button onclick="toggleFirebaseModal(true)" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs font-bold transition-all">⚙️ Firebase 설정 변경</button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -387,7 +345,7 @@
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-lg font-bold text-slate-800">🏆 전교생 열공 랭킹보드</h2>
-            <span id="sync-status-indicator" class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-100">로컬 모드</span>
+            <span id="ranking-sync-badge" class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-100">동기화 대기중</span>
           </div>
           <div id="ranking-list" class="divide-y divide-slate-100/80 max-h-[600px] overflow-y-auto pr-2 space-y-1"></div>
         </div>
@@ -451,11 +409,7 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+  <script>
     let currentUserData = null;
     let dbUsers = {};
     let questions = [];
@@ -465,12 +419,6 @@
     let isStudying = false;
     let studyTimeSeconds = 0;
     let stopwatchInterval = null;
-
-    let firebaseApp = null;
-    let firestoreDb = null;
-    let firebaseAuth = null;
-    let isCloudActive = false;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'school-community-app';
 
     function getLocalData(key, defaultValue) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : defaultValue; }
     function setLocalData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
@@ -499,21 +447,6 @@
       document.getElementById('find-pw-result').classList.add('hidden');
     };
 
-    window.toggleFirebaseModal = function(open) {
-      document.getElementById('modal-firebase').classList.toggle('hidden', !open);
-      if (open) {
-        const savedCfg = getLocalData('custom_fb_config', null);
-        if (savedCfg) {
-          document.getElementById('fb-apikey').value = savedCfg.apiKey || '';
-          document.getElementById('fb-authdomain').value = savedCfg.authDomain || '';
-          document.getElementById('fb-projectid').value = savedCfg.projectId || '';
-          document.getElementById('fb-storagebucket').value = savedCfg.storageBucket || '';
-          document.getElementById('fb-messagingsenderid').value = savedCfg.messagingSenderId || '';
-          document.getElementById('fb-appid').value = savedCfg.appId || '';
-        }
-      }
-    };
-
     window.switchTab = function(tabName) {
       ['home', 'board', 'timer', 'ranking', 'mypage', 'game'].forEach(name => {
         const section = document.getElementById(`content-${name}`);
@@ -532,9 +465,13 @@
       document.getElementById('game-canvas-area').classList.remove('hidden');
       document.getElementById('game-iframe').src = url;
       document.getElementById('new-tab-link').href = url;
+      
       setTimeout(() => {
         const iframe = document.getElementById('game-iframe');
-        if(iframe) { iframe.focus(); if(iframe.contentWindow) iframe.contentWindow.focus(); }
+        if(iframe) {
+            iframe.focus();
+            if(iframe.contentWindow) iframe.contentWindow.focus();
+        }
       }, 300);
     };
 
@@ -668,9 +605,7 @@
       if (!currentUserData) return;
       currentUserData.avatar = { ...avatarConfig }; dbUsers[currentUserData.userId].avatar = { ...avatarConfig };
       setLocalData('school_db_users_gs', dbUsers); renderAvatarGraphics();
-      if (isCloudActive && firestoreDb) {
-        try { await setDoc(doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_accounts', currentUserData.userId), currentUserData); } catch (e) {}
-      }
+      if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { avatar: avatarConfig }); } catch (e) { } }
       window.showAlert("선택하신 캐릭터가 내 프로필로 적용되었습니다!", "캐릭터 저장 완료", "🎨");
     };
 
@@ -697,8 +632,8 @@
       document.getElementById('user-display-studytime').innerText = formatTime(accumulated);
       renderStudyCalendar(); renderRanking();
       
-      if (isCloudActive && firestoreDb) {
-        try { await setDoc(doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_accounts', currentUserData.userId), currentUserData); } catch (e) {}
+      if (window.fbUpdateDoc) {
+        try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { studyTime: accumulated, dailyStudy: currentUserData.dailyStudy }); } catch (e) { }
       }
       studyTimeSeconds = 0; document.getElementById('timer-status').innerText = '준비 완료'; document.getElementById('btn-timer-toggle').innerHTML = '⏱️ 측정 시작하기';
     }
@@ -709,9 +644,7 @@
       if (currentUserData.attendanceDates.includes(todayStr)) return window.showAlert("오늘은 이미 출석체크를 완료했습니다!");
       currentUserData.attendanceDates.push(todayStr); currentUserData.attendanceDays = (currentUserData.attendanceDays || 0) + 1;
       dbUsers[currentUserData.userId] = currentUserData; setLocalData('school_db_users_gs', dbUsers); renderAttendanceStamps();
-      if (isCloudActive && firestoreDb) {
-        try { await setDoc(doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_accounts', currentUserData.userId), currentUserData); } catch (e) {}
-      }
+      if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { attendanceDays: currentUserData.attendanceDays, attendanceDates: currentUserData.attendanceDates }); } catch (e) {} }
       window.showAlert("출석 체크 완료! 🎉");
     };
 
@@ -731,70 +664,22 @@
       if (!questions[idx].replies) questions[idx].replies = [];
       questions[idx].replies.push({ id: crypto.randomUUID(), authorId: currentUserData.userId, content: val, createdAt: Date.now() });
       setLocalData('school_db_questions_gs', questions); renderBoardPosts();
-      if (isCloudActive && firestoreDb) {
-        try { await setDoc(doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_posts', id), questions[idx]); } catch (e) {}
-      }
+      if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_posts', id, { replies: questions[idx].replies }); } catch (e) {} }
     };
 
-    function initFirebase(cfg) {
-      try {
-        firebaseApp = initializeApp(cfg);
-        firebaseAuth = getAuth(firebaseApp);
-        firestoreDb = getFirestore(firebaseApp);
+    window.syncUsersFromDB = function(usersData) {
+      dbUsers = { ...dbUsers, ...usersData }; setLocalData('school_db_users_gs', dbUsers);
+      if (currentUserData && dbUsers[currentUserData.userId]) currentUserData = dbUsers[currentUserData.userId];
+      renderRanking();
+    };
 
-        signInAnonymously(firebaseAuth).then(() => {
-          isCloudActive = true;
-          document.getElementById('cloud-status-badge').className = 'inline-block mt-3 px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200';
-          document.getElementById('cloud-status-badge').innerText = '☁️ Firebase 익명 인증 연결 완료 (실시간 동기화 중)';
-          document.getElementById('sync-status-indicator').className = 'px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-100';
-          document.getElementById('sync-status-indicator').innerText = '실시간 동기화 중';
-
-          onSnapshot(collection(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_accounts'), (snapshot) => {
-            const tempUsers = {}; snapshot.forEach(d => tempUsers[d.id] = d.data());
-            dbUsers = { ...dbUsers, ...tempUsers }; setLocalData('school_db_users_gs', dbUsers);
-            if (currentUserData && dbUsers[currentUserData.userId]) {
-              currentUserData = dbUsers[currentUserData.userId];
-              document.getElementById('user-display-studytime').innerText = formatTime(currentUserData.studyTime || 0);
-            }
-            renderRanking();
-          }, (err) => console.error(err));
-
-          onSnapshot(collection(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_posts'), (snapshot) => {
-            const list = []; snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
-            list.sort((a, b) => b.createdAt - a.createdAt); questions = list; setLocalData('school_db_questions_gs', questions); renderBoardPosts();
-          }, (err) => console.error(err));
-
-        }).catch(err => {
-          window.showAlert("Firebase 익명 인증 실패: " + err.message, "연결 오류");
-        });
-      } catch (e) {
-        window.showAlert("Firebase 초기화 실패. 입력값을 확인해주세요.", "설정 오류");
-      }
-    }
+    window.syncPostsFromDB = function(postsData) {
+      postsData.sort((a, b) => b.createdAt - a.createdAt); questions = postsData; setLocalData('school_db_questions_gs', questions); renderBoardPosts();
+    };
 
     window.onload = function() {
       renderSubjectFilters(); updateAvatarUI();
       dbUsers = { ...getLocalData('school_db_users_gs', {}) }; questions = getLocalData('school_db_questions_gs', []); renderBoardPosts();
-
-      const savedCfg = getLocalData('custom_fb_config', null);
-      if (savedCfg && savedCfg.apiKey) { initFirebase(savedCfg); }
-
-      document.getElementById('firebase-config-form').onsubmit = function(e) {
-        e.preventDefault();
-        const cfg = {
-          apiKey: document.getElementById('fb-apikey').value.trim(),
-          authDomain: document.getElementById('fb-authdomain').value.trim(),
-          projectId: document.getElementById('fb-projectid').value.trim(),
-          storageBucket: document.getElementById('fb-storagebucket').value.trim(),
-          messagingSenderId: document.getElementById('fb-messagingsenderid').value.trim(),
-          appId: document.getElementById('fb-appid').value.trim()
-        };
-        if (!cfg.apiKey || !cfg.projectId) return window.showAlert("API Key와 Project ID는 필수 입력 항목입니다.");
-        setLocalData('custom_fb_config', cfg);
-        toggleFirebaseModal(false);
-        initFirebase(cfg);
-        window.showAlert("Firebase 설정이 저장되었습니다. 잠시 후 익명 인증으로 연결됩니다.", "설정 완료", "⚙️");
-      };
       
       const savedSession = localStorage.getItem('school_user_session');
       if (savedSession) {
@@ -829,9 +714,7 @@
           studyTime: 0, attendanceDays: 0, attendanceDates: [], dailyStudy: {}, avatar: { ...avatarConfig }, createdAt: Date.now()
         };
         dbUsers[id] = newUserData; setLocalData('school_db_users_gs', dbUsers);
-        if (isCloudActive && firestoreDb) {
-          try { await setDoc(doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_accounts', id), newUserData); } catch (e) {}
-        }
+        if (window.fbSetDoc) { try { await window.fbSetDoc('school_accounts', id, newUserData); } catch (e) { } }
         window.showAuthAlert('회원가입 완료! 로그인해 주세요.', 'success'); window.toggleAuthMode(false);
       };
 
@@ -858,10 +741,8 @@
         if (newPw.length < 6) return window.showAlert("비밀번호는 최소 6자 이상이어야 합니다.");
         currentUserData.name = newName; currentUserData.password = newPw;
         dbUsers[currentUserData.userId].name = newName; dbUsers[currentUserData.userId].password = newPw;
-        setLocalData('school_db_users_gs', dbUsers); renderDashboard(); renderRanking();
-        if (isCloudActive && firestoreDb) {
-          try { await setDoc(doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_accounts', currentUserData.userId), currentUserData); } catch (e) {}
-        }
+        setLocalData('school_db_users_gs', dbUsers); renderDashboard();
+        if (window.fbUpdateDoc) { try { await window.fbUpdateDoc('school_accounts', currentUserData.userId, { name: newName, password: newPw }); } catch (err) {} }
         window.showAlert("회원 정보가 성공적으로 변경되었습니다!", "수정 완료", "⚙️");
       };
 
@@ -874,9 +755,7 @@
         if (!title || !content) return window.showAlert("제목과 내용을 확인해주세요.");
         const newPost = { id: crypto.randomUUID(), title, content, subject, image: base64Img, authorId: currentUserData.userId, authorName: '익명', createdAt: Date.now(), replies: [] };
         questions.unshift(newPost); setLocalData('school_db_questions_gs', questions); renderBoardPosts();
-        if (isCloudActive && firestoreDb) {
-          try { await setDoc(doc(firestoreDb, 'artifacts', appId, 'public', 'data', 'school_posts', newPost.id), newPost); } catch (e) {}
-        }
+        if (window.fbSetDoc) { try { await window.fbSetDoc('school_posts', newPost.id, newPost); } catch (e) {} }
         window.openWriteModal(false); window.showAlert("질문이 등록되었습니다!", "등록 완료", "🎉");
       };
       
@@ -890,6 +769,78 @@
         }
       };
     };
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    /* =========================================================================
+     * [관리자 설정 영역] 본인이 만드신 파이어베이스 콘솔의 설정 정보를 아래에 넣으세요!
+     * ========================================================================= */
+    const myFirebaseConfig = {
+      apiKey: "AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s",
+      authDomain: "gyeseong-codecraft-webpage.firebaseapp.com",
+      projectId: "gyeseong-codecraft-webpage",
+      storageBucket: "gyeseong-codecraft-webpage.firebasestorage.app",
+      messagingSenderId: "282778032593",
+      appId: "1:282778032593:web:fba992e180d1284eb628f0"
+    };
+
+    try {
+      if (myFirebaseConfig.apiKey && myFirebaseConfig.apiKey !== "YOUR_API_KEY") {
+        const app = initializeApp(myFirebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'gyeseong-official-community'; // 전교생이 공용으로 쓸 고유 앱 ID
+
+        window.fbSetDoc = async (colName, docId, data) => {
+          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
+        };
+        window.fbUpdateDoc = async (colName, docId, data) => {
+          await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
+        };
+
+        // 파이어베이스 익명 인증 연결
+        signInAnonymously(auth).then(() => {
+          const badge = document.getElementById('cloud-status-indicator');
+          if (badge) {
+            badge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200";
+            badge.innerText = "☁️ 클라우드 동기화 연결됨";
+          }
+          const rankingBadge = document.getElementById('ranking-sync-badge');
+          if (rankingBadge) {
+            rankingBadge.className = "px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-100";
+            rankingBadge.innerText = "실시간 동기화 중";
+          }
+
+          onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+            
+            // 모든 계정 데이터 실시간 동기화 (랭킹보드용)
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_accounts'), (snapshot) => {
+              const tempUsers = {}; 
+              snapshot.forEach(d => tempUsers[d.id] = d.data());
+              if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
+            }, (err) => console.error(err));
+            
+            // 질문 마당 데이터 실시간 동기화
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_posts'), (snapshot) => {
+              const list = []; 
+              snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
+              if (window.syncPostsFromDB) window.syncPostsFromDB(list);
+            }, (err) => console.error(err));
+          });
+        }).catch(err => {
+          console.error("익명 인증 실패:", err);
+        });
+      } else {
+        console.log("파이어베이스 설정 정보가 입력되지 않았습니다. 로컬 모드로 동작합니다.");
+      }
+    } catch (e) {
+      console.error("Firebase 초기화 중 오류 발생:", e);
+    }
   </script>
 </body>
 </html>
