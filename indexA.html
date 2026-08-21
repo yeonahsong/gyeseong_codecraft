@@ -16,7 +16,7 @@
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
 
-  <!-- STREAMING_CHUNK:Rendering custom alert modal... -->
+  <!-- 커스텀 알림 모달 -->
   <div id="custom-alert" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center animate-in fade-in duration-200">
       <span class="text-3xl text-blue-500 block mb-2" id="alert-icon">📢</span>
@@ -28,7 +28,7 @@
     </div>
   </div>
 
-  <!-- STREAMING_CHUNK:Rendering auth container... -->
+  <!-- 비로그인 화면 (로그인 / 회원가입) -->
   <div id="auth-container" class="flex-1 flex flex-col justify-center items-center p-4">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
       <div class="text-center mb-8">
@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <!-- STREAMING_CHUNK:Rendering main dashboard layout... -->
+  <!-- 메인 대시보드 화면 -->
   <div id="main-container" class="hidden flex-1 flex flex-col">
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
       <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -115,7 +115,7 @@
 
     <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">
       
-      <!-- STREAMING_CHUNK:Rendering home tab section... -->
+      <!-- 홈 화면 탭 -->
       <section id="content-home" class="space-y-6">
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm">
           <h2 class="text-xl font-bold">계성고 소통광장에 오신 것을 환영합니다!</h2>
@@ -179,7 +179,7 @@
         </div>
       </section>
 
-      <!-- STREAMING_CHUNK:Rendering mini games tab section... -->
+      <!-- 미니 게임 탭 -->
       <section id="content-game" class="space-y-6 hidden">
         <div id="game-menu" class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center max-w-5xl mx-auto">
           <h2 class="text-2xl font-black text-slate-800 mb-2">🎮 미니 게임 & 활동</h2>
@@ -234,7 +234,7 @@
         </div>
       </section>
 
-      <!-- STREAMING_CHUNK:Rendering mypage tab section with Admin Password Protection... -->
+      <!-- 마이페이지 탭 -->
       <section id="content-mypage" class="space-y-6 hidden">
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-sm mb-6">
           <h2 class="text-xl font-bold">나의 정보 및 마이페이지</h2>
@@ -264,15 +264,15 @@
           </div>
 
           <div class="lg:col-span-2 space-y-6">
-            <!-- 관리자 비밀번호 보호형 테스트 데이터 초기화 패널 -->
+            <!-- 관리자 전용 데이터 초기화 패널 -->
             <div class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200">
               <h3 class="text-base font-bold text-amber-900 mb-1 flex items-center gap-2">
                 <span>🛠️ 관리자 전용 데이터 초기화 패널</span>
               </h3>
-              <p class="text-xs text-amber-700 mb-4">데이터를 초기화하려면 관리자 비밀번호를 입력해야 합니다.</p>
+              <p class="text-xs text-amber-700 mb-4">전체 계정과 랭킹 데이터를 초기화하려면 관리자 비밀번호를 입력해야 합니다.</p>
               <div class="flex flex-wrap gap-3">
                 <button onclick="adminResetAccounts()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
-                  <span>🗑️</span> 테스트 계정/랭킹 리셋
+                  <span>🗑️</span> 전체 계정/랭킹 리셋
                 </button>
                 <button onclick="adminResetQuestions()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
                   <span>📝</span> 질문마당 게시글 전체 삭제
@@ -327,7 +327,7 @@
         </div>
       </section>
 
-      <!-- STREAMING_CHUNK:Rendering board and ranking sections... -->
+      <!-- 질문마당 탭 -->
       <section id="content-board" class="space-y-6 hidden">
         <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between gap-4">
           <div><h2 class="text-lg font-bold text-slate-800">익명 질문 마당</h2></div>
@@ -337,6 +337,7 @@
         <div id="board-posts" class="space-y-4"></div>
       </section>
 
+      <!-- 스톱워치 탭 -->
       <section id="content-timer" class="space-y-6 hidden">
         <div class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-slate-100 max-w-xl mx-auto flex flex-col items-center">
           <h2 class="text-xl font-bold text-slate-800 mb-2">🔥 계품타 스톱워치</h2>
@@ -349,6 +350,7 @@
         </div>
       </section>
 
+      <!-- 랭킹보드 탭 -->
       <section id="content-ranking" class="space-y-6 hidden">
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div class="flex justify-between items-center mb-6">
@@ -417,8 +419,14 @@
     </div>
   </div>
 
-  <!-- STREAMING_CHUNK:Initializing application logic... -->
   <script>
+    /* =========================================================================
+     * 🔑 [관리자 설정 영역 1] 관리자 비밀번호 변경
+     * 마이페이지에서 전체 초기화 버튼을 누를 때 묻는 비밀번호입니다.
+     * 아래 "admin1234" 부분을 원하시는 비밀번호로 변경하세요!
+     * ========================================================================= */
+    const ADMIN_SECRET_PW = "admin2026";
+
     let currentUserData = null;
     let dbUsers = {};
     let questions = [];
@@ -428,9 +436,6 @@
     let isStudying = false;
     let studyTimeSeconds = 0;
     let stopwatchInterval = null;
-
-    // 관리자 비밀번호 (원하시는 비밀번호로 아래 문자열을 수정하세요!)
-    const ADMIN_SECRET_PW = "admin2026";
 
     async function hashPassword(password) {
       const msgBuffer = new TextEncoder().encode(password);
@@ -451,6 +456,7 @@
     window.showAuthAlert = function(msg, type = 'error') {
       const box = document.getElementById('auth-alert-box'); box.innerText = (type === 'error' ? '⚠️ ' : '🎉 ') + msg;
       box.className = `mb-4 p-3 rounded-xl text-sm font-bold shadow-sm ${type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
+      box.classList.add('block');
       box.classList.remove('hidden');
     };
 
@@ -676,19 +682,31 @@
       window.showAlert("출석 체크 완료! 🎉");
     };
 
-    // 관리자 비밀번호 확인 후 리셋 실행 함수
-    window.adminResetAccounts = function() {
+    // 🔄 모든 사용자 계정 전체 리셋 (관리자 비밀번호 필요)
+    window.adminResetAccounts = async function() {
       const inputPw = prompt("관리자 비밀번호를 입력하세요:");
       if (inputPw === null) return;
       if (inputPw !== ADMIN_SECRET_PW) {
         return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
       }
+
       dbUsers = {};
       localStorage.removeItem('school_db_users_gs');
       localStorage.removeItem('school_user_session');
       currentUserData = null;
+
+      if (window.fbDeleteDoc && window.allUserIds) {
+        try {
+          for (const uid of window.allUserIds) {
+            await window.fbDeleteDoc('school_accounts', uid);
+          }
+        } catch (e) {
+          console.error("Firestore 계정 일괄 삭제 오류:", e);
+        }
+      }
+
       renderRanking();
-      window.showAlert("테스트 계정 데이터가 초기화되었습니다.", "초기화 완료", "🧹");
+      window.showAlert("모든 사용자의 계정과 랭킹 기록이 완전히 리셋되었습니다.", "전체 초기화 완료", "🧹");
       setTimeout(() => location.reload(), 1000);
     };
 
@@ -701,7 +719,7 @@
       questions = [];
       localStorage.removeItem('school_db_questions_gs');
       renderBoardPosts();
-      window.showAlert("질문마당 게시글이 모두 삭제되었습니다.", "초기화 완료", "🧹");
+      window.showAlert("질문마당의 모든 게시글이 삭제되었습니다.", "초기화 완료", "🧹");
     };
 
     window.openWriteModal = function(open = true) {
@@ -725,6 +743,7 @@
 
     window.syncUsersFromDB = function(usersData) {
       const cleaned = {};
+      window.allUserIds = Object.keys(usersData);
       Object.keys(usersData).forEach(k => {
         if (usersData[k] && usersData[k].userId && usersData[k].name && usersData[k].passwordHash) {
           cleaned[k] = usersData[k];
@@ -871,14 +890,15 @@
   </script>
 
   <!-- ========================================================================= -->
-  <!-- [관리자 설정 영역] 본인의 파이어베이스 콘솔 설정 정보를 아래에 넣으세요! -->
+  <!-- ⚙️ [관리자 설정 영역 2] 파이어베이스 프로젝트 정보 입력 구간 -->
+  <!-- 아래 myFirebaseConfig 안에 본인의 파이어베이스 콘솔 정보를 넣어주세요! -->
   <!-- ========================================================================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 아래 빈 칸에 본인의 파이어베이스 프로젝트 정보를 입력하세요.
+    // 👇 아래 정보 칸에 선생님의 Firebase 프로젝트 정보를 입력하세요.
     const myFirebaseConfig = {
       apiKey: "AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s",
       authDomain: "gyeseong-codecraft-webpage.firebaseapp.com",
@@ -900,6 +920,9 @@
         };
         window.fbUpdateDoc = async (colName, docId, data) => {
           await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId), data);
+        };
+        window.fbDeleteDoc = async (colName, docId) => {
+          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', colName, docId));
         };
 
         // 익명 인증 실행
