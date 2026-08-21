@@ -664,7 +664,18 @@
     };
 
     window.syncUsersFromDB = function(usersData) {
-      dbUsers = { ...dbUsers, ...usersData }; setLocalData('school_db_users_gs', dbUsers);
+      // 🛡️ 보안 업데이트: 클라우드에서 다른 사람의 데이터가 들어올 때 민감한 비밀번호 정보는 삭제!
+      const safeUsersData = {};
+      for (const key in usersData) {
+        safeUsersData[key] = { ...usersData[key] };
+        // 현재 로그인한 내 계정이 아닌 '다른 사람'의 정보라면 비밀번호를 브라우저에서 날려버림
+        if (currentUserData == null || key !== currentUserData.userId) {
+          delete safeUsersData[key].password; 
+        }
+      }
+      
+      dbUsers = { ...dbUsers, ...safeUsersData }; 
+      setLocalData('school_db_users_gs', dbUsers);
       if (currentUserData && dbUsers[currentUserData.userId]) currentUserData = dbUsers[currentUserData.userId];
       renderRanking();
     };
@@ -797,7 +808,8 @@
       };
       window.fbUpdateDoc = async (colName, docId, data) => {
         if (firebaseConfig.apiKey === "본인의_API_KEY") return;
-        try { await updateDoc(doc(db, colName, docId), data); } catch (e) { console.warn("업데이트 안 됨 (로컬 모드)"); }
+        // updateDoc 대신 setDoc(..., { merge: true })를 사용하면 기존 로컬 계정도 클라우드에 자동 생성됩니다!
+        try { await setDoc(doc(db, colName, docId), data, { merge: true }); } catch (e) { console.warn("업데이트 안 됨 (로컬 모드)", e); }
       };
 
       const initAuth = async () => {
