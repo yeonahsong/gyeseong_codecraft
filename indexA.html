@@ -778,14 +778,12 @@
     };
   </script>
 
-  <!-- 파이어베이스 연동 영역 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- [여기에 붙여넣으세요] ---
-    // 아래 firebaseConfig 변수 내용을 파이어베이스 콘솔에서 복사한 값으로 바꾸세요
+    // 👇👇👇 여기에 본인의 파이어베이스 설정값을 복사해서 붙여넣으세요! 👇👇👇
     const firebaseConfig = {
       apiKey: "AIzaSyC9gh86JUmYDO5YGnY031jjKxqoqM7Cq5s",
       authDomain: "gyeseong-codecraft-webpage.firebaseapp.com",
@@ -794,61 +792,54 @@
       messagingSenderId: "282778032593",
       appId: "1:282778032593:web:fba992e180d1284eb628f0"
     };
-    // ----------------------------
+    // 👆👆👆 여기까지 👆👆👆
 
     try {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
+      // API 키를 정상적으로 넣었을 때만 진짜 파이어베이스 실행
+      if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "본인의_API_KEY") {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-      // 데이터 저장 위치를 진짜 데이터베이스로 고정
-      window.fbSetDoc = async (colName, docId, data) => {
-        if (firebaseConfig.apiKey === "본인의_API_KEY") return;
-        try { await setDoc(doc(db, colName, docId), data); } catch (e) { console.warn("저장 안 됨 (로컬 모드)"); }
-      };
-      window.fbUpdateDoc = async (colName, docId, data) => {
-        if (firebaseConfig.apiKey === "본인의_API_KEY") return;
-        // updateDoc 대신 setDoc(..., { merge: true })를 사용하면 기존 로컬 계정도 클라우드에 자동 생성됩니다!
-        try { await setDoc(doc(db, colName, docId), data, { merge: true }); } catch (e) { console.warn("업데이트 안 됨 (로컬 모드)", e); }
-      };
+        // 데이터를 저장하거나 수정할 때 에러가 나지 않도록 모두 병합(merge: true) 모드로 덮어쓰기
+        window.fbSetDoc = async (colName, docId, data) => {
+          await setDoc(doc(db, colName, docId), data, { merge: true });
+        };
+        window.fbUpdateDoc = async (colName, docId, data) => {
+          await setDoc(doc(db, colName, docId), data, { merge: true });
+        };
 
-      const initAuth = async () => {
-        // API 키를 아직 넣지 않았다면 에러를 띄우지 않고 안전하게 멈춤 (로컬 모드로 작동)
-        if (firebaseConfig.apiKey === "본인의_API_KEY" || !firebaseConfig.apiKey) {
-          console.warn("💡 파이어베이스 정보가 아직 입력되지 않아 임시 로컬 모드로 작동합니다.");
-          return;
-        }
-        
-        try {
-          await signInAnonymously(auth);
-        } catch (e) {
-          console.warn("💡 테스트 환경이거나 도메인 승인이 안 되어 임시 로컬 모드로 작동합니다.");
-        }
-      };
-
-      initAuth().then(() => {
-        onAuthStateChanged(auth, (user) => {
-          if (!user) return;
-          
-          // 전교생 랭킹 데이터 실시간 동기화
-          onSnapshot(collection(db, 'school_accounts'), (snapshot) => {
-            const tempUsers = {}; snapshot.forEach(d => tempUsers[d.id] = d.data());
-            if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
-          }, (err) => {
-            console.warn("랭킹 동기화 대기 중...");
+        // 익명 로그인 후 실시간 데이터 동기화 시작
+        signInAnonymously(auth).then(() => {
+          onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+            
+            // 랭킹 및 유저 정보 실시간 가져오기
+            onSnapshot(collection(db, 'school_accounts'), (snapshot) => {
+              const tempUsers = {}; 
+              snapshot.forEach(d => {
+                const data = d.data();
+                // 🛡️ 보안: 남의 비밀번호는 내 브라우저로 가져오지 않고 삭제
+                if (window.currentUserData == null || d.id !== window.currentUserData.userId) {
+                  delete data.password;
+                }
+                tempUsers[d.id] = data;
+              });
+              if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
+            }, (err) => console.error("랭킹 동기화 에러:", err));
+            
+            // 질문마당 게시글 실시간 가져오기
+            onSnapshot(collection(db, 'school_posts'), (snapshot) => {
+              const list = []; snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
+              if (window.syncPostsFromDB) window.syncPostsFromDB(list);
+            }, (err) => console.error("질문마당 동기화 에러:", err));
           });
-          
-          // 질문마당 데이터 실시간 동기화
-          onSnapshot(collection(db, 'school_posts'), (snapshot) => {
-            const list = []; snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
-            if (window.syncPostsFromDB) window.syncPostsFromDB(list);
-          }, (err) => {
-            console.warn("질문마당 동기화 대기 중...");
-          });
-        });
-      });
+        }).catch((e) => console.error("인증 에러:", e));
+      } else {
+        console.log("파이어베이스 설정값이 입력되지 않아 로컬(오프라인) 모드로 작동합니다.");
+      }
     } catch (e) {
-      console.warn("Firebase 연동 대기 중 (임시 로컬 모드 활성화)");
+      console.error("Firebase 초기화 에러:", e);
     }
   </script>
 </body>
