@@ -269,7 +269,7 @@
               <h3 class="text-base font-bold text-amber-900 mb-1 flex items-center gap-2">
                 <span>🛠️ 관리자 전용 데이터 초기화 패널</span>
               </h3>
-              <p class="text-xs text-amber-700 mb-4">전체 계정과 랭킹 데이터를 초기화하려면 관리자 비밀번호를 입력해야 합니다.</p>
+              <p class="text-xs text-amber-700 mb-4">내 계정을 포함하여 등록된 <strong>모든 학생의 계정과 랭킹 기록</strong>을 완전히 삭제합니다.</p>
               <div class="flex flex-wrap gap-3">
                 <button onclick="adminResetAccounts()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
                   <span>🗑️</span> 전체 계정/랭킹 리셋
@@ -421,9 +421,9 @@
 
   <script>
     /* =========================================================================
-     * 🔑 [관리자 설정 영역 1] 관리자 비밀번호 변경
-     * 마이페이지에서 전체 초기화 버튼을 누를 때 묻는 비밀번호입니다.
-     * 아래 "admin1234" 부분을 원하시는 비밀번호로 변경하세요!
+     * 🔑 [관리자 비밀번호 설정 영역]
+     * 전체 리셋 버튼을 누를 때 입력해야 하는 비밀번호입니다.
+     * 아래 따옴표 안의 "admin1234"를 원하시는 비밀번호로 변경하세요!
      * ========================================================================= */
     const ADMIN_SECRET_PW = "admin2026";
 
@@ -456,7 +456,6 @@
     window.showAuthAlert = function(msg, type = 'error') {
       const box = document.getElementById('auth-alert-box'); box.innerText = (type === 'error' ? '⚠️ ' : '🎉 ') + msg;
       box.className = `mb-4 p-3 rounded-xl text-sm font-bold shadow-sm ${type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
-      box.classList.add('block');
       box.classList.remove('hidden');
     };
 
@@ -682,7 +681,7 @@
       window.showAlert("출석 체크 완료! 🎉");
     };
 
-    // 🔄 모든 사용자 계정 전체 리셋 (관리자 비밀번호 필요)
+    // 🔄 내 계정 포함 모든 사용자 계정 및 랭킹 데이터 전체 삭제 함수
     window.adminResetAccounts = async function() {
       const inputPw = prompt("관리자 비밀번호를 입력하세요:");
       if (inputPw === null) return;
@@ -690,11 +689,7 @@
         return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
       }
 
-      dbUsers = {};
-      localStorage.removeItem('school_db_users_gs');
-      localStorage.removeItem('school_user_session');
-      currentUserData = null;
-
+      // 파이어베이스에 저장된 모든 사용자 문서 삭제
       if (window.fbDeleteDoc && window.allUserIds) {
         try {
           for (const uid of window.allUserIds) {
@@ -705,9 +700,17 @@
         }
       }
 
+      // 로컬 스토리지 및 메모리 데이터 완전 초기화 (현재 로그인된 내 계정 포함)
+      dbUsers = {};
+      localStorage.removeItem('school_db_users_gs');
+      localStorage.removeItem('school_user_session');
+      currentUserData = null;
+
+      document.getElementById('main-container').classList.add('hidden');
+      document.getElementById('auth-container').classList.remove('hidden');
+
       renderRanking();
-      window.showAlert("모든 사용자의 계정과 랭킹 기록이 완전히 리셋되었습니다.", "전체 초기화 완료", "🧹");
-      setTimeout(() => location.reload(), 1000);
+      window.showAlert("내 계정을 포함하여 모든 사용자의 계정과 랭킹 기록이 완전히 삭제되었습니다.", "전체 초기화 완료", "🧹");
     };
 
     window.adminResetQuestions = function() {
@@ -751,7 +754,15 @@
       });
       dbUsers = { ...cleaned }; 
       setLocalData('school_db_users_gs', dbUsers);
-      if (currentUserData && dbUsers[currentUserData.userId]) currentUserData = dbUsers[currentUserData.userId];
+      if (currentUserData && dbUsers[currentUserData.userId]) {
+        currentUserData = dbUsers[currentUserData.userId];
+      } else if (currentUserData && !dbUsers[currentUserData.userId]) {
+        // 만약 관리자에 의해 내 계정도 삭제되었다면 로그아웃 처리
+        currentUserData = null;
+        localStorage.removeItem('school_user_session');
+        document.getElementById('main-container').classList.add('hidden');
+        document.getElementById('auth-container').classList.remove('hidden');
+      }
       renderRanking();
     };
 
@@ -890,8 +901,7 @@
   </script>
 
   <!-- ========================================================================= -->
-  <!-- ⚙️ [관리자 설정 영역 2] 파이어베이스 프로젝트 정보 입력 구간 -->
-  <!-- 아래 myFirebaseConfig 안에 본인의 파이어베이스 콘솔 정보를 넣어주세요! -->
+  <!-- ⚙️ [관리자 설정 영역] 파이어베이스 프로젝트 정보 입력 구간 -->
   <!-- ========================================================================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
