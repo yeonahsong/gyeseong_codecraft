@@ -264,7 +264,7 @@
           </div>
 
           <div class="lg:col-span-2 space-y-6">
-            <!-- 관리자 전용 데이터 초기화 패널 -->
+            <!-- 관리자 전용 데이터 초기화 패널 (계정 리셋만 남김) -->
             <div class="bg-amber-50 p-6 rounded-2xl shadow-sm border border-amber-200">
               <h3 class="text-base font-bold text-amber-900 mb-1 flex items-center gap-2">
                 <span>🛠️ 관리자 전용 데이터 초기화 패널</span>
@@ -273,9 +273,6 @@
               <div class="flex flex-wrap gap-3">
                 <button onclick="adminResetAccounts()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
                   <span>🗑️</span> 전체 계정/랭킹 리셋
-                </button>
-                <button onclick="adminResetQuestions()" class="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center gap-1.5">
-                  <span>📝</span> 질문마당 게시글 전체 삭제
                 </button>
               </div>
             </div>
@@ -422,8 +419,6 @@
   <script>
     /* =========================================================================
      * 🔑 [관리자 비밀번호 설정 영역]
-     * 전체 리셋 버튼을 누를 때 입력해야 하는 비밀번호입니다.
-     * 아래 따옴표 안의 "admin1234"를 원하시는 관리자 비밀번호로 변경하세요!
      * ========================================================================= */
     const ADMIN_SECRET_PW = "admin2026";
 
@@ -593,7 +588,7 @@
         let imgHtml = q.image ? `<img src="${q.image}" class="mt-2 rounded-xl max-h-48 object-cover">` : '';
         
         card.innerHTML = `
-          <div class="flex justify-between border-b pb-3 border-slate-100">
+          <div class="flex justify-between items-center border-b pb-3 border-slate-100">
             <div><span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">${q.subject}</span> <span class="text-xs font-bold ml-2 text-slate-500">👤 익명</span></div>
             <span class="text-[10px] text-slate-400">${new Date(q.createdAt).toLocaleString()}</span>
           </div>
@@ -681,7 +676,6 @@
       window.showAlert("출석 체크 완료! 🎉");
     };
 
-    // 🔄 모든 사용자 계정 전체 리셋 (관리자 비밀번호 필요)
     window.adminResetAccounts = async function() {
       const inputPw = prompt("관리자 비밀번호를 입력하세요:");
       if (inputPw === null) return;
@@ -708,33 +702,7 @@
       document.getElementById('auth-container').classList.remove('hidden');
 
       renderRanking();
-      window.showAlert("내 계정을 포함하여 모든 사용자의 계정과 랭킹 기록이 완전히 삭제되었습니다.", "전체 초기화 완료", "🧹");
-    };
-
-    // 📝 질문마당 전체 게시글 영구 삭제 (서버 데이터 포함 완벽 초기화)
-    window.adminResetQuestions = async function() {
-      const inputPw = prompt("관리자 비밀번호를 입력하세요:");
-      if (inputPw === null) return;
-      if (inputPw !== ADMIN_SECRET_PW) {
-        return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
-      }
-
-      // 파이어베이스(Firestore)에 등록된 모든 게시글 문서를 확실하게 개별 삭제
-      if (window.fbDeleteDoc && window.allPostIds && window.allPostIds.length > 0) {
-        try {
-          for (const pid of window.allPostIds) {
-            await window.fbDeleteDoc('school_posts', pid);
-          }
-        } catch (e) {
-          console.error("Firestore 게시물 일괄 삭제 오류:", e);
-        }
-      }
-
-      questions = [];
-      window.allPostIds = [];
-      localStorage.removeItem('school_db_questions_gs');
-      renderBoardPosts();
-      window.showAlert("질문마당의 모든 게시글이 영구 삭제되었습니다.", "초기화 완료", "🧹");
+      window.showAlert("모든 사용자의 계정과 랭킹 기록이 완전히 삭제되었습니다.", "전체 초기화 완료", "🧹");
     };
 
     window.openWriteModal = function(open = true) {
@@ -771,7 +739,6 @@
         if (dbUsers[currentUserData.userId]) {
           currentUserData = dbUsers[currentUserData.userId];
         } else {
-          // 파이어베이스나 다른 곳에서 내 계정이 삭제된 경우 강제 로그아웃
           currentUserData = null;
           localStorage.removeItem('school_user_session');
           document.getElementById('main-container').classList.add('hidden');
@@ -782,7 +749,10 @@
     };
 
     window.syncPostsFromDB = function(postsData) {
-      postsData.sort((a, b) => b.createdAt - a.createdAt); questions = postsData; setLocalData('school_db_questions_gs', questions); renderBoardPosts();
+      postsData.sort((a, b) => b.createdAt - a.createdAt); 
+      questions = postsData; 
+      setLocalData('school_db_questions_gs', questions); 
+      renderBoardPosts();
     };
 
     window.onload = function() {
@@ -898,9 +868,16 @@
         const base64Img = imgContainer.classList.contains('hidden') ? '' : document.getElementById('image-preview').src;
         if (!title || !content) return window.showAlert("제목과 내용을 확인해주세요.");
         const newPost = { id: crypto.randomUUID(), title, content, subject, image: base64Img, authorId: currentUserData.userId, authorName: '익명', createdAt: Date.now(), replies: [] };
-        questions.unshift(newPost); setLocalData('school_db_questions_gs', questions); renderBoardPosts();
-        if (window.fbSetDoc) { try { await window.fbSetDoc('school_posts', newPost.id, newPost); } catch (e) {} }
-        window.openWriteModal(false); window.showAlert("질문이 등록되었습니다!", "등록 완료", "🎉");
+        
+        questions.unshift(newPost); 
+        setLocalData('school_db_questions_gs', questions); 
+        renderBoardPosts();
+        
+        if (window.fbSetDoc) { 
+          try { await window.fbSetDoc('school_posts', newPost.id, newPost); } catch (e) {} 
+        }
+        window.openWriteModal(false); 
+        window.showAlert("질문이 등록되었습니다!", "등록 완료", "🎉");
       };
       
       document.getElementById('post-image-file').onchange = function(e) {
@@ -967,7 +944,7 @@
               if (window.syncUsersFromDB) window.syncUsersFromDB(tempUsers);
             }, (err) => console.error(err));
             
-            // 질문 마당 데이터 실시간 동기화
+            // 질문 마당 데이터 실시간 동기화 (서버에 남아있는 실시간 목록 반영)
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'school_posts'), (snapshot) => {
               const list = []; 
               snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
@@ -986,4 +963,3 @@
   </script>
 </body>
 </html>
-```eof
