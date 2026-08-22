@@ -681,7 +681,7 @@
       window.showAlert("출석 체크 완료! 🎉");
     };
 
-    // 🔄 내 계정 포함 모든 사용자 계정 전체 리셋 (관리자 비밀번호 필요)
+    // 🔄 모든 사용자 계정 전체 리셋 (관리자 비밀번호 필요)
     window.adminResetAccounts = async function() {
       const inputPw = prompt("관리자 비밀번호를 입력하세요:");
       if (inputPw === null) return;
@@ -689,7 +689,6 @@
         return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
       }
 
-      // 1. 파이어베이스에 저장된 모든 사용자 문서 일괄 삭제
       if (window.fbDeleteDoc && window.allUserIds) {
         try {
           for (const uid of window.allUserIds) {
@@ -700,13 +699,11 @@
         }
       }
 
-      // 2. 로컬 스토리지 및 메모리 데이터 완전 초기화 (내 로그인 세션 포함)
       dbUsers = {};
       localStorage.removeItem('school_db_users_gs');
       localStorage.removeItem('school_user_session');
       currentUserData = null;
 
-      // 3. 화면을 로그인 창으로 강제 전환
       document.getElementById('main-container').classList.add('hidden');
       document.getElementById('auth-container').classList.remove('hidden');
 
@@ -714,16 +711,30 @@
       window.showAlert("내 계정을 포함하여 모든 사용자의 계정과 랭킹 기록이 완전히 삭제되었습니다.", "전체 초기화 완료", "🧹");
     };
 
-    window.adminResetQuestions = function() {
+    // 📝 질문마당 전체 게시글 영구 삭제 (서버 데이터 포함 완벽 초기화)
+    window.adminResetQuestions = async function() {
       const inputPw = prompt("관리자 비밀번호를 입력하세요:");
       if (inputPw === null) return;
       if (inputPw !== ADMIN_SECRET_PW) {
         return window.showAlert("관리자 비밀번호가 일치하지 않습니다!", "권한 거부", "⚠️");
       }
+
+      // 파이어베이스(Firestore)에 등록된 모든 게시글 문서를 확실하게 개별 삭제
+      if (window.fbDeleteDoc && window.allPostIds && window.allPostIds.length > 0) {
+        try {
+          for (const pid of window.allPostIds) {
+            await window.fbDeleteDoc('school_posts', pid);
+          }
+        } catch (e) {
+          console.error("Firestore 게시물 일괄 삭제 오류:", e);
+        }
+      }
+
       questions = [];
+      window.allPostIds = [];
       localStorage.removeItem('school_db_questions_gs');
       renderBoardPosts();
-      window.showAlert("질문마당의 모든 게시글이 삭제되었습니다.", "초기화 완료", "🧹");
+      window.showAlert("질문마당의 모든 게시글이 영구 삭제되었습니다.", "초기화 완료", "🧹");
     };
 
     window.openWriteModal = function(open = true) {
